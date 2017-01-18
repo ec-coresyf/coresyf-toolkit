@@ -23,12 +23,16 @@ It uses the GDAL raster utility program "gdal_translate.py" to split the bands
 of an input raster into different output raster files.  
 
 @example:
-Example 1 - Generate different raster images for all bands of the input raster
-            file:
-./coresyf_image_splitting.py -r image_2bands.tif -o band.tif --all_bands 
+Example 1.1 - Generate different raster images for all bands of the input raster
+              file (providing basename for output files):
+./coresyf_image_splitting.py -r image_2bands.tif -o band.tif --all_bands
+
+Example 1.2 - Generate different raster images for all bands of the input raster
+              file (providing all output file names):
+./coresyf_image_splitting.py -r image_2bands.tif -o band_1.tif band_2.tif --all_bands 
 
 Example 2 - Generate raster image only for 2nd band of the input raster file:
-./coresyf_image_splitting.py -r image_2bands.tif --r_band=2 -o band.tif
+./coresyf_image_splitting.py -r image_2bands.tif --r_band=2 -o band_2.tif
  
 @attention: 
  
@@ -44,7 +48,7 @@ Example 2 - Generate raster image only for 2nd band of the input raster file:
 VERSION = '1.0'
 USAGE   = ( "\n"
             "coresyf_image_splitting.py [-r <InputMultiBandRaster>] [--r_band=<Value>]\n"
-            "                           [-o <OutputRaster>] [--o_format=<OutputFileFormat>]\n"
+            "                           [-o <Outputbasename> OR <Output1> <Output2> ...] [--o_format=<OutputFileFormat>]\n"
             "                           [--o_type=<DataType>] [--no_data_value=<Value>]\n"
             "                           [--all_bands]"
             "\n")
@@ -76,7 +80,7 @@ def main():
                       type=int )
     parser.add_option('-o', 
                       dest="output_raster", metavar=' ',
-                      help=("basename for output files, where each one corresponds "
+                      help=("basename or all names of output files, where each one corresponds "
                             "to a separate band of the input raster file (default: 'image_band.tif')"),
                       default="image_band.tif")
     parser.add_option('--o_format', 
@@ -123,11 +127,19 @@ def main():
     #================================#   
     r_bandsIDs = [opts.raster_band]
     output_files = [opts.output_raster]
+    
+    # Add remaining args to list of output rasters
+    if len(args) > 0:
+        output_files.extend(args)
+    
     if opts.all_bands:
         try:
             r_bands = gdal.Open(opts.input_raster, gdal.GA_ReadOnly).RasterCount    
             r_bandsIDs = [i for i in range(1, r_bands+1)]
-            output_files = [str(i) + '_' + opts.output_raster for i in range(1, r_bands+1)]
+            
+            if len(output_files) != r_bands:
+                print ("Creating output file names from output basename...")
+                output_files = [str(i) + '_' + opts.output_raster for i in range(1, r_bands+1)]
         except:
             print ("Unable to determine the number of bands of the input file!")
             sys.exit(1)    
@@ -151,7 +163,7 @@ def main():
             output_opts += '-a_nodata %d ' % (opts.no_data_value)
 
         gdal_translate_command = gdal_exe + raster_opts + output_opts
-
+        
         #------------------------------------#
         #  Run gdal_translate command line   #
         #------------------------------------#

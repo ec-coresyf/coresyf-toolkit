@@ -36,17 +36,17 @@ level areas) to the input raster to create a masked image with only the
 regions of interest.  
 
 Example 1 - Calculate masked image using a mask:
-./coresyf_image_mask.py -r etopo_raster.tif -m image_mask.tif 
-                        -o masked_image.tiff 
+./coresyf_image_mask.py -r etopo_raster.tif -m mask_ocean.tif 
+                        -o masked_image.tif 
 
 Example 2 - Create a mask on the fly (with elevations below 0)
             and calculate masked image:
 ./coresyf_image_mask.py -r etopo_raster.tif -m etopo_raster.tif 
-                       --m_range=:0  -o masked_image_onTheFly.tiff
+                       --m_range=:0  -o masked_image_onTheFly.tif
 
 Example 3 - Create a mask on the fly (with elevations above 1000)
             and calculate masked image for all raster bands:
-./coresyf_image_mask.py -r multiBandImg.tif -m multiBandImg.tif --m_range=1000:
+./coresyf_image_mask.py -r multiBandImage.tif -m multiBandImage.tif --m_range=1000:
                         -o multiBand_maskedImg.tif --all_bands            
 
 @attention: 
