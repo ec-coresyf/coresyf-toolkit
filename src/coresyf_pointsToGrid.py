@@ -35,10 +35,8 @@ Example 1 - Create a raster TIFF from a shapefile with point measurements. The
                         
 Example 2 - Create a raster TIFF from a text file with a list of comma separated
             X, Y, Z values (.CSV file) with a virtual dataset header (.VRT file).
-            X and Y coordinates are being taken from geometry and the pixel 
-            values are being taken from the "elev" field.
-./coresyf_pointsToGrid.py -s dem.vrt -a nearest
-                          -o elev_raster_nearest.tif --o_xsize=500 --o_ysize=500
+./coresyf_pointsToGrid.py -s points.vrt -a nearest
+                          -o elev_raster_nearest_pts.tif --o_xsize=500 --o_ysize=500
 
 @attention: 
   - The interpolation algorithm "nearest" seems to yield good results. Explore
