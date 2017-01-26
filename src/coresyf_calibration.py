@@ -18,7 +18,7 @@
 """ SYSTEM MODULES """
 import subprocess
 import sys
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 '''
 @summary: 
@@ -68,7 +68,7 @@ Example 3 - Create a mask on the fly (with elevations above 1000)
 
 VERSION = '1.0'
 USAGE = ("\n"
-         "coresyf_calibration.py [-Ssource=<file>] [--PauxFile=<string>]\n"
+         "coresyf_calibration.py [--Ssource=<file>] [--PauxFile=<string>]\n"
          "                      [--PcreateBetaBand <boolean>] [--PcreateGammaBand <boolean>]\n"
          "                      [--PexternalAuxFile <file>] [--PoutputBetaBand <boolean>]\n"
          "                      [--PoutputGammaBand <boolean>] [--PoutputImageInComplex <boolean>]\n"
@@ -79,71 +79,75 @@ USAGE = ("\n"
 
 DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
 
+def parameter(prefix, value):
+    format = ("--%s=\"%s\"" if isinstance(value, basestring) else "--%s=%s")
+    return format % (prefix, value)
+
 
 def main():
-    parser = OptionParser(usage=USAGE,
+    parser = ArgumentParser(usage=USAGE,
                           version=VERSION)
 
     # ==============================#
     # Define command line options  #
     # ==============================#
-    parser.add_option('--Ssource',
+    parser.add_argument('--Ssource',
                       dest="source", metavar='<filepath>',
                       help="Sets source 'source' to <filepath>", )
-    parser.add_option('--PauxFile',
-                      dest="aux_file", metavar='<string>',
+    parser.add_argument('--PauxFile',
+                      dest="PauxFile", metavar='<string>',
                       help="Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File', "
                            "'External Auxiliary File'.",
                       default="Latest Auxiliary File")
-    parser.add_option('--PcreateBetaBand',
-                      dest="create_beta_band", metavar='<boolean>',
+    parser.add_argument('--PcreateBetaBand',
+                      dest="PcreateBetaBand", metavar='<boolean>',
                       help="Create beta0 virtual band.",
                       type=bool,
                       default=False)
-    parser.add_option('--PcreateGammaBand',
-                      dest="create_gamma_band", metavar=' ',
+    parser.add_argument('--PcreateGammaBand',
+                      dest="PcreateGammaBand", metavar=' ',
                       help="Create gamma0 virtual band.",
                       default=False,
                       type=bool)
-    parser.add_option('--PexternalAuxFile',
-                      dest="external_aux_file", metavar='<file>.',
+    parser.add_argument('--PexternalAuxFile',
+                      dest="PexternalAuxFile", metavar='<file>.',
                       help="The antenna elevation pattern gain auxiliary data file.")
-    parser.add_option('--PoutputBetaBand',
-                      dest="output_beta_band", metavar='<boolean>',
+    parser.add_argument('--PoutputBetaBand',
+                      dest="PoutputBetaBand", metavar='<boolean>',
                       help="Output beta0 band.",
                       type=bool,
                       default=False)
-    parser.add_option('--PoutputGammaBand',
-                      dest="output_gamma_band", metavar='<boolean>',
+    parser.add_argument('--PoutputGammaBand',
+                      dest="PoutputGammaBand", metavar='<boolean>',
                       help="Output gamma0 band.",
                       type=bool,
                       default=False)
-    parser.add_option('--PoutputImageInComplex',
-                      dest="output_image_in_complex", metavar='<boolean>',
+    parser.add_argument('--PoutputImageInComplex',
+                      dest="PoutputImageInComplex", metavar='<boolean>',
                       help="Output image in complex.",
                       type=bool,
                       default=False)
-    parser.add_option('--PoutputImageScaleInDb',
-                      dest="output_image_in_scale_db", metavar='<boolean>',
+    parser.add_argument('--PoutputImageScaleInDb',
+                      dest="PoutputImageScaleInDb", metavar='<boolean>',
                       help="Output image scale.",
                       type=bool,
                       default=False)
-    parser.add_option("--PoutputSigma",
-                      dest="output_sigma",
+    parser.add_argument("--PoutputSigma",
+                      dest="PoutputSigma",
                       help="Output sigma0 band.",
                       type=bool,
                       default=True)
-    parser.add_option("--PselectedPolarisations",
-                      dest="selected_polarisations",
+    parser.add_argument("--PselectedPolarisations",
+                      dest="PselectedPolarisations",
                       help="The list of polarisations.")
-    parser.add_option("--PsourceBands",
+    parser.add_argument("--PsourceBands",
                       dest="source_bands",
                       help="The list of source bands.")
 
     # ==============================#
     #   Check mandatory options    #
     # ==============================#
-    (opts, args) = parser.parse_args()
+    opts = parser.parse_args()
 
     if len(sys.argv) == 1:
         print(USAGE)
@@ -156,16 +160,16 @@ def main():
     # ==============================#
     #   Check data type option     #
     # ==============================#
-    if opts.aux_file and opts.aux_file not in DefaultAuxFilesLookup:
+    if opts.PauxFile and opts.PauxFile not in DefaultAuxFilesLookup:
         print("Incorrect output data type!")
         print("Must be one of %s." % DefaultAuxFilesLookup)
         print(USAGE)
         return
 
     # ====================================#
-    #    LOOP THROUGH ALL SELECTED PRODUCTS#
+    #  LOOP THROUGH ALL SELECTED PRODUCTS#
     # ====================================#
-    product_files = []
+    product_files = [opts.source]
     for i in product_files:
         print ("Applying calibration %s..." % i)
         # ------------------------------------#
@@ -173,14 +177,15 @@ def main():
         # ------------------------------------#
         gpt_exe = 'gpt'
         gpt_operator = 'Calibration'
-        gpt_options = ''
+        gpt_options = ' '.join([parameter(key, value) for key,value in vars(opts).items() if value is not None])
 
-        gpt_command = gpt_exe + gpt_operator + gpt_options
+        gpt_command = gpt_exe + " " + gpt_operator + " " + gpt_options
 
         # ------------------------------------#
         #    Run gpt command line   #
         # ------------------------------------#
-        print ('\n invoking' + gpt_command)
+        print ('\n invoking: ' + gpt_command)
+        exit(0)
         try:
             process = subprocess.Popen(gpt_command,
                                        shell=True,
