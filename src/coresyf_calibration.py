@@ -79,11 +79,6 @@ USAGE = ("\n"
 
 DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
 
-def parameter(prefix, value):
-    format = ("-%s=\"%s\"" if isinstance(value, basestring) else "-%s=%s")
-    return format % (prefix, value)
-
-
 def main():
     parser = ArgumentParser(usage=USAGE,
                           version=VERSION)
@@ -172,35 +167,40 @@ def main():
     product_files = [opts.Ssource]
     for i in product_files:
         print ("Applying calibration %s..." % i)
-        # ------------------------------------#
-        # Building gpt command line #
-        # ------------------------------------#
-        gpt_exe = 'gpt'
-        gpt_operator = 'Calibration'
-        gpt_options = ' '.join([parameter(key, value) for key,value in vars(opts).items() if value is not None])
+        call_gpt('Calibration', opts)
 
-        gpt_command = gpt_exe + " " + gpt_operator + " " + gpt_options
 
-        # ------------------------------------#
-        #    Run gpt command line   #
-        # ------------------------------------#
-        print ('\n invoking: ' + gpt_command)
-        try:
-            process = subprocess.Popen(gpt_command,
-                                       shell=True,
-                                       stdin=subprocess.PIPE,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE, )
-            # Reads the output and waits for the process to exit before returning
-            stdout, stderr = process.communicate()
-            print (stdout)
-            if stderr:
-                raise Exception(stderr)  # or  if process.returncode:
-            if 'Error' in stdout:
-                raise Exception()
-        except Exception, message:
-            print(str(message))
-            sys.exit(1)  # or sys.exit(process.returncode)
+def parameter(prefix, value):
+    format = ("-%s=\"%s\"" if isinstance(value, basestring) else "-%s=%s")
+    return format % (prefix, value)
+
+
+def call_gpt(operator, options):
+    # ------------------------------------#
+    # Building gpt command line #
+    # ------------------------------------#
+    gpt_options = ' '.join([parameter(key, value) for key, value in vars(options).items() if value is not None])
+    gpt_command = "gpt %s %s" % (operator, gpt_options)
+    # ------------------------------------#
+    #    Run gpt command line   #
+    # ------------------------------------#
+    print ('\n invoking: ' + gpt_command)
+    try:
+        process = subprocess.Popen(gpt_command,
+                                   shell=True,
+                                   stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE, )
+        # Reads the output and waits for the process to exit before returning
+        stdout, stderr = process.communicate()
+        print (stdout)
+        if stderr:
+            raise Exception(stderr)  # or  if process.returncode:
+        if 'Error' in stdout:
+            raise Exception()
+    except Exception, message:
+        print(str(message))
+        sys.exit(1)  # or sys.exit(process.returncode)
 
 
 if __name__ == '__main__':
