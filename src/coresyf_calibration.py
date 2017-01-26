@@ -80,7 +80,7 @@ USAGE = ("\n"
 DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
 
 def parameter(prefix, value):
-    format = ("--%s=\"%s\"" if isinstance(value, basestring) else "--%s=%s")
+    format = ("-%s=\"%s\"" if isinstance(value, basestring) else "-%s=%s")
     return format % (prefix, value)
 
 
@@ -92,7 +92,7 @@ def main():
     # Define command line options  #
     # ==============================#
     parser.add_argument('--Ssource',
-                      dest="source", metavar='<filepath>',
+                      dest="Ssource", metavar='<filepath>',
                       help="Sets source 'source' to <filepath>", )
     parser.add_argument('--PauxFile',
                       dest="PauxFile", metavar='<string>',
@@ -132,8 +132,8 @@ def main():
                       help="Output image scale.",
                       type=bool,
                       default=False)
-    parser.add_argument("--PoutputSigma",
-                      dest="PoutputSigma",
+    parser.add_argument("--PoutputSigmaBand",
+                      dest="PoutputSigmaBand",
                       help="Output sigma0 band.",
                       type=bool,
                       default=True)
@@ -141,7 +141,7 @@ def main():
                       dest="PselectedPolarisations",
                       help="The list of polarisations.")
     parser.add_argument("--PsourceBands",
-                      dest="source_bands",
+                      dest="PsourceBands",
                       help="The list of source bands.")
 
     # ==============================#
@@ -152,7 +152,7 @@ def main():
     if len(sys.argv) == 1:
         print(USAGE)
         return
-    if not opts.source:
+    if not opts.Ssource:
         print("No input raster provided. Nothing to do!")
         print(USAGE)
         return
@@ -169,7 +169,7 @@ def main():
     # ====================================#
     #  LOOP THROUGH ALL SELECTED PRODUCTS#
     # ====================================#
-    product_files = [opts.source]
+    product_files = [opts.Ssource]
     for i in product_files:
         print ("Applying calibration %s..." % i)
         # ------------------------------------#
@@ -185,7 +185,6 @@ def main():
         #    Run gpt command line   #
         # ------------------------------------#
         print ('\n invoking: ' + gpt_command)
-        exit(0)
         try:
             process = subprocess.Popen(gpt_command,
                                        shell=True,
