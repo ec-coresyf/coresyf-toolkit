@@ -79,8 +79,11 @@ def main():
     # ==============================#
     parser.add_argument('--Ssource',
                       dest="Ssource", metavar='<filepath>',
-                      help="Sets source 'source' to <filepath>",
+                      help="Sets source to <filepath>",
                         required=True)
+    parser.add_argument('--Ttarget', metavar='<filepath>',
+                        dest="Ttarget",
+                        help="Sets the target to <filepath>")
     parser.add_argument('--PauxFile',
                       dest="PauxFile", metavar='<string>',
                       help="Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File', "
@@ -132,16 +135,16 @@ def main():
                       dest="PsourceBands",
                       help="The list of source bands.")
 
-    opts = parser.parse_args()
-
+    opts = vars(parser.parse_args())
+    target = opts.pop("Ttarget")
 
     # ====================================#
     #  LOOP THROUGH ALL SELECTED PRODUCTS#
     # ====================================#
-    product_files = [opts.Ssource]
+    product_files = [opts['Ssource']]
     for i in product_files:
         print ("Applying calibration %s..." % i)
-        call_gpt('Calibration', opts)
+        call_gpt('Calibration', target, opts)
 
 
 def parameter(prefix, value):
@@ -149,12 +152,12 @@ def parameter(prefix, value):
     return format % (prefix, value)
 
 
-def call_gpt(operator, options):
+def call_gpt(operator, target, options):
     # ------------------------------------#
     # Building gpt command line #
     # ------------------------------------#
-    gpt_options = ' '.join([parameter(key, value) for key, value in vars(options).items() if value is not None])
-    gpt_command = "gpt %s -f GeoTIFF %s" % (operator, gpt_options)
+    gpt_options = ' '.join([parameter(key, value) for key, value in options.items() if value is not None])
+    gpt_command = "gpt %s -f GeoTIFF -t \"%s\" %s" % (operator, target, gpt_options)
     # ------------------------------------#
     #    Run gpt command line   #
     # ------------------------------------#
