@@ -21,7 +21,8 @@ src/coresyf_calibration.py --Ssource Vancouver_RS2_FineQuad2_HH_VV_HV_VH_SLC/pro
 check "target specified" `[ $? -a -f out.tif ]`
 rm -f out.tif
 
-src/coresyf_calibration.py --Ssource Vancouver_RS2_FineQuad2_HH_VV_HV_VH_SLC/product.xml --Ttarget out --PauxFile 'Latest Auxiliary File' --PcreateBetaBand true --PcreateGammaBand true --PoutputBetaBand true --PoutputGammaBand true --PoutputImageInComplex true --PoutputImageScaleInDb true --PoutputSigmaBand true
+src/coresyf_calibration.py --Ssource Vancouver_RS2_FineQuad2_HH_VV_HV_VH_SLC/product.xml --Ttarget out --PauxFile 'Latest Auxiliary File' --PcreateBetaBand true --PcreateGammaBand true --PoutputBetaBand true --PoutputGammaBand true --PoutputImageInComplex true --PoutputImageScaleInDb true --PoutputSigmaBand true --PsourceBands 'i_HH,q_HV,i_VH,q_VH' --PselectedPolarisations 'HH,HV'
+
 check "all parameters" `[ $? -a -f out.dim ]`
 rm -f out.tif
 
