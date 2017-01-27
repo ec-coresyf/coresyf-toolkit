@@ -154,7 +154,7 @@ def call_gpt(operator, options):
     # Building gpt command line #
     # ------------------------------------#
     gpt_options = ' '.join([parameter(key, value) for key, value in vars(options).items() if value is not None])
-    gpt_command = "gpt %s %s" % (operator, gpt_options)
+    gpt_command = "gpt %s -f GeoTIFF %s" % (operator, gpt_options)
     # ------------------------------------#
     #    Run gpt command line   #
     # ------------------------------------#
