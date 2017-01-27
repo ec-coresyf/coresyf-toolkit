@@ -152,6 +152,8 @@ def main():
         parser.error("Selectors should be used only for sources which are directories.")
     if path.isdir(source) and not selector:
         parser.error("Selector parameter is missing.")
+    if path.isdir(source) and target:
+        parser.error("Target should not be specified when multiple source files are selected from a dir.")
 
     # ====================================#
     #  LOOP THROUGH ALL SELECTED PRODUCTS#
