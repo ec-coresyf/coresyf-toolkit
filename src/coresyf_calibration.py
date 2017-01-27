@@ -80,15 +80,15 @@ USAGE = ("\n"
 DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
 
 def main():
-    parser = ArgumentParser(usage=USAGE,
-                          version=VERSION)
+    parser = ArgumentParser(version=VERSION)
 
     # ==============================#
     # Define command line options  #
     # ==============================#
     parser.add_argument('--Ssource',
                       dest="Ssource", metavar='<filepath>',
-                      help="Sets source 'source' to <filepath>", )
+                      help="Sets source 'source' to <filepath>",
+                        required=True)
     parser.add_argument('--PauxFile',
                       dest="PauxFile", metavar='<string>',
                       help="Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File', "
@@ -139,18 +139,8 @@ def main():
                       dest="PsourceBands",
                       help="The list of source bands.")
 
-    # ==============================#
-    #   Check mandatory options    #
-    # ==============================#
     opts = parser.parse_args()
 
-    if len(sys.argv) == 1:
-        print(USAGE)
-        return
-    if not opts.Ssource:
-        print("No input raster provided. Nothing to do!")
-        print(USAGE)
-        return
 
     # ==============================#
     #   Check data type option     #
