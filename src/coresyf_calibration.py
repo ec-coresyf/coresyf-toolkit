@@ -21,6 +21,7 @@ import sys
 from argparse import ArgumentParser
 from os import path
 import os
+import glob
 
 '''
 @summary: 
@@ -72,7 +73,6 @@ VERSION = '1.0'
 
 DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
 
-
 def main():
     parser = ArgumentParser(version=VERSION)
 
@@ -83,6 +83,9 @@ def main():
                       dest="Ssource", metavar='<filepath>',
                       help="Sets source to <filepath>",
                         required=True)
+    parser.add_argument('--Pselector',
+                        dest="Pselector", metavar='<glob>',
+                        help="A glob to select the appropriate product files from a directory.")
     parser.add_argument('--Ttarget', metavar='<filepath>',
                         dest="Ttarget",
                         help="Sets the target to <filepath>")
@@ -140,15 +143,26 @@ def main():
     opts = vars(parser.parse_args())
 
     source = opts.pop("Ssource")
+    selector = opts.pop("Pselector")
     target = opts.pop("Ttarget")
 
     if not os.path.exists(source):
         parser.error("%s does not exists." % source)
+    if path.isfile(source) and glob:
+        parser.error("Selectors should be used only for sources which are directories.")
+    if path.isdir(source) and not glob:
+        parser.error("Selector parameter is missing.")
 
     # ====================================#
     #  LOOP THROUGH ALL SELECTED PRODUCTS#
     # ====================================#
-    product_files = ( [source] if path.isfile(source) else [path.join(source, fname) for fname in os.listdir(source)] )
+    product_files = []
+    if path.isdir(source):
+        product_files = [file for file in glob.glob(source + path.sep + selector)]
+        print("selected files: %s%s" % (os.linesep, os.linesep.join(product_files)))
+    else:
+        product_files = [source]
+
     for i in product_files:
         print ("Applying calibration %s..." % i)
         call_gpt('Calibration', i, target, opts)
