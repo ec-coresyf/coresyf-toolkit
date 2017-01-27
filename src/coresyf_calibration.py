@@ -93,12 +93,12 @@ def main():
                       type=bool,
                       default=False)
     parser.add_argument('--PcreateGammaBand',
-                      dest="PcreateGammaBand", metavar=' ',
+                      dest="PcreateGammaBand", metavar='<boolean>',
                       help="Create gamma0 virtual band.",
                       default=False,
                       type=bool)
     parser.add_argument('--PexternalAuxFile',
-                      dest="PexternalAuxFile", metavar='<file>.',
+                      dest="PexternalAuxFile", metavar='<file>',
                       help="The antenna elevation pattern gain auxiliary data file.")
     parser.add_argument('--PoutputBetaBand',
                       dest="PoutputBetaBand", metavar='<boolean>',
@@ -120,15 +120,15 @@ def main():
                       help="Output image scale.",
                       type=bool,
                       default=False)
-    parser.add_argument("--PoutputSigmaBand",
+    parser.add_argument("--PoutputSigmaBand", metavar='<boolean>',
                       dest="PoutputSigmaBand",
                       help="Output sigma0 band.",
                       type=bool,
                       default=True)
-    parser.add_argument("--PselectedPolarisations",
+    parser.add_argument("--PselectedPolarisations", metavar='<string,string,string,...>',
                       dest="PselectedPolarisations",
                       help="The list of polarisations.")
-    parser.add_argument("--PsourceBands",
+    parser.add_argument("--PsourceBands", metavar='<string,string,string,...>',
                       dest="PsourceBands",
                       help="The list of source bands.")
 
