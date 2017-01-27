@@ -148,9 +148,9 @@ def main():
 
     if not os.path.exists(source):
         parser.error("%s does not exists." % source)
-    if path.isfile(source) and glob:
+    if path.isfile(source) and selector:
         parser.error("Selectors should be used only for sources which are directories.")
-    if path.isdir(source) and not glob:
+    if path.isdir(source) and not selector:
         parser.error("Selector parameter is missing.")
 
     # ====================================#
@@ -178,7 +178,8 @@ def call_gpt(operator, source, target, options):
     # Building gpt command line #
     # ------------------------------------#
     gpt_options = ' '.join([parameter(key, value) for key, value in options.items() if value is not None])
-    gpt_command = "gpt %s -f GeoTIFF -t \"%s\" -Ssource=\"%s\" %s" % (operator, target, source, gpt_options)
+    targetopt = ("-t \"%s\"" % target if target else "")
+    gpt_command = "gpt %s -f GeoTIFF %s -Ssource=\"%s\" %s" % (operator, targetopt, source, gpt_options)
     # ------------------------------------#
     #    Run gpt command line   #
     # ------------------------------------#
