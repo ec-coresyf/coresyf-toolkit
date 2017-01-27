@@ -67,17 +67,9 @@ Example 3 - Create a mask on the fly (with elevations above 1000)
 '''
 
 VERSION = '1.0'
-USAGE = ("\n"
-         "coresyf_calibration.py [--Ssource=<file>] [--PauxFile=<string>]\n"
-         "                      [--PcreateBetaBand <boolean>] [--PcreateGammaBand <boolean>]\n"
-         "                      [--PexternalAuxFile <file>] [--PoutputBetaBand <boolean>]\n"
-         "                      [--PoutputGammaBand <boolean>] [--PoutputImageInComplex <boolean>]\n"
-         "                      [--PoutputImageScaleInDb <boolean>] [--PoutputSigmaBand <boolean>]\n"
-         "                      [--PselectPolarisations=<string,string,string,...> \n"
-         "                      [--PsourceBands=<string,string,string,...>"
-         "\n")
 
 DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
+
 
 def main():
     parser = ArgumentParser(version=VERSION)
@@ -93,7 +85,8 @@ def main():
                       dest="PauxFile", metavar='<string>',
                       help="Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File', "
                            "'External Auxiliary File'.",
-                      default="Latest Auxiliary File")
+                      default="Latest Auxiliary File",
+                        choices=DefaultAuxFilesLookup)
     parser.add_argument('--PcreateBetaBand',
                       dest="PcreateBetaBand", metavar='<boolean>',
                       help="Create beta0 virtual band.",
@@ -141,15 +134,6 @@ def main():
 
     opts = parser.parse_args()
 
-
-    # ==============================#
-    #   Check data type option     #
-    # ==============================#
-    if opts.PauxFile and opts.PauxFile not in DefaultAuxFilesLookup:
-        print("Incorrect output data type!")
-        print("Must be one of %s." % DefaultAuxFilesLookup)
-        print(USAGE)
-        return
 
     # ====================================#
     #  LOOP THROUGH ALL SELECTED PRODUCTS#
