@@ -19,6 +19,8 @@
 import subprocess
 import sys
 from argparse import ArgumentParser
+from os import path
+import os
 
 '''
 @summary: 
@@ -136,15 +138,20 @@ def main():
                       help="The list of source bands.")
 
     opts = vars(parser.parse_args())
+
+    source = opts.pop("Ssource")
     target = opts.pop("Ttarget")
+
+    if not os.path.exists(source):
+        parser.error("%s does not exists." % source)
 
     # ====================================#
     #  LOOP THROUGH ALL SELECTED PRODUCTS#
     # ====================================#
-    product_files = [opts['Ssource']]
+    product_files = ( [source] if path.isfile(source) else [path.join(source, fname) for fname in os.listdir(source)] )
     for i in product_files:
         print ("Applying calibration %s..." % i)
-        call_gpt('Calibration', target, opts)
+        call_gpt('Calibration', i, target, opts)
 
 
 def parameter(prefix, value):
@@ -152,12 +159,12 @@ def parameter(prefix, value):
     return format % (prefix, value)
 
 
-def call_gpt(operator, target, options):
+def call_gpt(operator, source, target, options):
     # ------------------------------------#
     # Building gpt command line #
     # ------------------------------------#
     gpt_options = ' '.join([parameter(key, value) for key, value in options.items() if value is not None])
-    gpt_command = "gpt %s -f GeoTIFF -t \"%s\" %s" % (operator, target, gpt_options)
+    gpt_command = "gpt %s -f GeoTIFF -t \"%s\" -Ssource=\"%s\" %s" % (operator, target, source, gpt_options)
     # ------------------------------------#
     #    Run gpt command line   #
     # ------------------------------------#
@@ -177,7 +184,7 @@ def call_gpt(operator, target, options):
             raise Exception()
     except Exception, message:
         print(str(message))
-        sys.exit(1)  # or sys.exit(process.returncode)
+        #sys.exit(1)  # or sys.exit(process.returncode)
 
 
 if __name__ == '__main__':
