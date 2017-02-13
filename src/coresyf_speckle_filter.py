@@ -29,20 +29,11 @@ with several images.
 
 
 @example:
-Speckle image reduction:
+Example 1 - Apply Speckle Median filter to RADARSAT product and save the output into
+            user-defined path.
+./coresyf_speckle_filter.py -s /RS2_OK871_PK6637_DK3212_SCWA_20080426_141717_HH_HV_SGF/product.xml 
+                            --Pfilter="Median" --Ttarget=myoutput
 
-
-Example 1 - Create a raster TIFF from a shapefile with point measurements. The 
-            X and Y coordinates are being taken from geometry and the Z values 
-            are being taken from the "elev" field.
-            NOTE: "elev_points.shp" must contain a layer named "elev_points" 
-./coresyf_pointsToGrid.py -s elev_points.shp --s_field="elev" -a nearest
-                          -o elev_raster_nearest.tif --o_xsize=500 --o_ysize=500
-                        
-Example 2 - Create a raster TIFF from a text file with a list of comma separated
-            X, Y, Z values (.CSV file) with a virtual dataset header (.VRT file).
-./coresyf_pointsToGrid.py -s points.vrt -a nearest
-                          -o elev_raster_nearest_pts.tif --o_xsize=500 --o_ysize=500
 
 @attention: 
   @todo: 
@@ -59,21 +50,23 @@ Example 2 - Create a raster TIFF from a text file with a list of comma separated
 
 VERSION = '1.0'
 USAGE   = ( '\n'
-            'coresyf_speckle_filter.py [-s <Inputdatasource>]\n'
+            'coresyf_speckle_filter.py [-s <Inputdatasource>] [--Ttarget=<OutputDataPath>]\n'
             "                          [--PdampingFactor=<DampingValue>] [--PedgeThreshold=<EdgeThreshold>]\n"
             "                          [--Penl=<LooksNumber>] [--PestimateENL=<Boolean>]\n"
             '                          [--Pfilter=<FilterName>] [--PfilterSizeX=<KernelXdimension>] [--PfilterSizeY=<KernelYdimension>]\n'
             '                          [--PsourceBands="<BandName1>,<BandName2>,..."]'
             "\n")  
 
-FilterNames  = [ 'Mean', 'Median', 'Frost', 'Gamma Map', 'Lee', 'Refined Lee']
+FilterNames  = [ 'None', 'Boxcar', 'Median', 'Frost', 'Gamma Map', 'Lee', 'Refined Lee', 'Lee Sigma', 'IDAN']
 BoolOptions = ['false', 'true']
 
 
 ''' SYSTEM MODULES '''
 from optparse import OptionParser
 import sys
-import subprocess
+
+''' PROGRAM MODULES '''
+from gpt import call_gpt
 
 
 def main():
@@ -86,6 +79,9 @@ def main():
     parser.add_option('-s', 
                       dest="Ssource", metavar=' ',
                       help="input SAR file",)
+    parser.add_option('--Ttarget', metavar=' ',
+                      dest="Ttarget",
+                      help="Sets the output file path")
     parser.add_option('--PdampingFactor',
                       dest="PdampingFactor", metavar=' ',
                       help=("The damping factor (Frost filter only) "
@@ -106,7 +102,7 @@ def main():
                       type=float)
     parser.add_option('--PestimateENL', 
                       dest="PestimateENL", metavar=' ',
-                      help=("Sets parameter 'estimateENL' to <boolean>."
+                      help=("Sets parameter 'estimateENL' to <boolean>. "
                             "Default value is 'false'."),
                       type='choice', choices=BoolOptions,
                       default="false",)
@@ -114,9 +110,9 @@ def main():
                       dest="Pfilter", metavar=' ',
                       help=("Parameter filter name."
                             "Value must be one of: %s ."
-                            "Default value is 'Mean'.") % FilterNames,
+                            "Default value is 'None'.") % FilterNames,
                       type='choice', choices=FilterNames,
-                      default="Mean",)
+                      default="None",)
     parser.add_option('--PfilterSizeX',
                       dest="PfilterSizeX", metavar=' ',
                       help=("The kernel x dimension. Valid interval is (1, 100]."
@@ -147,53 +143,28 @@ def main():
         print(USAGE)
         return  
     
-    #=================================#
-    #    Building gpt command line    #
-    #=================================#
-    gpt_exe    = 'gpt Speckle-Filter '
+    #===============================#
+    # Remove non-applicable options #
+    #===============================#
+    if opts.Pfilter != 'Frost': 
+        del opts.PdampingFactor 
+        
+    if opts.Pfilter != 'Refined Lee': 
+        del opts.PedgeThreshold
 
-    input = "-Ssource=%s " % opts.Ssource
+    source = opts.Ssource
+    del opts.Ssource
     
-    filter_opts = ""    
-    if opts.Pfilter == 'Frost': 
-        filter_opts += "-PdampingFactor=%s " % opts.PdampingFactor 
-    if opts.Pfilter == 'Refined Lee': 
-        filter_opts += "-PedgeThreshold=%s " % opts.PedgeThreshold
-    if opts.Penl: 
-        filter_opts += "-Penl=%s " % opts.Penl
-    if opts.PestimateENL: 
-        filter_opts += "-PestimateENL=%s " % opts.PestimateENL
-    if opts.Pfilter: 
-        filter_opts += "-Pfilter=%s " % opts.Pfilter
-    if opts.PfilterSizeX: 
-        filter_opts += "-PfilterSizeX=%s " % opts.PfilterSizeX
-    if opts.PfilterSizeY: 
-        filter_opts += "-PfilterSizeY=%s " % opts.PfilterSizeY     
-    if opts.PsourceBands: 
-        filter_opts += "-PsourceBands=%s " % opts.PsourceBands
-
-    gpt_exe_command = gpt_exe + input + filter_opts
-
+    target = ''
+    if opts.Ttarget:
+        target = opts.Ttarget
+        del opts.Ttarget
     
     #============================#
-    #     Run gpt command line   #
+    #    Run gpt command line    #
     #============================#
-    print('\n' + gpt_exe_command)
-    
-    try:
-        process = subprocess.Popen( gpt_exe_command,
-                                    shell  = True,
-                                    stdin  = subprocess.PIPE,
-                                    stdout = subprocess.PIPE,
-                                    stderr = subprocess.PIPE, )
-        # Reads the output and waits for the process to exit before returning
-        stdout, stderr = process.communicate()   
-        print (stdout) 
-        if stderr:      raise Exception (stderr)  # or  if process.returncode:
-    except Exception, message:
-        print( str(message) )
-        sys.exit(process.returncode)
-    
+    call_gpt('Speckle-Filter', source, target, vars(opts))
+
 
 if __name__ == '__main__':
     main()
