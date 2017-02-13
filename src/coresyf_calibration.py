@@ -26,42 +26,13 @@ from gpt import call_gpt
 
 '''
 @summary: 
-This module runs the following Co-ReSyF tool:
- - IMAGE MASK
-It uses the GDAL raster utility program "gdal_calc.py" to calculate the final 
-masked image.
-It can take any raster file and use it as a mask to extract values from a 
-geospatial image. The mask is a raster in which each pixel contains no-data or 
-a single valid value. The no-data pixels on the mask are assigned as no-data 
-values on the output raster. For the remaining pixels, the output raster 
-contains the values extracted from the input image. Note that, there is the 
-possibility of using the input image to create a mask on the fly.
+TBC
 
 @example:
-An example might be the case of a raster with elevation values ranging from 
-below sea level to mountain tops. If you are only interested in elevations 
-below sea level, you can use this tool to apply a mask (defining below sea 
-level areas) to the input raster to create a masked image with only the
-regions of interest.  
-
-Example 1 - Calculate masked image using a mask:
-./coresyf_image_mask.py -r etopo_raster.tif -m mask_ocean.tif 
-                        -o masked_image.tif 
-
-Example 2 - Create a mask on the fly (with elevations below 0)
-            and calculate masked image:
-./coresyf_image_mask.py -r etopo_raster.tif -m etopo_raster.tif 
-                       --m_range=:0  -o masked_image_onTheFly.tif
-
-Example 3 - Create a mask on the fly (with elevations above 1000)
-            and calculate masked image for all raster bands:
-./coresyf_image_mask.py -r multiBandImage.tif -m multiBandImage.tif --m_range=1000:
-                        -o multiBand_maskedImg.tif --all_bands            
+TBC          
 
 @attention: 
-- Note that both files (raster and mask) must have the same dimensions;
-- No projection checking is performed. 
-
+TBC
 
 @version: v.1.0
 
