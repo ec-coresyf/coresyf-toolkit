@@ -93,9 +93,8 @@ def get_ProductFile( p_path ):
         files.append(p_path)
     else:
         print("Finding snap product file at directory:\n %s ..." % p_path )
-        files = [os.path.join(p_path + fa) for fa in os.listdir(p_path) 
-                                           if os.path.isfile( os.path.join(p_path + fa) )]
-
+        files.extend( [os.path.join(p_path, fa) for fa in os.listdir(p_path) 
+                                           if os.path.isfile( os.path.join(p_path, fa) )] )
     p_file_aux = None
     for fi in files: 
         p = None
