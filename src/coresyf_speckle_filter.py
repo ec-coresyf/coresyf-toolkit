@@ -35,6 +35,10 @@ Example 1 - Apply Speckle Median filter to RADARSAT product and save the output 
                             --Pfilter="Median" --Ttarget=myoutput
 
 
+Example 2 - The previous example, however in this case the user provides as input the product folder:
+./coresyf_speckle_filter.py -s /Vancouver_R2_FineQuad15_Frame2_SLC 
+                            --Pfilter="Median" --Ttarget=myoutput
+
 @attention: 
   @todo: 
   - test all features and parameters?
