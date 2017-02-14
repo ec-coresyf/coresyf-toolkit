@@ -24,8 +24,6 @@ This module is used to run the gpt executable in batch-mode.
 import os
 import subprocess
 
-''' IMPORTANT PARAMETERS'''
-GPT_EXE = os.path.expanduser("~") + '/snap/bin/gpt'
 
 
 def parameter(prefix, value):
@@ -39,7 +37,7 @@ def call_gpt(operator, source, target, options):
     # ------------------------------------#
     gpt_options = ' '.join([parameter(key, value) for key, value in options.items() if value is not None])
     targetopt = ("-t \"%s\"" % target if target else "")
-    gpt_command = GPT_EXE + " %s -f GeoTIFF %s -Ssource=\"%s\" %s" % (operator, targetopt, source, gpt_options)
+    gpt_command = "gpt %s -f GeoTIFF %s -Ssource=\"%s\" %s" % (operator, targetopt, source, gpt_options)
     # ------------------------------------#
     #    Run gpt command line   #
     # ------------------------------------#
