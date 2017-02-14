@@ -67,6 +67,7 @@ import sys
 
 ''' PROGRAM MODULES '''
 from gpt import call_gpt
+from snapFileSelector import get_ProductFile
 
 
 def main():
@@ -142,6 +143,11 @@ def main():
         print("No input file provided. Nothing to do!")
         print(USAGE)
         return  
+    
+    opts.Ssource = get_ProductFile(opts.Ssource)
+    if not opts.Ssource:
+        print("Readable input file not found!")
+        return
     
     #===============================#
     # Remove non-applicable options #
