@@ -54,7 +54,7 @@ from osgeo import gdal
 
 VERSION = '1.0'
 
-OUTPUT_FORMATS = ['GTiff', 'IMG', 'netCDF', 'HDF']
+OUTPUT_FORMATS = ['GTiff', 'HFA', 'netCDF', 'HDF4', 'HDF5']
 
 
 def main():
@@ -66,35 +66,36 @@ def main():
     # Define command line options  #
     #==============================#
     parser.add_argument('-o',
-                        dest="target_file", metavar='FILE_PATH',
+                        dest="target_file",
                         help="The output file path.",
                         required=True)
-    parser.add_argument('--o_format', metavar=' '.join(OUTPUT_FORMATS),
+    parser.add_argument('--o_format',
                         dest="format",
                         help="The output format.",
-                        default='GTiff')
+                        default='GTiff',
+                        choices=OUTPUT_FORMATS)
     parser.add_argument('--bands',
-                        dest="bands", metavar='BANDS',
+                        dest="bands",
                         help=("The number of bands."),
                         default="1",
                         type=int)
     parser.add_argument('--width',
-                        dest="width", metavar='WIDTH',
+                        dest="width",
                         help=("The image width (in pixels)."),
                         type=int,
                         required=True)
     parser.add_argument('--height',
-                        dest="height", metavar='HEIGHT',
+                        dest="height",
                         help=("The image height (in pixels)."),
                         type=int,
                         required=True)
     parser.add_argument('--min',
-                        dest="min", metavar='MIN',
+                        dest="min",
                         help=("The min value."),
                         default="0",
                         type=int)
     parser.add_argument('--max',
-                        dest="max", metavar='MAX',
+                        dest="max",
                         help=("The max value."),
                         default="255",
                         type=int)
@@ -105,7 +106,7 @@ def main():
     #==============================#
 
     if opts.min and opts.max and opts.min > opts.max:
-        print "Minimum should not exceed maximum"
+        parser.error("Minimum should not exceed maximum.")
 
     generate_image(opts.target_file, opts.bands, opts.width, opts.height, opts.min, opts.max, opts.format)
  
@@ -116,6 +117,8 @@ def generate_image(target_file, bands, width, height, min, max, format):
     print values
 
     driver = gdal.GetDriverByName(format)
+    if (not driver):
+        raise Exception('No gdal driver was found for %s.' % format)
     dataset = driver.Create(target_file, width, height, bands, gdal.GDT_Float32)
     for i in range(0, bands):
         dataset.GetRasterBand(i+1).WriteArray(values[i])
