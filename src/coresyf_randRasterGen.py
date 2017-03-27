@@ -24,7 +24,7 @@ This tool generates a raster image with random values uniformly distributed over
 the half-open interval [low, high[ (includes low, but excluded high value).
 Therefore, any value within the interval is equally likely to appear within the
 raster image.
-It uses the "numpy" and "GDAL" Python modules to generate raster images in
+It uses the "numpy", "GDAL", and "h5py" Python modules to generate raster images in
 different formats: GeoTIFF, IMG (Erdas file type) or netCDF and HDF.
 
 
@@ -110,30 +110,40 @@ def main():
     if opts.min and opts.max and opts.min > opts.max:
         parser.error("Minimum should not exceed maximum.")
 
-    generate_image(opts.target_file, opts.bands, opts.width, opts.height, opts.min, opts.max, opts.format)
- 
-def generate_image(target_file, bands, width, height, min, max, format):
+    print 'generating image...'
+    generate_image(opts.target_file, opts.bands, opts.width, opts.height, opts.min, opts.max,
+                   opts.format)
+    print 'finished'
+
+def generate_image(target_file, bands, width, height, minimum, maximum, img_format):
     """generate an synthetic raster image band
     with each pixel value drawn from a uniform distribution."""
-    values = uniform(min, max, [bands, height, width])
-    if format == 'HDF5':
-        hdf_file = h5py.File(target_file, 'w')
-        dataset_name = basename(splitext(target_file)[0])
-        hdf_file.create_dataset(dataset_name, data=values)
-        hdf_file.close()
-        return hdf_file
+    values = uniform(minimum, maximum, [bands, height, width])
+    if img_format == 'HDF5':
+        h5py_create_image(target_file, values)
     else:
+        gdal_create_image(target_file, width, height, bands, img_format, values)
 
-        driver = gdal.GetDriverByName(format)
-        if (not driver):
-            raise Exception('No gdal driver was found for %s.' % format)
-        dataset = driver.Create(target_file, width, height, bands, gdal.GDT_Float32)
-        for i in range(0, bands):
-            dataset.GetRasterBand(i+1).WriteArray(values[i])
-        dataset.FlushCache()
-        return dataset
+def h5py_create_image(target_file, values):
+    """create an HDF5 image from a 3D matrix, where the 1th dimesion represents the bands,
+    2th the rows, and the 3th the lines of the image"""
+    hdf_file = h5py.File(target_file, 'w')
+    dataset_name = basename(splitext(target_file)[0])
+    hdf_file.create_dataset(dataset_name, data=values)
+    hdf_file.close()
+    return hdf_file
 
+def gdal_create_image(target_file, width, height, bands, img_format, values):
+    """create an gdal compatible image from a 3D matrix, where 1th dimesion represents the
+    bands, 2th the rows, and the 3th the lines of the image"""
+    driver = gdal.GetDriverByName(img_format)
+    if not driver:
+        raise Exception('No gdal driver was found for %s.' % img_format)
+    dataset = driver.Create(target_file, width, height, bands, gdal.GDT_Float32)
+    for i in range(0, bands):
+        dataset.GetRasterBand(i+1).WriteArray(values[i])
+    dataset.FlushCache()
+    return dataset
 
-
-#if __name__ == '__main__':
-main()
+if __name__ == '__main__':
+    main()
