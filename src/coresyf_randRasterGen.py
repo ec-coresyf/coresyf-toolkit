@@ -46,15 +46,17 @@ Example 1 - Create a random raster image and save the output into GeoTIFF format
 - First release of the tool.
 '''
 
+from os.path import basename, splitext
 from argparse import ArgumentParser
 from numpy.random import uniform
 from osgeo import gdal
+import h5py
 
 
 
 VERSION = '1.0'
 
-OUTPUT_FORMATS = ['GTiff', 'HFA', 'netCDF', 'HDF4', 'HDF5']
+OUTPUT_FORMATS = ['GTiff', 'HFA', 'netCDF', 'HDF5']
 
 
 def main():
@@ -114,16 +116,22 @@ def generate_image(target_file, bands, width, height, min, max, format):
     """generate an synthetic raster image band
     with each pixel value drawn from a uniform distribution."""
     values = uniform(min, max, [bands, height, width])
-    print values
+    if format == 'HDF5':
+        hdf_file = h5py.File(target_file, 'w')
+        dataset_name = basename(splitext(target_file)[0])
+        hdf_file.create_dataset(dataset_name, data=values)
+        hdf_file.close()
+        return hdf_file
+    else:
 
-    driver = gdal.GetDriverByName(format)
-    if (not driver):
-        raise Exception('No gdal driver was found for %s.' % format)
-    dataset = driver.Create(target_file, width, height, bands, gdal.GDT_Float32)
-    for i in range(0, bands):
-        dataset.GetRasterBand(i+1).WriteArray(values[i])
-    dataset.FlushCache()
-    return dataset
+        driver = gdal.GetDriverByName(format)
+        if (not driver):
+            raise Exception('No gdal driver was found for %s.' % format)
+        dataset = driver.Create(target_file, width, height, bands, gdal.GDT_Float32)
+        for i in range(0, bands):
+            dataset.GetRasterBand(i+1).WriteArray(values[i])
+        dataset.FlushCache()
+        return dataset
 
 
 
