@@ -4,10 +4,11 @@
 #==============================================================================
 # Project   : Co-ReSyF
 # Company   : Deimos Engenharia
-# Component : Co-ReSyF Tools (Image Crop)
+# Component : Co-ReSyF Tools (polygon to polyline conversion tool)
 # Language  : Python (v.2.6)
 #------------------------------------------------------------------------------
-# Scope : Command line raster cropping tool for GDAL supported files
+# Scope : Command line polygon to polyline conversion tool for GDAL supported 
+#         shapefiles.
 # Usage : (see the following docstring)
 #==============================================================================
 # $LastChangedRevision:  $:
@@ -19,26 +20,19 @@
 @summary: 
 This module runs the following Co-ReSyF tool:
  - Polygon to Polyline
-It uses the GDAL raster utility program "ogr2ogr" to produce a polyline 
-from a polygon.
+It uses the GDAL vector utility program "ogr2ogr" to convert a polygon to a 
+polyline shapefile.
+It can be used to create new shapefiles containing layers with polyline geometry.  
 
 
 @example:
-It may be useful for the user to convert a polygon file into a polyline.
 
-Example 1 - Convert raster file into a polygon: 
-./coresyf_PolygonToPolyline.py -r input_polygon.shp  
-                        -o polylined_image.shp 
-
-
-@attention: ???????????
-    @todo
-    - Is projection checking performed???
-    - Explore other limitations...
+Example 1 - Convert a polygon into a polyline: 
+./coresyf_PolygonToPolyline.py -r ../examples/PolygonToPolyline/polygons_land_mask.shp -o my_polyline.shp 
 
 
 @version: v.1.0
-@author: RIAA
+@author: RCCC
 
 @change:
 1.0
@@ -47,18 +41,17 @@ Example 1 - Convert raster file into a polygon:
 
 VERSION = '1.0'
 USAGE   = ( '\n'
-            'coresyf_PolygonToPolyline.py [-r <InputPolygon>]'
-            "                      [-o <OutputPolyline>] [--o_format=<OutputFileFormat>]"
- #           "[--o_type=<DataType>]" 
+            'coresyf_PolygonToPolyline.py [-r <InputPolygon>] [-o <OutputPolyline>]'
             "\n")
-
-#DefaultTypesLookup = ['Byte','UInt16','Int16','UInt32','Int32','Float32','Float64']
 
 
 ''' SYSTEM MODULES '''
 from optparse import OptionParser
 import sys
 import subprocess
+
+
+OUTPUT_FORMATS = ['ESRI Shapefile', 'netCDF']
 
 
 def main():
@@ -70,15 +63,16 @@ def main():
     #==============================#
     parser.add_option('-r', 
                       dest="input_polygon", metavar=' ',
-                      help="input polygon file (GDAL supported file)", )
+                      help="input polygon file (GDAL supported vector file)", )
     parser.add_option('-o', 
                       dest="output_polyline", metavar=' ',
                       help=("output raster file "
-                            "(default: 'polylined_image.shp')"),
-                      default="polylined_image.shp")
+                            "(default: 'output_polyline.shp')"),
+                      default="output_polyline.shp")
     parser.add_option('--o_format', 
                       dest="output_format", metavar=' ',
-                      help="GDAL format for output file (default: 'ESRI Shapefile')",
+                      help= ("GDAL vector format for output file, e.g."
+                             " %s (default: 'ESRI Shapefile')")%OUTPUT_FORMATS,
                       default="ESRI Shapefile" )    
 
     #==============================#
@@ -90,34 +84,31 @@ def main():
         print(USAGE)
         return
     if not opts.input_polygon:
-        print("No input polygon provided. Nothing to do!")
+        print("No input polygon file provided. Nothing to do!")
         print(USAGE)
         return
 
     
-  
-    #================================#
-    # Building gdal_polygonize command line #
-    #================================#
+    #============================================#
+    # Building gdal_ogr2ogr_command command line #
+    #============================================#
     gdal_exe    = 'ogr2ogr '
     
+    output_opts = '-f "%s" -nlt %s %s %s ' % (opts.output_format,
+                                              'MULTILINESTRING',
+                                              opts.output_polyline,
+                                              opts.input_polygon ) 
 
+    gdal_ogr2ogr_command = gdal_exe + output_opts
     
-    output_opts = '%s -f "%s" %s %s ' % (opts.input_polygon,
-                                     opts.output_format,
-                                     opts.output_polyline,
-                                     opts.output_polyline) 
-    
-    gdal_polygonize_command = gdal_exe + output_opts
-    print (gdal_polygonize_command)
-    #===========================#
-    # Run gdal_polygonize command line #
-    #===========================#
-    #print ('\n' + gdal_polygonize_command)
+    #=======================================#
+    # Run gdal_ogr2ogr_command command line #
+    #=======================================#
+    print ('\n' + gdal_ogr2ogr_command)
     #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
     
     try:
-        process = subprocess.Popen(gdal_polygonize_command,
+        process = subprocess.Popen(gdal_ogr2ogr_command,
                                    shell=True,
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
