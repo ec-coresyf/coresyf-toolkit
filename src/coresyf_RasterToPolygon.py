@@ -4,10 +4,10 @@
 #==============================================================================
 # Project   : Co-ReSyF
 # Company   : Deimos Engenharia
-# Component : Co-ReSyF Tools (Image Crop)
+# Component : Co-ReSyF Tools (Raster to Polygon)
 # Language  : Python (v.2.6)
 #------------------------------------------------------------------------------
-# Scope : Command line raster cropping tool for GDAL supported files
+# Scope : Command line raster to polygon tool for GDAL supported files
 # Usage : (see the following docstring)
 #==============================================================================
 # $LastChangedRevision:  $:
