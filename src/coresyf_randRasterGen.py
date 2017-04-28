@@ -125,7 +125,7 @@ def generate_image(target_file, bands, width, height, minimum, maximum, img_form
         gdal_create_image(target_file, width, height, bands, img_format, values)
 
 def h5py_create_image(target_file, values):
-    """create an HDF5 image from a 3D matrix, where the 1th dimesion represents the bands,
+    """create an HDF5 image from a 3D matrix, where the 1th dimension represents the bands,
     2th the rows, and the 3th the lines of the image"""
     hdf_file = h5py.File(target_file, 'w')
     dataset_name = basename(splitext(target_file)[0])
@@ -134,7 +134,7 @@ def h5py_create_image(target_file, values):
     return hdf_file
 
 def gdal_create_image(target_file, width, height, bands, img_format, values):
-    """create an gdal compatible image from a 3D matrix, where 1th dimesion represents the
+    """create an gdal compatible image from a 3D matrix, where 1th dimension represents the
     bands, 2th the rows, and the 3th the lines of the image"""
     driver = gdal.GetDriverByName(img_format)
     if not driver:

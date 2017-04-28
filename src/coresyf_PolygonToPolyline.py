@@ -27,8 +27,8 @@ It can be used to create new shapefiles containing layers with polyline geometry
 
 @example:
 
-Example 1 - Convert a polygon into a polyline: 
-./coresyf_PolygonToPolyline.py -r ../examples/PolygonToPolyline/polygons_land_mask.shp -o my_polyline.shp 
+Example 1 - Convert a shapefile geometry from polygon to polyline: 
+./coresyf_PolygonToPolyline.py -r ../examples/PolygonToPolyline/polygons_land_mask.shp -o my_polyline.shp
 
 
 @version: v.1.0
@@ -51,8 +51,6 @@ import sys
 import subprocess
 
 
-OUTPUT_FORMATS = ['ESRI Shapefile', 'netCDF']
-
 
 def main():
     parser = OptionParser(usage   = USAGE, 
@@ -69,11 +67,11 @@ def main():
                       help=("output raster file "
                             "(default: 'output_polyline.shp')"),
                       default="output_polyline.shp")
-    parser.add_option('--o_format', 
-                      dest="output_format", metavar=' ',
-                      help= ("GDAL vector format for output file, e.g."
-                             " %s (default: 'ESRI Shapefile')")%OUTPUT_FORMATS,
-                      default="ESRI Shapefile" )    
+#     parser.add_option('--o_format', 
+#                       dest="output_format", metavar=' ',
+#                       help= ("GDAL vector format for output file, some possible formats are"
+#                              " 'ESRI Shapefile', 'netCDF'  (default: 'ESRI Shapefile')"),
+#                       default="ESRI Shapefile" )    
 
     #==============================#
     #   Check mandatory options    #
@@ -94,7 +92,7 @@ def main():
     #============================================#
     gdal_exe    = 'ogr2ogr '
     
-    output_opts = '-f "%s" -nlt %s %s %s ' % (opts.output_format,
+    output_opts = '-f "%s" -overwrite -nlt %s %s %s ' % ("ESRI Shapefile", #opts.output_format,
                                               'MULTILINESTRING',
                                               opts.output_polyline,
                                               opts.input_polygon ) 
@@ -104,7 +102,7 @@ def main():
     #=======================================#
     # Run gdal_ogr2ogr_command command line #
     #=======================================#
-    print ('\n' + gdal_ogr2ogr_command)
+    #print ('\n' + gdal_ogr2ogr_command)
     #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
     
     try:
@@ -116,6 +114,7 @@ def main():
         # Reads the output and waits for the process to exit before returning
         stdout, stderr = process.communicate()
         print (stdout)
+        print ("Done!")
         if stderr:      
             raise Exception (stderr)  # or  if process.returncode:
     except Exception as message:
