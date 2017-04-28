@@ -25,8 +25,8 @@ raster image. Vectors are read from OGR supported vector formats.
 
 @example:
 
-Example 1 - Generate a 3000 by 3000 raster from a polyline:
-./coresyf_PolylineToRaster.py -n DN -w 3000 -h 3000 -r input_polyline.shp -l output_raster -o output_raster.tif
+Example 1 - Generate a 3000 by 3000 raster with HDF4 format from a polyline:
+./coresyf_PolylineToRaster.py -n DN --width 3000 --height 3000 --o_format HDF4Image -r ../examples/PolylineToRaster/output_polyline.shp -l output_polyline -o output_raster.tif
 
 
 @version: v.1.0
@@ -39,7 +39,7 @@ Example 1 - Generate a 3000 by 3000 raster from a polyline:
 
 VERSION = '1.0'
 USAGE = ('\n'
-         'coresyf_PolylineToRaster.py [-n <FieldName>] [-w <Width>] [-h <Height>]'
+         'coresyf_PolylineToRaster.py [-n <FieldName>] [-width <Width>] [-h <Height>]'
          "[-r <InputPolyline>] [-o <OutputRaster>] "
  #        "[--o_type=<DataType>]"
          "\n")
@@ -114,7 +114,7 @@ def main():
         # Building gdal_translate command line #
         #--------------------------------------#
     gdal_exe = 'gdal_rasterize '
-    output_opts = '-a %s -of -ts %s %s -l %s %s %s' % (opts.fieldname,
+    output_opts = '-a %s -of %s -ts %s %s -l %s %s %s' % (opts.fieldname,
                                                  opts.output_format,
                                                  opts.width,
                                                  opts.height,
