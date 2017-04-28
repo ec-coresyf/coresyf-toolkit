@@ -7,7 +7,7 @@
 # Component : Co-ReSyF Tools (Polyline to Raster)
 # Language  : Python (v.2.6)
 #------------------------------------------------------------------------------
-# Scope : Command line raster cropping tool for GDAL supported files
+# Scope : Command line polyline to raster tool for GDAL supported files
 # Usage : (see the following docstring)
 #==============================================================================
 # $LastChangedRevision:  $:
@@ -26,7 +26,8 @@ raster image. Vectors are read from OGR supported vector formats.
 @example:
 
 Example 1 - Generate a 3000 by 3000 raster with HDF4 format from a polyline:
-./coresyf_PolylineToRaster.py -n DN --width 3000 --height 3000 --o_format HDF4Image -r ../examples/PolylineToRaster/output_polyline.shp -l output_polyline -o output_raster.tif
+./coresyf_PolylineToRaster.py -n DN --width 3000 --height 3000 --o_format HDF4Image 
+-r ../examples/PolylineToRaster/output_polyline.shp -l output_polyline -o output_raster.tif
 
 
 @version: v.1.0
@@ -39,8 +40,8 @@ Example 1 - Generate a 3000 by 3000 raster with HDF4 format from a polyline:
 
 VERSION = '1.0'
 USAGE = ('\n'
-         'coresyf_PolylineToRaster.py [-n <FieldName>] [-width <Width>] [-h <Height>]'
-         "[-r <InputPolyline>] [-o <OutputRaster>] "
+         'coresyf_PolylineToRaster.py [-n <FieldName>] [--width <Width>] [--height <Height>]'
+         "[--o_format <OutputFormat>] [-r <InputPolyline>] [-l <Layer>] [-o <OutputRaster>] "
  #        "[--o_type=<DataType>]"
          "\n")
 
@@ -67,7 +68,7 @@ def main():
     #==============================#
     parser.add_option('-r',
                       dest="input_polyline", metavar=' ',
-                      help="input raster file (GDAL supported file)", )
+                      help="input polyline shapefile (GDAL supported file)", )
     parser.add_option('-o',
                       dest="output_raster", metavar=' ',
                       help=("output raster "
@@ -86,7 +87,7 @@ def main():
                       help="Height of the output file")
     parser.add_option("-l", 
                       dest="layer", metavar=' ',
-                      help="Layer of the input file "
+                      help="Layer of the input file to be used "
                       "(default: filename)")
     parser.add_option('--o_format',
                       dest="output_format", metavar=' ',
@@ -107,6 +108,7 @@ def main():
         print(USAGE)
         return
     if not opts.layer:
+        #If no layer name is received, use the input filename
         opts.layer=os.path.split(opts.input_polyline.split('.')[0])[1]
         return
 
