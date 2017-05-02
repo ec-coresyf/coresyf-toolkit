@@ -7,7 +7,7 @@
 # Component : Co-ReSyF Tools (Raster to Polygon)
 # Language  : Python (v.2.6)
 #------------------------------------------------------------------------------
-# Scope : Command line raster to polygon tool for GDAL supported files
+# Scope : Command line tool for converting a raster into a polygon shapefile
 # Usage : (see the following docstring)
 #==============================================================================
 # $LastChangedRevision:  $:
@@ -30,7 +30,7 @@ value of that polygon.
 @example:
 
 Example 1 - Generate different polygons for all bands of the input raster:
-./coresyf_RasterToPolygon.py -r multiBandImage.tif -o polygonized_raster.shp
+./coresyf_RasterToPolygon.py -r ../examples/RasterToPolygon/multiBandImage.tif -o polygonized_raster.shp
 
 
 @version: v.1.0
@@ -48,7 +48,6 @@ USAGE = ('\n'
  #        "[--o_type=<DataType>]"
          "\n")
 
-#DefaultTypesLookup = ['Byte','UInt16','Int16','UInt32','Int32','Float32','Float64']
 
 
 ''' SYSTEM MODULES '''
@@ -108,7 +107,7 @@ def main():
         print("Unable to determine the number of bands of the input file!")
         sys.exit(1)
 
-     #====================================#
+    #====================================#
     #    LOOP THROUGH ALL RASTER BANDS   #
     #====================================#
 
@@ -127,9 +126,9 @@ def main():
         gdal_polygonize_command = gdal_exe + output_opts
 
 
-        #===========================#
+        #==================================#
         # Run gdal_polygonize command line #
-        #===========================#
+        #==================================#
         #print ('\n' + gdal_polygonize_command)
         #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
 
