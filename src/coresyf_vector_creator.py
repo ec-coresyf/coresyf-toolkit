@@ -22,15 +22,18 @@ This module runs the following Co-ReSyF tool:
  - Vector creation and edition
 It uses the GDAL ogr module to create and edit shapefiles.
 It can be used to create new shapefiles or to add attribute fields and respective 
-values to existing shapefiles.  
+values to existing shapefiles. Only the point geometry is supported. 
 
 Refs: https://pcjericks.github.io/py-gdalogr-cookbook/geometry.html#create-a-point
       https://pcjericks.github.io/py-gdalogr-cookbook/vector_layers.html
 
 @example:
 
-Example 1 - Convert a shapefile geometry from polygon to polyline: 
-./coresyf_vector_creator.py -r ../examples/VectorCreator/polygons_land_mask.shp
+Example 1 - Create a shapefile using text file with data field values separated by tab character: 
+./coresyf_vector_creator.py -o ../examples/VectorCreator/newshapefile.shp --data_file ../examples/VectorCreator/data_to_create.txt
+
+Example 2 - Updating the previous shapefile with new data field values contained in 'data2.txt':
+./coresyf_vector_creator.py -r ../examples/VectorCreator/newshapefile.shp --data_file ../examples/VectorCreator/data_to_edit.txt
 
 
 @version: v.1.0
@@ -43,21 +46,19 @@ Example 1 - Convert a shapefile geometry from polygon to polyline:
 
 VERSION = '1.0'
 USAGE   = ( '\n'
-            'coresyf_vector_creator.py.py [-r <InputVectorfile>] [-o <OutputVectorfile>]'
+            'coresyf_vector_creator.py.py [-r <InputVectorfile>] [-o <OutputVectorfile>] [--o_format <VectorFormat>] [--data_file <DataFile>]'
             "\n")
 
 
 ''' SYSTEM MODULES '''
 from optparse import OptionParser
 import sys
-import subprocess
 import csv, os
 
 from osgeo import ogr, osr
 
 
-geo_types_dict = { 'point': ogr.wkbPoint,
-                 }
+
 
 def createPoint( point_coord = [] ):
     my_point = ogr.Geometry( ogr.wkbPoint )
@@ -134,8 +135,8 @@ def createGeoFromWKT (wkt_code):
     else:
         print ('WKT Expression Error. Check syntax')
 
-
 #createGeoFromWKT('POINT (10 0)')
+
 
 def createVector(file_path, data_file, format_name='ESRI Shapefile' ):
     # set up the shapefile driver
@@ -173,7 +174,7 @@ def createVector(file_path, data_file, format_name='ESRI Shapefile' ):
         dst_layer.CreateFeature(feature)
         feature = None
         
-#createVector('/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp', '/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data.txt')
+#createVector('/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp', '/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data_to_create.txt')
 
 
 def editVector(file_path, data_file, format_name='ESRI Shapefile' ):
@@ -203,7 +204,7 @@ def editVector(file_path, data_file, format_name='ESRI Shapefile' ):
         inFeature = inLayer.GetNextFeature()
         if not inFeature: break
         
-#editVector('/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp', '/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data2.txt')
+#editVector('/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp', '/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data_to_edit.txt')
 
 
 
@@ -233,6 +234,7 @@ def main():
                       help= ("Delimited text file with data fields separated by tab character"),
                       )    
 
+
     #==============================#
     #   Check mandatory options    #
     #==============================#
@@ -249,28 +251,25 @@ def main():
         print("No data file provided containing the field values. Nothing to do!")
         print(USAGE)
         return
+    if opts.input_file and not os.path.exists(opts.input_file):
+        print("The vector file %s was not found. No vector file available for editing!" % opts.input_file)
+        return
     
-    #======#
-    # Run  #
-    #======#    
-    #try:
-    if opts.input_file:
-        print ("Creating a new vector file using data from %s ..." % opts.data_file)
-        createVector(opts.output_file, opts.data_file)
-    else:
-        print ("Updating vector file using data from %s ..." % opts.data_file)
-        editVector(opts.input_file, opts.data_file)
-        
-    #except Exception as message:
-        #print message
-        #print( str(message) )
-        #sys.exit(process.returncode)
+    #==========#
+    #   Run    #
+    #==========#    
+    try:
+        if opts.input_file:
+            print ("\nUpdating vector file using data from %s ..." % opts.data_file)
+            editVector(opts.input_file, opts.data_file)
+        else:
+            print ("\nCreating a new vector file using data from %s ..." % opts.data_file)
+            createVector(opts.output_file, opts.data_file, opts.output_format)
+        print ('...Done!')    
+    except Exception as message:
+        print( str(message) )
+        print('Error: Unable to create or edit vector file.')
+        sys.exit(-1)
 
 if __name__ == '__main__':   
     main()
-
-# CREATE 
-#./coresyf_vector_creator.py -o /home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp --data_file /home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data.txt
-
-# EDIT
-#./coresyf_vector_creator.py -r /home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp --data_file /home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data2.txt
