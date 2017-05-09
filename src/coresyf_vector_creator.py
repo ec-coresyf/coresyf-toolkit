@@ -68,7 +68,6 @@ def createPoint( point_coord = [] ):
     return my_point
     
     
-
 def createLine( line_coord = [] ):
     my_line = ogr.Geometry( ogr.wkbLineString )
     for point_coord in line_coord:
