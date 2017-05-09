@@ -31,7 +31,7 @@ python coresyf_isodata_classification.py -r ../examples/ISOdata_classification/e
 @attention: 
     @todo
     - Is projection checking performed???
-    - Explore other limitations...
+
 
 
 @version: v.1.0
