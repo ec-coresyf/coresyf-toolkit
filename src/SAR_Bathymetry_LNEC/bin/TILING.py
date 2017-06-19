@@ -5,7 +5,7 @@
 ===============================================================================
 Co-ReSyF Research Application - SAR_Bathymetry
 ===============================================================================
- Authors: Alberto Azevedo and Francisco Sancho
+ Authors: 
  Date: June/2016
  Last update: March/2017
  
@@ -33,30 +33,43 @@ import argparse
 import tarfile
 import ConfigParser
 
-'''
+
 def restricted_float(x):
     x = float(x)
     if x < 0.1 or x > 0.5:
         raise argparse.ArgumentTypeError("%r not in range [0.1, 0.5]"%(x,))
     return x
-'''
+
 
 ########## Input arguments
 parser = argparse.ArgumentParser(description='Co-ReSyF: Sar Bathymetry Research Application')
 parser.add_argument('-i', '--input', help='Input image', required=True)
-parser.add_argument('-o', '--output', help='Output file (tar.gz) with .npz files for FFT determination', required=True)
-parser.add_argument('-u', '--outlist', help='List with output file names (tar.gz) with .npz files for FFT determination (to be used by Wings)', required=True)
-parser.add_argument('-p', '--out_param', help='Output parameters file (.ini file)', required=True)
-parser.add_argument('-p', '--polygon', help='Bathymetric AOI - Polygon coords list file', required=False)
-parser.add_argument("-g", "--graphics", help="Show matplotlib plots while running the application", action="store_true")
-parser.add_argument("-l", "--landmask", help="Apply Landmask",action="store_true")
-parser.add_argument("-r", "--resDx", help="Resolution of the final bathymetric grid, in meters (m). Default=500m.", default=500., type=float,required=False)
-parser.add_argument("-s", help="FFT box shift parameter. Possible values between (0.1-0.5). Default=0.5.",default=0.5, type=restricted_float,required=False)
-parser.add_argument("-v","--verbose", help="increase output verbosity",action="store_true")
+parser.add_argument('-o', '--output', help='Output file (tar.gz) with .npz files for FFT determination', required=False)
+parser.add_argument('-u', '--outlist', help='List with output file names (tar.gz) with .npz files for FFT determination (to be used by Wings)', required=False)
+parser.add_argument('-a', '--in_param', help='Input parameters file (.ini file)', required=True)
+#parser.add_argument('-p', '--polygon', help='Bathymetric AOI - Polygon coords list file', required=False)
+#parser.add_argument("-g", "--graphics", help="Show matplotlib plots while running the application", action="store_true")
+#parser.add_argument("-l", "--landmask", help="Apply Landmask",action="store_true")
+#parser.add_argument("-r", "--resDx", help="Resolution of the final bathymetric grid, in meters (m). Default=500m.", default=500., type=float, required=False)
+#parser.add_argument("-s", help="FFT box shift parameter. Possible values between (0.1-0.5). Default=0.5.",default=0.5, type=restricted_float, required=False)
+#parser.add_argument("-v","--verbose", help="increase output verbosity",action="store_true")
 args = parser.parse_args()
 
 
-RunId = datetime.now().strftime('%Y%m%dT%H%M%S')
+# Reading ini file with parameters    
+Config = ConfigParser.ConfigParser()
+Config.read(args.in_param) 
+
+Input = Config.get("Arguments", "Input_file")
+Output = Config.get("Arguments", "Output_file",)
+Polygon = Config.get("Arguments", "Polygon_file")
+Graphics = Config.get("Arguments", "Graphics")
+resDx = Config.get("Arguments", "Grid_resolution")
+FFT_shift = Config.get("Arguments", "FFT_box_shift")
+Landmask = Config.get("Arguments", "Landmask")
+Verbose = Config.get("Arguments", "Verbose")
+RunId = Config.get("Run", "Id")
+
 
 # Creating temp folder (for temporary files)
 curdir = os.getcwd()
@@ -65,27 +78,7 @@ PathOut = curdir + '/temp/' + str(RunId) + "/FFT_img_outputs"
 if not os.path.exists(PathOut):
     os.makedirs(PathOut)
 
-# Creating 
-Params=[ "\n#########################################################################################\n",
-         "\nCo-ReSyF: Sar Bathymetry Research Application\n",
-         "#########################################################################################\n",
-         "RunId : %s" % RunId +"\n",
-         "Input file: %s" % args.input +"\n",
-         "Output file: %s" % args.output +"\n",
-         "Polygon file: %s" % args.polygon +"\n",
-         "Graphics: %s" % args.graphics +"\n",
-         "Grid resolution: %s" % args.resDx+"\n",
-         #"Period of the swell: %s" % args.t+"\n",
-         "FFT box shift parameter: %s" % args.s+"\n",
-         "Landmask: %s" % args.landmask+"\n",
-         "Verbosity: %s" % args.verbose+"\n",
-         "\n\n"]
-
-paramsFile = args.out_param
-parOut = open(paramsFile, "w")
-parOut.writelines(Params)
-parOut.close()
-
+'''
 if args.verbose:
     for i in Params:
         print i[:-1]
@@ -209,3 +202,4 @@ if args.verbose:
         print "The FFT .npz files were successfully created !!! "
 
 
+'''
