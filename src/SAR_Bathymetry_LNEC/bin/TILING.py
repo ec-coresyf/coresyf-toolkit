@@ -15,11 +15,11 @@ Co-ReSyF Research Application - SAR_Bathymetry
 ===============================================================================
 """
 
-import os,sys
-wdir=os.getcwd()
-paths=[wdir[:-6]+"bin"]
-for i in paths:
-    sys.path.append(i)
+import os, sys
+#wdir=os.getcwd()
+#paths=[wdir[:-6]+"bin"]
+#for i in paths:
+#    sys.path.append(i)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,19 +31,22 @@ import matplotlib.colors as colors
 from datetime import datetime
 import argparse
 import tarfile
+import ConfigParser
 
+'''
 def restricted_float(x):
     x = float(x)
     if x < 0.1 or x > 0.5:
         raise argparse.ArgumentTypeError("%r not in range [0.1, 0.5]"%(x,))
     return x
+'''
 
 ########## Input arguments
 parser = argparse.ArgumentParser(description='Co-ReSyF: Sar Bathymetry Research Application')
 parser.add_argument('-i', '--input', help='Input image', required=True)
 parser.add_argument('-o', '--output', help='Output file (tar.gz) with .npz files for FFT determination', required=True)
 parser.add_argument('-u', '--outlist', help='List with output file names (tar.gz) with .npz files for FFT determination (to be used by Wings)', required=True)
-parser.add_argument('-c', '--out_config', help='Output configuration file with resolution values (.txt file)', required=True)
+parser.add_argument('-p', '--out_param', help='Output parameters file (.ini file)', required=True)
 parser.add_argument('-p', '--polygon', help='Bathymetric AOI - Polygon coords list file', required=False)
 parser.add_argument("-g", "--graphics", help="Show matplotlib plots while running the application", action="store_true")
 parser.add_argument("-l", "--landmask", help="Apply Landmask",action="store_true")
@@ -57,19 +60,18 @@ RunId = datetime.now().strftime('%Y%m%dT%H%M%S')
 
 # Creating temp folder (for temporary files)
 curdir = os.getcwd()
-
 PathOut = curdir + '/temp/' + str(RunId) + "/FFT_img_outputs"
 #newpath = r'./'+PathOut
 if not os.path.exists(PathOut):
     os.makedirs(PathOut)
 
+# Creating 
 Params=[ "\n#########################################################################################\n",
          "\nCo-ReSyF: Sar Bathymetry Research Application\n",
          "#########################################################################################\n",
          "RunId : %s" % RunId +"\n",
          "Input file: %s" % args.input +"\n",
          "Output file: %s" % args.output +"\n",
-         "Output config: %s" % args.out_config +"\n",
          "Polygon file: %s" % args.polygon +"\n",
          "Graphics: %s" % args.graphics +"\n",
          "Grid resolution: %s" % args.resDx+"\n",
@@ -79,7 +81,7 @@ Params=[ "\n####################################################################
          "Verbosity: %s" % args.verbose+"\n",
          "\n\n"]
 
-paramsFile = args.out_config
+paramsFile = args.out_param
 parOut = open(paramsFile, "w")
 parOut.writelines(Params)
 parOut.close()
@@ -205,13 +207,5 @@ for n,i in enumerate(Pontos):
     tar.close()
 if args.verbose:
         print "The FFT .npz files were successfully created !!! "
-
-
-
-
-######### END HERE =============================================
-# @TODO  Create here xml with metada for WINGS
-
-
 
 
