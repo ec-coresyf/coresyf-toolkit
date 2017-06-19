@@ -21,17 +21,18 @@ parser.add_argument('-o', '--output', help='Output file text file... ', required
 args = parser.parse_args()
 
 
-# Creating temp folder (for temporary files)
-#curdir = os.getcwd()
-#if not os.path.exists(PathOut):
-#    os.makedirs(PathOut)
-
-
-
 
 
 files_list=args.input
 
 print (args.input)
+output_file = open(args.output, 'w')
 
-print (files_list [1])
+for i in range (0, len(files_list)):
+    input_file = open(files_list[i], 'r')
+    for line in input_file:
+        output_file.write(line)
+    
+    input_file.close()
+
+output_file.close()
