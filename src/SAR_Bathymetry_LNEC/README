@@ -1,0 +1,63 @@
+#==============================#
+#    Dependencies:  (by RCCC)  #
+#==============================#
+sudo apt-get install python-opencv
+sudo pip install Cython
+sudo pip install scikit-image
+sudo pip install pyproj
+
+
+#============================================#
+Co-ReSyF SAR Bathymetry Research Application
+Author: Alberto Azevedo
+Email: aazevedo@lnec.pt
+#============================================#
+
+Structure of the directories:
+                                      |- CSAR.py (Functions)
+RA_SAR_Bathymetry             |-------|- SAR_Bathymetry_CoReSyF_V8.py (Main code)
+        |                     |
+        |                     |
+        |	|------bin :--|         |----EMODNET : Bathymetry data from EMODNET
+        |	|                       |
+        |-------|------input :----------|----Images : Images used by the script
+                |                       |
+                |------output :---|     |----VFP : Directory where the global landmask is stored
+                |                 |
+                |------RunDir     |        ---Runs----
+                        |         |--------| SAR_BathyOut_{RunId 1} |-- FFT_img_outputs
+                        |                  | SAR_BathyOut_{RunId 2} |-- FFT_img_outputs
+                        |                  | SAR_BathyOut_{RunId 3} |-- FFT_img_outputs
+                        |
+                        |------ : (the script is called in this directory and the polygon files are also stored were)
+
+
+
+In order to use the algorithm one must "cd RunDir" and run the following command:
+
+../bin/SAR_Bathymetry_CoReSyF_V8.py -i ../input/Images/K5_20140919184413_000000_05912_D_WD02_HH_WTC_B_L1D/K5_Sesimbra_zoom.tif -p P_K5_Sesimbra_zoom.txt -v -t 13 -r 500
+
+To check all the flags of the script:
+
+../bin/SAR_Bathymetry_CoReSyF_V8.py -h
+
+
+
+For a more demanding computational task one may try to run the following command:
+../bin/SAR_Bathymetry_CoReSyF_V8.py -i ../input/Images/subset_1_of_S1B_IW_GRDH_1SDV_20170320T183449_20170320T183514_004796_008603_6295_Cal_Flip_Spk_Sigma0_VV.tif -p P_Sentinel1.txt -v -r 300 -t 15
+
+One should consider that the lower resolution (in this case 300 m), the higher the computational cost (more grid points).
+
+
+Notes:
+ - If -p flag is not set, the algorithm will call the interactive routine for the definition of the ROI, by the user.
+ - Each run is stored in a SAR_BathyOut_{RunId} folder.
+        - Inside this folder all the results are stored.
+        - Inside the subfolder FFT_img_outputs the FFT .npy, .PNGs, .txt and final Depth are stored
+        - Each .npz contains a subset of the image with lat and lon for each FFT Box. Therefore the number of .npz should be the number necessary of VMs for the cloud computing infrastructure.
+ - RunId is created using the timestamp, with a resolution of seconds.
+ 
+
+
+
+
