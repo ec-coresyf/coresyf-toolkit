@@ -25,14 +25,18 @@ args = parser.parse_args()
 
 files_list=args.input
 
-print (args.input)
 output_file = open(args.output, 'w')
+
+output_buffer = []
 
 for i in range (0, len(files_list)):
     input_file = open(files_list[i], 'r')
-    for line in input_file:
-        output_file.write(line)
+    output_buffer.append(input_file.readline())
     
     input_file.close()
+
+output_buffer.sort()
+for j in range (0, len(output_buffer)):
+    output_file.write(output_buffer[j])
 
 output_file.close()
