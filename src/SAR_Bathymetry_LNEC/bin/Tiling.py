@@ -118,7 +118,7 @@ lon, lat = CSAR.GetLonLat(LMaskFile)
 
 # Saving list with variable 'res' into parameter file
 cfgfile = open(args.param, 'w')
-Config.set("Run", "res", res)
+Config.set("Run", "res", str(res[0]) + ', ' + str(res[1]) ) 
 Config.write(cfgfile)
 cfgfile.close
 
