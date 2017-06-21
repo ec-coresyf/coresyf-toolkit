@@ -13,7 +13,8 @@ from datetime import datetime
 import argparse
 import tarfile
 import os, re
-
+import ConfigParser
+import shutil
 
 ########## Input arguments
 parser = argparse.ArgumentParser(description='Co-ReSyF: Sar Bathymetry Research Application')
@@ -22,21 +23,36 @@ parser.add_argument('-o', '--output', help='Output text file', required=True)
 parser.add_argument("-g", "--graphics", help="Show matplotlib plots while running the application", action="store_true")
 parser.add_argument("-t", help="Period of the swell in deep waters, in seconds (s). Default=12s", default=12., type=float, required=False)
 parser.add_argument("-v","--verbose", help="increase output verbosity",action="store_true")
+parser.add_argument('-a', '--param', help='Parameters file (.ini file)', required=True)
 args = parser.parse_args()
 
-########### @TODO
-res= [6.39, 6.39]
 
-Tmax=args.t
+# Reading ini file with parameters
+ConfigF = ConfigParser.ConfigParser()
+ConfigF.read(args.param)
+
+resStr = ConfigF.get("Run", "res")
+resList = resStr.split(',')
+res = [float(elem) for elem in resList]
+
+print res
+
+Tmax = args.t
 fileout = args.output
 npz_tar_file = args.input
+
+# Creating Temporary folder
+curdir = os.getcwd()
+Path_temp = curdir + '/temp/' 
+if not os.path.exists(Path_temp):
+    os.makedirs(Path_temp)
 
 #################################################################
 ### TO DO - Read EMODNET to define Tmax
 
 #Tmax=12.## Swell com periodo de 15 segundos
-Lmax=(9.8*(Tmax*Tmax))/(2*np.pi)
-W2_deep=(2.*np.pi/(Tmax))*(2.*np.pi/(Tmax))
+Lmax = (9.8*(Tmax*Tmax))/(2*np.pi)
+W2_deep = (2.*np.pi/(Tmax))*(2.*np.pi/(Tmax))
 print "LMAX" , Lmax
 
 
@@ -61,9 +77,8 @@ PointId = re.findall(r"FFT_(\d+)", npz_tar_file_basename)[0]
 DepthOut = fileout  #+ 'Depth_' + str(RunId) + '_' + PointId + '.txt'
 FDepthOut = open(DepthOut,"w")
 
-# Saving fileoutTXT in current working directory (temporary file)
-curdir = os.getcwd()
-fileoutTXT = curdir + '/' + str(RunId) + "_FFT_" + PointId + ".txt"
+# Saving fileoutTXT in temporary folder directory (temporary file)
+fileoutTXT = Path_temp + '/' + str(RunId) + "_FFT_" + PointId + ".txt"
 fout = open(fileoutTXT,"w")
 
 tar = tarfile.open(npz_tar_file)
@@ -85,7 +100,7 @@ for member in tar.getmembers(): #for j in xrange(9):
 	################    FFT Boxes    
 	CDO,DIR,mag,deltaX,deltaY,p2_plot,Kscale,RMask,CDO_array=CSAR.FFT_SAR(BoxFile['imgs'],BoxFile['lons'],BoxFile['lats'],fout,FFTid,Lmax,res=res,Tmax=Tmax)
 	################    FFT Plots    
-	CSAR.PlotSARFFT(BoxFile['imgs'],BoxFile['lons'],BoxFile['lats'],CDO,DIR,mag,deltaX,deltaY,p2_plot,Kscale,RMask,CDO_array,FFTid,CDOMax=Lmax,dir=fileout)
+	CSAR.PlotSARFFT(BoxFile['imgs'],BoxFile['lons'],BoxFile['lats'],CDO,DIR,mag,deltaX,deltaY,p2_plot,Kscale,RMask,CDO_array,FFTid,CDOMax=Lmax,dir=Path_temp)
 	j+=1
 fout.close()
 tar.close()
@@ -99,8 +114,8 @@ FDepthOut.write(" %s   %s   %s   %s   %s   %s   " % (PointId, CdoDirData[0,1],Cd
 FDepthOut.close()
 
 
-
-
+# Removing temporary folder
+shutil.rmtree(Path_temp)
 
 '''
 ########################### NEXT SCRIPT ############################
