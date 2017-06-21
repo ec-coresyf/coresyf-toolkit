@@ -31,6 +31,7 @@ import matplotlib.colors as colors
 from datetime import datetime
 import argparse
 import ConfigParser
+import shutil
 
 def restricted_float(x):
     x = float(x)
@@ -59,11 +60,18 @@ GridDx=args.resDx
 shift=args.s
 RunId=datetime.now().strftime('%Y%m%dT%H%M%S')
 #RunId=datetime.now().strftime('%Y%m%dT%H%M')
-PathOut = os.path.dirname(os.path.realpath(filein))
+#PathOut = os.path.dirname(os.path.realpath(filein))
 #PathOut="../output/SAR_BathyOut_"+str(RunId)+"/"
 #newpath = r'./'+PathOut
 #if not os.path.exists(newpath):
 #	os.makedirs(newpath)
+
+
+#Creating Temporary folder
+curdir = os.getcwd()
+Path_temp = curdir + '/temp/' 
+if not os.path.exists(Path_temp):
+	os.makedirs(Path_temp)
 
 # Creating ini file with parameters    
 parOut = open(args.out_param, "w")
@@ -108,7 +116,7 @@ EPSG="WGS84"
 
 if args.verbose:
 	print "\n\nReading Image..."
-img,mask,res, LMaskFile=CSAR.ReadSARImg(filein,ScaleFactor=np.float(SFactor),C_Stretch=True,SlantCorr=Slant_Flag,EPSG_flag=EPSG,Land=args.landmask, path=PathOut)
+img,mask,res, LMaskFile=CSAR.ReadSARImg(filein,ScaleFactor=np.float(SFactor),C_Stretch=True,SlantCorr=Slant_Flag,EPSG_flag=EPSG,Land=args.landmask, path=Path_temp)
 
 if args.verbose:
 	print "\n\nReading Image... DONE!!!"
@@ -138,11 +146,11 @@ Pontos = np.array(Pontos)
 if args.polygon==None:
 	Polygon=CSAR.SetPolygon(LMaskFile,offset,PtsNum=10)
 	np.savetxt("Polygon.txt",Polygon)
-	os.system("cp -f Polygon.txt "+PathOut+".")
+	os.system("cp -f Polygon.txt "+Path_temp+".")
 	for i in Polygon:
 		print i
 else:
-	os.system("cp -f "+args.polygon+" "+PathOut+".")
+	os.system("cp -f "+args.polygon+" "+Path_temp+".")
 	Polygon=np.loadtxt(args.polygon)
 	print Polygon	
 
@@ -160,7 +168,7 @@ Pontos=Pontos[Pts2Keep]
 plt.figure()
 plt.imshow(img,cmap="gray")
 plt.scatter(Pontos[:,0],Pontos[:,1],3,marker='o',color='r')
-plt.savefig(PathOut+"Grid.png", dpi=300)
+plt.savefig(Path_temp+"Grid.png", dpi=300)
 if Graphics:
 	plt.show()
 
@@ -180,3 +188,6 @@ print metadata_filepath
 metadata_file=open(metadata_filepath,"w")
 metadata_file.write("NumberTiles = %s" % Pontos.shape[0])
 metadata_file.close()
+
+# Removing temporary folder
+shutil.rmtree(Path_temp)
