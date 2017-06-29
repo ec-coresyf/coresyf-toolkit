@@ -38,6 +38,7 @@ def call_gpt(operator, source, target, options):
     gpt_options = ' '.join([parameter(key, value) for key, value in options.items() if value is not None])
     targetopt = ("-t \"%s\"" % target if target else "")
     gpt_command = "gpt %s -f GeoTIFF %s -Ssource=\"%s\" %s" % (operator, targetopt, source, gpt_options)
+    
     # ------------------------------------#
     #    Run gpt command line   #
     # ------------------------------------#
@@ -58,3 +59,7 @@ def call_gpt(operator, source, target, options):
     except Exception, message:
         print(str(message))
         # sys.exit(1)  # or sys.exit(process.returncode)
+    
+    # Change output name (dummy resolution to solve SNAP bug of automatically adding extension)
+    os.rename(target + ".tif", target)
+    
