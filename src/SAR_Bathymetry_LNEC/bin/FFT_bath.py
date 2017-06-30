@@ -110,7 +110,7 @@ CdoDirData=np.loadtxt(fileoutTXT)
 CDO_mean=np.nanmean(CdoDirData[:,3])
 DIR_mean=np.nanmean(CdoDirData[:,4])
 Depth=CSAR.SAR_LinearDepth(CDO_mean,W2_deep,Lmax)
-FDepthOut.write(" %s   %s   %s   %s   %s   %s   " % (PointId, CdoDirData[0,1],CdoDirData[0,2],CDO_mean,DIR_mean,Depth)+"\n")
+FDepthOut.write("%s\t%s\t%s\t%s\t%s\t%s" % (PointId, CdoDirData[0,1],CdoDirData[0,2],CDO_mean,DIR_mean,Depth)+"\n")
 FDepthOut.close()
 
 
@@ -127,3 +127,4 @@ CSAR.Plot_DTM(RunId,fileout,graphics=Graphics)
 if args.verbose:
     print "\n\n SAR Bathymetry DONE!!!"
 '''
+

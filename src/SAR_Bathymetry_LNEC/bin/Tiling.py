@@ -48,32 +48,50 @@ def restricted_float(x):
 ########## Input arguments
 parser = argparse.ArgumentParser(description='Co-ReSyF: Sar Bathymetry Research Application')
 parser.add_argument('-i', '--input', help='Input image', required=True)
+parser.add_argument('-x','--lat_path', help='Path with latitude txt file',required=True)
+parser.add_argument('-y','--lon_path', help='Path with longitude txt file',required=True)
 parser.add_argument('-o', '--output', help='Output file (tar.gz) with .npz files for FFT determination', required=False)
 parser.add_argument('-u', '--outlist', nargs='+', help='List with output file names (tar.gz) with .npz files for FFT determination (to be used by Wings)', required=False)
 parser.add_argument('-a', '--param', help='Parameters file (.ini file)', required=True)
-#parser.add_argument('-p', '--polygon', help='Bathymetric AOI - Polygon coords list file', required=False)
-#parser.add_argument("-g", "--graphics", help="Show matplotlib plots while running the application", action="store_true")
-#parser.add_argument("-l", "--landmask", help="Apply Landmask",action="store_true")
-#parser.add_argument("-r", "--resDx", help="Resolution of the final bathymetric grid, in meters (m). Default=500m.", default=500., type=float, required=False)
-#parser.add_argument("-s", help="FFT box shift parameter. Possible values between (0.1-0.5). Default=0.5.",default=0.5, type=restricted_float, required=False)
+parser.add_argument('-p', '--polygon', help='Bathymetric AOI - Polygon coords list file', required=False)
+parser.add_argument("-g", "--graphics", help="Show matplotlib plots while running the application", action="store_true")
+parser.add_argument("-l", "--landmask", help="Apply Landmask",action="store_true")
+parser.add_argument("-r", "--resDx", help="Resolution of the final bathymetric grid, in meters (m). Default=500m.", default=500., type=float, required=False)
+parser.add_argument("-s", help="FFT box shift parameter. Possible values between (0.1-0.5). Default=0.5.",default=0.5, type=restricted_float, required=False)
 parser.add_argument("-v","--verbose", help="increase output verbosity",action="store_true")
+
 args = parser.parse_args()
 
+RunId = datetime.now().strftime('%Y%m%dT%H%M%S')
 
-# Reading ini file with parameters
+# Creating ini file with parameters    
+parOut = open(args.param, "w")
 Config = ConfigParser.ConfigParser()
-Config.read(args.param) 
+ 
+Config.add_section("Arguments")
+Config.set("Arguments", "Input_file", args.input)
+Config.set("Arguments", "Output_file", args.output)
+Config.set("Arguments", "Polygon_file", args.polygon)
+Config.set("Arguments", "Graphics", args.graphics)
+Config.set("Arguments", "Landmask", args.landmask)
+Config.set("Arguments", "Grid_resolution", args.resDx)
+Config.set("Arguments", "FFT_box_shift", args.s)
+Config.set("Arguments", "Verbose", args.verbose)
+Config.add_section("Run")
+Config.set("Run", "Id", RunId)
 
-Input = Config.get("Arguments", "Input_file")
-Output = Config.get("Arguments", "Output_file",)
-Polygon = Config.get("Arguments", "Polygon_file")
-Graphics = Config.get("Arguments", "Graphics")
-GridDx = Config.getfloat("Arguments", "Grid_resolution")
-shift = Config.getfloat("Arguments", "FFT_box_shift")
-Landmask = Config.get("Arguments", "Landmask")
-Verbose = Config.get("Arguments", "Verbose")
-RunId = Config.get("Run", "Id")
+Config.write(parOut)
+parOut.close()
 
+# Creating parameters
+Input = args.input
+Output = args.output
+Polygon = args.polygon
+Graphics = args.graphics
+Landmask = args.landmask
+GridDx = args.resDx
+shift = args.s
+Verbose = args.verbose
 
 # Creating temp folder (for temporary files)
 curdir = os.getcwd()
@@ -81,16 +99,6 @@ Path_temp = curdir + '/temp/'
 PathOut = Path_temp + str(RunId) + "/FFT_img_outputs"
 if not os.path.exists(PathOut):
     os.makedirs(PathOut)
-
-
-# Printing parameters (verbose)
-if args.verbose:
-    print ("===========================")
-    print ("Printing parameters file...")
-    for sect in Config.sections():
-        print ("--- %s -----------" % sect)
-        for param in Config.options(sect):
-            print ( "    " + param + " : " + Config.get(sect, param) )
 
 
 #### Hardcoded flags...
@@ -123,7 +131,6 @@ Config.write(cfgfile)
 cfgfile.close
 
 
-###
 ### Offset = # of pixels for half of 1 km FFT box. 
 ### Therefore, the Offset varies with image resolution. 
 offset=CSAR.GetBoxDim(res[0])
@@ -134,6 +141,44 @@ if args.verbose:
 ###### Grid definition
 ############################################################
 ############################################################
+
+##########################################################
+# RCCC AND RIAA NEW CODE ################################
+##########################################################
+lon_new = np.loadtxt(args.lon_path)
+lat_new = np.loadtxt(args.lat_path)
+print lat_new.shape[0]
+print lon_new.shape[0]
+
+corrected_grid = []
+for j in lat_new:
+	for val_lon in lon_new:
+		corrected_grid_values = [val_lon, j]
+		corrected_grid.append(corrected_grid_values)
+		print val_lon
+
+print corrected_grid
+
+LonVec,LatVec=lon[0,:],lat[:,0]
+Pontos=[]
+for i in corrected_grid:
+	valx, lon_index=CSAR.find_nearest(LonVec,i[0])
+	valy, lat_index=CSAR.find_nearest(LatVec,i[1])
+	Pontos.append([lon_index,lat_index])
+Pontos = np.array(Pontos)
+
+print Pontos.shape
+print Pontos
+print max(Pontos[0])
+print min(Pontos[0])
+print max(Pontos[1])
+print min(Pontos[1])
+
+##########################################################
+##########################################################
+
+
+'''
 Pts = CSAR.SetGrid(LMaskFile, res, GridDeltaX = GridDx)
 LonVec, LatVec = lon[0,:], lat[:,0]
 Pontos=[]
@@ -162,6 +207,9 @@ for m,k in enumerate(Pts):
     if Result!=-1.0:
         Pts2Keep.append(m)
 Pontos=Pontos[Pts2Keep]
+#############################################################
+#############################################################
+'''
 
 
 if Graphics == 'True': #Graphics

@@ -10,13 +10,8 @@ sudo pip install pyproj
 #=====================================#
 #  Command line execution: (by RCCC)  #
 #=====================================#
-
-./pre_tiling.py -i /home/rccc/_CORESYF/RA_SAR_Bathymetry_InputData/input/Images/K5_20140919184413_000000_05912_D_WD02_HH_WTC_B_L1D/K5_Sesimbra_zoom.tif -p /home/rccc/_CORESYF/RA_SAR_Bathymetry_InputData/input/Images/K5_20140919184413_000000_05912_D_WD02_HH_WTC_B_L1D/P_K5_Sesimbra_zoom.txt -v -r 500 -a dummy.ini -o img_test.tif
-./Tiling.py -i img_test.tif -o myfiles -a dummy.ini -v
-
-./FFT_bath.py -i myfiles20170621T154709_FFT_1.tar.gz -o textfilebath_1.txt -a dummy.ini -t 13 -v 
-./FFT_bath.py -i myfiles20170621T154709_FFT_2.tar.gz -o textfilebath_2.txt -a dummy.ini -t 13 -v
-
+Run "run.sh" script:
+> ./run.sh
 
 
 #============================================#
