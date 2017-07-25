@@ -27,7 +27,7 @@ spacing = 500
 # Set the inset - determine how close to the edge of the layer the points start, in map units (meters)
 inset = 5
 # Set CRS
-crs_meters = '3763'
+crs_meters = '3857'
 crs_degrees = '4326'
 
 lon_vector_path = '/home/rccc/Downloads/lon_vector.txt'

@@ -29,11 +29,11 @@ Refs: https://pcjericks.github.io/py-gdalogr-cookbook/geometry.html#create-a-poi
 
 @example:
 
-Example 1 - Create a shapefile using text file with data field values separated by tab character: 
+Example 1 - Create a shapefile using text file with data field values separated by comma character: 
 ./coresyf_vector_creator.py -o ../examples/VectorCreator/newshapefile.shp --data_file ../examples/VectorCreator/data_to_create.txt
 
 Example 2 - Updating the previous shapefile with new data field values contained in 'data2.txt':
-./coresyf_vector_creator.py -r ../examples/VectorCreator/newshapefile.shp --data_file ../examples/VectorCreator/data_to_edit.txt
+./coresyf_vector_creator.py -i ../examples/VectorCreator/newshapefile.shp -o ../examples/VectorCreator/editedfile.shp --data_file ../examples/VectorCreator/data_to_edit.txt
 
 
 @version: v.1.0
@@ -46,7 +46,7 @@ Example 2 - Updating the previous shapefile with new data field values contained
 
 VERSION = '1.0'
 USAGE   = ( '\n'
-            'coresyf_vector_creator.py.py [-r <InputVectorfile>] [-o <OutputVectorfile>] [--o_format <VectorFormat>] [--data_file <DataFile>]'
+            'coresyf_vector_creator.py.py [-i <InputVectorfile>] [-o <OutputVectorfile>] [--o_format <VectorFormat>] [--data_file <DataFile>]'
             "\n")
 
 
@@ -57,7 +57,8 @@ import csv, os
 
 from osgeo import ogr, osr
 
-
+''' PROGRAM MODULES '''
+import wingsUtils
 
 
 def createPoint( point_coord = [] ):
@@ -138,14 +139,14 @@ def createGeoFromWKT (wkt_code):
 
 
 def createVector(file_path, data_file, format_name='ESRI Shapefile' ):
+    
     # set up the shapefile driver
     driver = ogr.GetDriverByName( format_name )
     # Remove output shapefile if it already exists
     if os.path.exists(file_path):
         driver.DeleteDataSource(file_path)
     # create the data source
-    dst_datasource = driver.CreateDataSource( file_path )
-    
+    dst_datasource = driver.CreateDataSource( file_path )    
     # Create layer with the spatial reference, WGS84
     proj = osr.SpatialReference()
     proj.SetWellKnownGeogCS( 'EPSG:4326' )
@@ -153,7 +154,7 @@ def createVector(file_path, data_file, format_name='ESRI Shapefile' ):
     dst_layer = dst_datasource.CreateLayer(layer_name, srs=proj, geom_type = ogr.wkbPoint)
     
     # Read data from data file
-    data = csv.DictReader(open(data_file,"rb"), delimiter='\t', quoting=csv.QUOTE_NONE)
+    data = csv.DictReader(open(data_file,"rb"), delimiter=',', quoting=csv.QUOTE_NONE)
     
     # Add a new fields
     for field in data.fieldnames:
@@ -172,21 +173,29 @@ def createVector(file_path, data_file, format_name='ESRI Shapefile' ):
         feature.SetGeometry( point )
         dst_layer.CreateFeature(feature)
         feature = None
-        
+    
+    dst_datasource = None
+    
 #createVector('/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp', '/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data_to_create.txt')
 
 
-def editVector(file_path, data_file, format_name='ESRI Shapefile' ):
+def editVector(input_path, data_file, output_path="", format_name='ESRI Shapefile' ):
     # set up the shapefile driver
     driver = ogr.GetDriverByName( format_name )
-    # Open the data source
-    inDataSource = driver.Open(file_path, 1) # 0 means read-only. 1 means writable.
     
+    # Open the data source
+    inDataSource = driver.Open(input_path, 1) # 0 means read-only. 1 means writable.
+    
+    # Copy vector to new file (keep original vector data unchanged)
+    if output_path:
+        driver.CopyDataSource(inDataSource, output_path)
+        inDataSource = driver.Open(output_path, 1)
+        
     # Get layer
     inLayer = inDataSource.GetLayer()
     
     # Read data from data file
-    data = csv.DictReader(open(data_file,"rb"), delimiter='\t', quoting=csv.QUOTE_NONE)
+    data = csv.DictReader(open(data_file,"rb"), delimiter=',', quoting=csv.QUOTE_NONE)
     
     # Add a new fields
     for field in data.fieldnames:
@@ -202,7 +211,7 @@ def editVector(file_path, data_file, format_name='ESRI Shapefile' ):
         inLayer.SetFeature(inFeature)
         inFeature = inLayer.GetNextFeature()
         if not inFeature: break
-        
+    
 #editVector('/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp', '/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data_to_edit.txt')
 
 
@@ -214,7 +223,7 @@ def main():
     #==============================#
     # Define command line options  #
     #==============================#
-    parser.add_option('-r', 
+    parser.add_option('-i', 
                       dest="input_file", metavar=' ',
                       help="input file for editing (GDAL supported vector file)"
                            "use this option to update an existing vector file" , )
@@ -242,8 +251,8 @@ def main():
     if len(sys.argv) == 1:
         print(USAGE)
         return
-    if not opts.input_file and not opts.output_file:
-        print("No vector file provided for editing or output file to be created. Nothing to do!")
+    if not opts.output_file:
+        print("No output file provided for creating vector data. Nothing to do!")
         print(USAGE)
         return
     if not opts.data_file:
@@ -253,14 +262,26 @@ def main():
     if opts.input_file and not os.path.exists(opts.input_file):
         print("The vector file %s was not found. No vector file available for editing!" % opts.input_file)
         return
-    
+
+    #=====================================================#
+    # Check output&input extensions (required for Wings)  #
+    #=====================================================#    
+    try:    
+        if opts.input_file:   
+            opts.input_file, wasUnZipped = wingsUtils.prepareInputData(opts.input_file, ".shp")
+        
+        opts.output_file, output_zip = wingsUtils.prepareOutputData(opts.output_file)
+    except Exception as message:
+        print ( str(message) )
+        sys.exit(-1)
+
     #==========#
     #   Run    #
     #==========#    
     try:
         if opts.input_file:
             print ("\nUpdating vector file using data from %s ..." % opts.data_file)
-            editVector(opts.input_file, opts.data_file)
+            editVector(opts.input_file, opts.data_file, opts.output_file)
         else:
             print ("\nCreating a new vector file using data from %s ..." % opts.data_file)
             createVector(opts.output_file, opts.data_file, opts.output_format)
@@ -269,6 +290,17 @@ def main():
         print( str(message) )
         print('Error: Unable to create or edit vector file.')
         sys.exit(-1)
+        
+        
+    #============================================================#
+    # Compress output files into zip file (required for Wings)   #
+    #============================================================#
+    if opts.input_file and wasUnZipped:
+        wingsUtils.clearTempData( opts.input_file )
+    if opts.output_file and output_zip:
+        wingsUtils.compressData( opts.output_file, output_zip)
+
+        
 
 if __name__ == '__main__':   
     main()
