@@ -46,7 +46,7 @@ Example 2 - Updating the previous shapefile with new data field values contained
 
 VERSION = '1.0'
 USAGE   = ( '\n'
-            'coresyf_vector_creator.py.py [-i <InputVectorfile>] [-o <OutputVectorfile>] [--o_format <VectorFormat>] [--o_crs <CRS_ref>] [--data_file <DataFile>]'
+            'coresyf_vector_creator.py.py [-i <InputVectorfile>] [--i_format <VectorFormat>] [-o <OutputVectorfile>] [--o_format <VectorFormat>] [--o_crs <CRS_ref>] [--data_file <DataFile>]'
             "\n")
 
 
@@ -227,6 +227,11 @@ def main():
                       dest="input_file", metavar=' ',
                       help="input file for editing (GDAL supported vector file)"
                            "use this option to update an existing vector file" , )
+    parser.add_option('--i_format', 
+                      dest="input_format", metavar=' ',
+                      help= ("GDAL vector format for input file, some possible formats are"
+                             " 'ESRI Shapefile', 'netCDF'  (default: 'ESRI Shapefile')"),
+                      default="ESRI Shapefile" )
     parser.add_option('-o', 
                       dest="output_file", metavar=' ',
                       help=("output vector file to be created (default: 'output_vector.shp')"
@@ -286,7 +291,7 @@ def main():
     try:
         if opts.input_file:
             print ("\nUpdating vector file using data from %s ..." % opts.data_file)
-            editVector(opts.input_file, opts.data_file, opts.output_file)
+            editVector(opts.input_file, opts.data_file, opts.output_file, opts.input_format)
         else:
             print ("\nCreating a new vector file using data from %s ..." % opts.data_file)
             createVector(opts.output_file, opts.data_file, opts.output_format, opts.output_crs)
