@@ -30,7 +30,7 @@ Refs: https://pcjericks.github.io/py-gdalogr-cookbook/geometry.html#create-a-poi
 @example:
 
 Example 1 - Create a shapefile using text file with data field values separated by comma character: 
-./coresyf_vector_creator.py -o ../examples/VectorCreator/newshapefile.shp --data_file ../examples/VectorCreator/data_to_create.txt
+./coresyf_vector_creator.py -o ../examples/VectorCreator/newshapefile.shp --o_crs EPSG:4326 --data_file ../examples/VectorCreator/data_to_create.txt
 
 Example 2 - Updating the previous shapefile with new data field values contained in 'data2.txt':
 ./coresyf_vector_creator.py -i ../examples/VectorCreator/newshapefile.shp -o ../examples/VectorCreator/editedfile.shp --data_file ../examples/VectorCreator/data_to_edit.txt
@@ -46,7 +46,7 @@ Example 2 - Updating the previous shapefile with new data field values contained
 
 VERSION = '1.0'
 USAGE   = ( '\n'
-            'coresyf_vector_creator.py.py [-i <InputVectorfile>] [-o <OutputVectorfile>] [--o_format <VectorFormat>] [--data_file <DataFile>]'
+            'coresyf_vector_creator.py.py [-i <InputVectorfile>] [-o <OutputVectorfile>] [--o_format <VectorFormat>] [--o_crs <CRS_ref>] [--data_file <DataFile>]'
             "\n")
 
 
@@ -138,7 +138,7 @@ def createGeoFromWKT (wkt_code):
 #createGeoFromWKT('POINT (10 0)')
 
 
-def createVector(file_path, data_file, format_name='ESRI Shapefile' ):
+def createVector(file_path, data_file, format_name='ESRI Shapefile', crs_ref='EPSG:4326' ):
     
     # set up the shapefile driver
     driver = ogr.GetDriverByName( format_name )
@@ -149,7 +149,7 @@ def createVector(file_path, data_file, format_name='ESRI Shapefile' ):
     dst_datasource = driver.CreateDataSource( file_path )    
     # Create layer with the spatial reference, WGS84
     proj = osr.SpatialReference()
-    proj.SetWellKnownGeogCS( 'EPSG:4326' )
+    proj.SetWellKnownGeogCS( crs_ref )
     layer_name = os.path.splitext(os.path.basename(file_path))[0]
     dst_layer = dst_datasource.CreateLayer(layer_name, srs=proj, geom_type = ogr.wkbPoint)
     
@@ -237,6 +237,11 @@ def main():
                       help= ("GDAL vector format for output file, some possible formats are"
                              " 'ESRI Shapefile', 'netCDF'  (default: 'ESRI Shapefile')"),
                       default="ESRI Shapefile" )
+    parser.add_option('--o_crs', 
+                      dest="output_crs", metavar=' ',
+                      help= ("Coordinate reference system of the output vector, some possible references are"
+                             " 'EPSG:4326', 'EPSG:3857'  (default: 'EPSG:4326')"),
+                      default="EPSG:4326" )      
     parser.add_option('--data_file', 
                       dest="data_file", metavar=' ',
                       help= ("Delimited text file with data fields separated by tab character"),
@@ -284,7 +289,7 @@ def main():
             editVector(opts.input_file, opts.data_file, opts.output_file)
         else:
             print ("\nCreating a new vector file using data from %s ..." % opts.data_file)
-            createVector(opts.output_file, opts.data_file, opts.output_format)
+            createVector(opts.output_file, opts.data_file, opts.output_format, opts.output_crs)
         print ('...Done!')    
     except Exception as message:
         print( str(message) )
