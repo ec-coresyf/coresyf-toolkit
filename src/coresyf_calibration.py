@@ -20,9 +20,14 @@ import os
 import zipfile
 from argparse import ArgumentParser
 from os import path
+import shutil
 
-from product_selector import ProductSelector
+''' PROGRAM MODULES '''
 from gpt import call_gpt
+
+
+TEMP_PATH_IN = os.path.abspath("temp_input") + "/"
+
 
 '''
 @summary: 
@@ -56,9 +61,6 @@ def main():
                         dest="Ssource", metavar='<filepath>',
                         help="Sets source to <filepath>",
                         required=True)
-    parser.add_argument('--Pselector',
-                        dest="Pselector", metavar='<glob>',
-                        help="A glob to select the appropriate product files from a directory.")
     parser.add_argument('--Ttarget', metavar='<filepath>',
                         dest="Ttarget",
                         help="Sets the target to <filepath>")
@@ -116,33 +118,34 @@ def main():
     opts = vars(parser.parse_args())
 
     source = opts.pop("Ssource")
-    selector = opts.pop("Pselector")
     target = opts.pop("Ttarget")
 
     if not os.path.exists(source):
         parser.error("%s does not exists." % source)
-    if path.isfile(source) and selector and not zipfile.is_zipfile(source):
-        parser.error("Selectors should be used only for sources which are directories or zips.")
-    if path.isdir(source) and not selector:
-        parser.error("Selector parameter is missing.")
-    if path.isdir(source) and target:
-        parser.error("Target should not be specified when multiple source files are selected from a dir.")
-
-    ps = ProductSelector(selector)
+    if zipfile.is_zipfile(source):
+        myzip = zipfile.ZipFile(source, 'r')
+        if not myzip.infolist():
+            raise ("Input Zip file '%s' is empty!" % input_path)
+        myzip.extractall( TEMP_PATH_IN )
+        myzip.close()
+        input_list = [os.path.join(TEMP_PATH_IN, x) for x in os.listdir(TEMP_PATH_IN)] # input 
+        if input_list: 
+            source = input_list[0]
 
     # ====================================#
-    #  LOOP THROUGH ALL SELECTED PRODUCTS#
+    #  CALL GPT                           #
     # ====================================#
-    if path.isdir(source):
-        product_files = [path.join(source, fname) for fname in os.listdir(source)
-                         if ps.isproduct(path.join(source, fname))]
-        print("selected files: %s%s" % (os.linesep, os.linesep.join(product_files)))
-    else:
-        product_files = [source]
-
-    for i in product_files:
-        print ("Applying calibration %s..." % i)
-        call_gpt('Calibration', ps.openproduct(i), target, opts)
+    print ("Applying calibration %s..." % source)
+    call_gpt('Calibration', source, target, opts)
+    
+    # Cleaning temp data
+    if os.path.isdir(TEMP_PATH_IN):
+        print("Deleting temp data...")
+        datafolder = os.path.dirname(TEMP_PATH_IN)
+        shutil.rmtree( datafolder )
+    
+    # Rename target file 
+    os.rename(target + ".tif", target)
 
 
 if __name__ == '__main__':
