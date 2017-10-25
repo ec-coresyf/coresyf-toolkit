@@ -191,7 +191,6 @@ def main():
 
     # Remove source extension
     if added_source_extension:
-        print (source)
         os.rename( source, os.path.splitext( source )[0] )
 
 
