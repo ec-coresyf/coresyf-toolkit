@@ -15,6 +15,37 @@
 # $LastChangedDate:  $:
 # ==============================================================================
 
+'''
+@summary: 
+This module runs the following Co-ReSyF tool:
+ - CALIBRATION
+ It uses the command line based Graph Processing Tool (GPT) to perform radiometric
+callibration of mission products. The input must be the whole product (use either
+ the 'manifest.safe' or the whole product in a zip file as input).
+
+@example:
+
+Example 1 - Calibrate a Sentinel product S1A:
+./coresyf_calibration.py --Ssource S1A_EW_GRDM_1SDH_20171001T060648_20171001T060753_018615_01F62E_EE7F.zip 
+                         --Ttarget myfile
+
+@attention: 
+    @todo
+    - Add a product file to be used as example in 'examples' directory
+    - Develop test script
+
+@version: v.1.0
+
+@change:
+1.0
+- First release of the tool. 
+'''
+
+VERSION = '1.0'
+
+DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
+
+
 """ SYSTEM MODULES """
 import os
 import zipfile
@@ -27,28 +58,6 @@ from gpt import call_gpt
 
 
 TEMP_PATH_IN = os.path.abspath("temp_input") + "/"
-
-
-'''
-@summary: 
-TBC
-
-@example:
-TBC          
-
-@attention: 
-TBC
-
-@version: v.1.0
-
-@change:
-1.0
-- First release of the tool. 
-'''
-
-VERSION = '1.0'
-
-DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
 
 
 def main():
@@ -68,7 +77,7 @@ def main():
                         dest="PauxFile", metavar='<string>',
                         help="Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File', "
                              "'External Auxiliary File'.",
-                        default="Latest Auxiliary File",
+                        default="Product Auxiliary File",
                         choices=DefaultAuxFilesLookup)
     parser.add_argument('--PcreateBetaBand',
                         dest="PcreateBetaBand", metavar='<boolean>',
@@ -143,9 +152,6 @@ def main():
         print("Deleting temp data...")
         datafolder = os.path.dirname(TEMP_PATH_IN)
         shutil.rmtree( datafolder )
-    
-    # Rename target file 
-    os.rename(target + ".tif", target)
 
 
 if __name__ == '__main__':

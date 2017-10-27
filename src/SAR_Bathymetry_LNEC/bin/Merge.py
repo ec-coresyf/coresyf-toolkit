@@ -29,12 +29,11 @@ output_buffer = []
 
 for i in range (0, len(files_list)):
     input_file = open(files_list[i], 'r')
-    output_buffer.append(input_file.readline())
-
+    output_buffer.append(input_file.readline().replace('   ', ','))
     input_file.close()
 
 output_buffer.sort()
-output_file.write("ID\tLongitude\tLatitude\tCDO_mean\tDIR_mean\tDepth\n")
+output_file.write("ID,Longitude,Latitude,CDO_mean,DIR_mean,Depth\n")          #output_file.write("ID\tLongitude\tLatitude\tCDO_mean\tDIR_mean\tDepth\n")
 for j in range (0, len(output_buffer)):
     output_file.write(output_buffer[j])
 

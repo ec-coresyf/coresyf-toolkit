@@ -48,17 +48,20 @@ def restricted_float(x):
 ########## Input arguments
 parser = argparse.ArgumentParser(description='Co-ReSyF: Sar Bathymetry Research Application')
 parser.add_argument('-i', '--input', help='Input image', required=True)
-parser.add_argument('-x','--lat_path', help='Path with latitude txt file',required=True)
-parser.add_argument('-y','--lon_path', help='Path with longitude txt file',required=True)
+parser.add_argument('-b','--bath_grid', help='Bathymetric grid in a txt file',required=False)
+parser.add_argument('-x','--lon_path', help='lon',required=False)
+parser.add_argument('-y','--lat_path', help='lat',required=False)
 parser.add_argument('-o', '--output', help='Output file (tar.gz) with .npz files for FFT determination', required=False)
 parser.add_argument('-u', '--outlist', nargs='+', help='List with output file names (tar.gz) with .npz files for FFT determination (to be used by Wings)', required=False)
-parser.add_argument('-a', '--param', help='Parameters file (.ini file)', required=True)
+parser.add_argument('-a', '--param', help='Parameters file (.ini file)', required=False)
 parser.add_argument('-p', '--polygon', help='Bathymetric AOI - Polygon coords list file', required=False)
 parser.add_argument("-g", "--graphics", help="Show matplotlib plots while running the application", action="store_true")
 parser.add_argument("-l", "--landmask", help="Apply Landmask",action="store_true")
 parser.add_argument("-r", "--resDx", help="Resolution of the final bathymetric grid, in meters (m). Default=500m.", default=500., type=float, required=False)
 parser.add_argument("-s", help="FFT box shift parameter. Possible values between (0.1-0.5). Default=0.5.",default=0.5, type=restricted_float, required=False)
 parser.add_argument("-v","--verbose", help="increase output verbosity",action="store_true")
+parser.add_argument('--xnum')
+parser.add_argument('--ynum')
 
 args = parser.parse_args()
 
@@ -113,13 +116,13 @@ EPSG="WGS84"
 #################################################################
 print "\n------- Starting Tiling -------"
 
-if args.verbose:
-    print "\n\nReading Image..."
+#if args.verbose:
+print "\n\nReading Image..."
 img, mask, res, LMaskFile = CSAR.ReadSARImg(args.input, ScaleFactor = np.float(SFactor), C_Stretch = True, SlantCorr = Slant_Flag,
-                                            EPSG_flag = EPSG, Land=Landmask, path=PathOut) #args.landmask
+                                              EPSG_flag = EPSG, Land=Landmask, path=PathOut) #args.landmask
 
-if args.verbose:
-    print "\n\nReading Image... DONE!!!"
+#if args.verbose:
+print "\n\nReading Image... DONE!!!"
 
 lon, lat = CSAR.GetLonLat(LMaskFile)
 
@@ -145,72 +148,18 @@ if args.verbose:
 ##########################################################
 # RCCC AND RIAA NEW CODE ################################
 ##########################################################
-lon_new = np.loadtxt(args.lon_path)
-lat_new = np.loadtxt(args.lat_path)
-print lat_new.shape[0]
-print lon_new.shape[0]
+# Load the grid from txt file and convert to list
+corrected_grid = np.loadtxt(args.bath_grid)
+corrected_grid = corrected_grid.tolist()
 
-corrected_grid = []
-for j in lat_new:
-	for val_lon in lon_new:
-		corrected_grid_values = [val_lon, j]
-		corrected_grid.append(corrected_grid_values)
-		print val_lon
-
-print corrected_grid
-
-LonVec,LatVec=lon[0,:],lat[:,0]
-Pontos=[]
-for i in corrected_grid:
-	valx, lon_index=CSAR.find_nearest(LonVec,i[0])
-	valy, lat_index=CSAR.find_nearest(LatVec,i[1])
-	Pontos.append([lon_index,lat_index])
-Pontos = np.array(Pontos)
-
-print Pontos.shape
-print Pontos
-print max(Pontos[0])
-print min(Pontos[0])
-print max(Pontos[1])
-print min(Pontos[1])
-
-##########################################################
-##########################################################
-
-
-'''
-Pts = CSAR.SetGrid(LMaskFile, res, GridDeltaX = GridDx)
+#Find the nearest pixels in the image that correspond to the grid points
 LonVec, LatVec = lon[0,:], lat[:,0]
 Pontos=[]
-for i in Pts:
-    valx, lon_index=CSAR.find_nearest(LonVec,i[0])
-    valy, lat_index=CSAR.find_nearest(LatVec,i[1])
-    Pontos.append([lon_index,lat_index])
+for i in corrected_grid:
+	valx, lon_index = CSAR.find_nearest(LonVec,i[0])
+	valy, lat_index = CSAR.find_nearest(LatVec,i[1])
+	Pontos.append([lon_index,lat_index])
 Pontos = np.array(Pontos)
-
-if Polygon == 'None': #args.polygon==None:
-    Polygon = CSAR.SetPolygon(LMaskFile, offset, PtsNum=10)
-    np.savetxt("Polygon.txt",Polygon)
-    os.system("cp -f Polygon.txt "+PathOut+".")
-    for i in Polygon:
-        print i
-else:
-    os.system("cp -f " + Polygon + " "+PathOut+".") # args.polygon
-    Polygon=np.loadtxt(Polygon) #(args.polygon)
-    print Polygon    
-
-cnt=Polygon.reshape((-1,1,2)).astype(np.float32)
-
-Pts2Keep=[]
-for m,k in enumerate(Pts):
-    Result=cv2.pointPolygonTest(cnt, (k[0],k[1]), False)
-    if Result!=-1.0:
-        Pts2Keep.append(m)
-Pontos=Pontos[Pts2Keep]
-#############################################################
-#############################################################
-'''
-
 
 if Graphics == 'True': #Graphics
     plt.figure()
@@ -219,28 +168,18 @@ if Graphics == 'True': #Graphics
     plt.savefig(PathOut+"Grid.png", dpi=300)
     plt.show()
 
-if args.verbose:
-    print "\n\n"
-    print Pontos.shape
-    #print Pontos
-    print "\n\n"
-
 
 ############################################################
 ############################################################
 ####   Preparing files for FFT determination and plot  #####
 ############################################################
-#fileout=PathOut+"FFT_img_outputs/"
-#if not os.path.exists(fileout):
-#    os.makedirs(fileout)
-#fileout = fileout + '/SAR_BathyOut_' + str(RunId) + '/FFT_img_outputs'
 if args.verbose:
-        print "Creating the FFT image subsets for each grid point... "
+    print "Creating the FFT image subsets for each grid point... "
 
 
 for n,i in enumerate(Pontos):
     Point_id=str(n+1)
-    
+
     if args.output:
         npz_tar_file = args.output + str(RunId) + "_FFT_" + Point_id + ".tar.gz"
     else:
@@ -251,7 +190,6 @@ for n,i in enumerate(Pontos):
     for m,j in enumerate(imgs):
         FFTid = str(n+1)+"."+str(m+1)
         npzOut = npz_tar_file[:-7] + "_" + FFTid + ".npz"
-        #print npzOut
         np.savez(npzOut, lons=lons[m], lats=lats[m], imgs=imgs[m])
         tar.add( npzOut, os.path.basename(npzOut) )
         os.remove (npzOut)
