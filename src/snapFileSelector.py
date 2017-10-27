@@ -70,6 +70,10 @@ from snappy import ProductIO
 AUX_DATA_FILES = ['GeoTIFF', 'GeoTIFF-BigTIFF', 'NetCDF'] 
 
 
+class SnapProduct():
+    def __init__(self, file_path, mission_format):
+        self.file_path = file_path
+        self.mission_format = mission_format
 
 
 #====================================#
@@ -87,6 +91,7 @@ snappy.SystemUtils.LOG.setLevel(Level.OFF)
 #===================================#
 def get_ProductFile( p_path ):
     
+    p_path = os.path.abspath(p_path)
     files = []
     if(os.path.isfile(p_path)):
         print("Checking if the file is readable by snap:\n %s ..." % p_path )
@@ -107,15 +112,16 @@ def get_ProductFile( p_path ):
         if p:
             p_type = p.getProductType()
             if p.getProductType() in AUX_DATA_FILES:
-                p_file_aux = fi
+                p_file_aux = SnapProduct(fi, p.getProductType())
             else:
                 print(' ------------------------------------------------')
                 print(' Type: '       + p.getProductType() )
-                print(' Mission/Format: '     + ', '.join( p.getProductReader().getReaderPlugIn().getFormatNames() ))
+                mission_or_format = ', '.join( p.getProductReader().getReaderPlugIn().getFormatNames() )
+                print(' Mission/Format: ' + mission_or_format )
                 #print(' Band Names: ' + ', '.join( p.getBandNames() ) )
                 #print(' Raster Sizes: heigth=%d, Width=%d' % (p.getSceneRasterHeight(), p.getSceneRasterWidth()) )
-                print(' ------------------------------------------------')
-                return fi
+                print(' ------------------------------------------------')  
+                return SnapProduct(fi, mission_or_format)
     
     return p_file_aux
         

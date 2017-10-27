@@ -68,6 +68,7 @@ BoolOptions = ['false', 'true']
 ''' SYSTEM MODULES '''
 from optparse import OptionParser
 import sys
+import os
 
 ''' PROGRAM MODULES '''
 from gpt import call_gpt
@@ -115,9 +116,9 @@ def main():
                       dest="Pfilter", metavar=' ',
                       help=("Parameter filter name."
                             "Value must be one of: %s ."
-                            "Default value is 'None'.") % FilterNames,
+                            "Default value is 'Lee Sigma'.") % FilterNames,
                       type='choice', choices=FilterNames,
-                      default="None",)
+                      default="Lee Sigma",)
     parser.add_option('--PfilterSizeX',
                       dest="PfilterSizeX", metavar=' ',
                       help=("The kernel x dimension. Valid interval is (1, 100]."
@@ -148,10 +149,23 @@ def main():
         print(USAGE)
         return  
     
-    opts.Ssource = get_ProductFile(opts.Ssource)
-    if not opts.Ssource:
+    snap_product = get_ProductFile(opts.Ssource)
+
+    if not snap_product:
         print("Readable input file not found!")
         return
+    
+    # Adding .tif extension to GeoTIFF file (to make GPT use GeoTIFF reader) 
+    added_source_extension = False
+    if os.path.splitext( snap_product.file_path )[-1] == '':
+        if 'TIF' in snap_product.mission_format:
+            print ("WARNING: Changing extension to '.tif' of file: " + 
+                   snap_product.file_path)
+            added_source_extension = True
+            os.rename(snap_product.file_path, snap_product.file_path + '.tif' )
+            snap_product.file_path = snap_product.file_path + '.tif'
+    
+    opts.Ssource = snap_product.file_path
     
     #===============================#
     # Remove non-applicable options #
@@ -174,6 +188,10 @@ def main():
     #    Run gpt command line    #
     #============================#
     call_gpt('Speckle-Filter', source, target, vars(opts))
+
+    # Remove source extension
+    if added_source_extension:
+        os.rename( source, os.path.splitext( source )[0] )
 
 
 if __name__ == '__main__':
