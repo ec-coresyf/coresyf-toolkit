@@ -123,6 +123,12 @@ def main():
         print("No input raster provided. Nothing to do!")
         print(USAGE)
         return
+    if opts.crop_wkt == '':
+        # No crop, rename input file to be available to wings
+        os.rename(opts.input_raster, opts.output_raster)
+        print("Empty WKT provided. Output raster not cropped!")
+        return
+
     if not opts.crop_file and not opts.crop_limits and not opts.crop_wkt:
         print("No input polygon or crop limits provided. Nothing to do!")
         print(USAGE)
