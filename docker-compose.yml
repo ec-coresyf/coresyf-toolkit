@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  test:
+    image: "repo.coresyf.eu/toolkit:latest"
+    build:
+      context: .
+    volumes:
+      - ./src:/opt/toolkit/src
+      - ./examples:/opt/toolkit/examples
+    command: ["-m", "unittest", "discover", "-s", "/opt/toolkit/src", "-p", "tests.py"]
+  crop:
+    image: "repo.coresyf.eu/toolkit:latest"
+    build:
+      context: .
+    volumes:
+      - ./src:/opt/toolkit/src
+      - ./examples:/opt/toolkit/examples
+    command: ["coresyf_image_crop.py", "-r", "/opt/toolkit/examples/ImageCrop/etopo_raster.tif", 
+      "-c", "/opt/toolkit/examples/ImageCrop/crop_limits.shp", "-o", "/opt/toolkit/examples/ImageCrop/cropped_image2.tif"]
+
