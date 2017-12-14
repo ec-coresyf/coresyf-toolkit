@@ -16,11 +16,56 @@ CORESYF TOOLKIT works with Python 2.6-2.7
 
 
 ## Installation
-TBC
+No need to install anything. Just run docker (see usage for examples).
 
 ## Usage
-TBC
+### Build image (mandatory)
+If the image is not yet built, run the command: 
 
+`docker-compose build`.
+
+This will create an image with the tag `repo.coresyf.eu/toolkit:latest`.
+
+### Test all tools (not implemented yet)
+This will find all `tests.py` scripts with unittest module and test the tools:
+
+`docker-compose run test`.
+
+### Test tool by tool
+To test `docker-compose up <tool_name>`. Tool name can be one of the following:
+* **calibration**: coresyf_calibration
+* **crop**: coresyf_image_crop
+* **mask**: coresyf_image_mask
+* **spliting**: coresyf_image_splitting
+* **stacking**: coresyf_image_stacking
+* **isodata**: coresyf_isodata_classification
+* **pt2grid**: coresyf_pointsToGrid
+* **polygon2polyline**: coresyf_PolygonToPolyline
+* **polyline2raster**: coresyf_PolylineToRaster
+* **randraster**: coresyf_randRasterGen
+* **raster2polygon**: coresyf_RasterToPolygon
+* **sarfile**: coresyf_sar_fileSelector
+* **speckle**: coresyf_speckle_fileter
+* **vector**: coresyf_vector_creator
+
+**NOTE**: Image crop is the only tool implemented, and it is not working (needs solving).
+
+### Manual testing
+
+It's possible to test the tools without running any of the predefined commands and options. To do so, invoke the tool with the following command: 
+
+`docker container run repo.coresyf.eu/toolkit <tool_script>.py`
+
+### Where is the data?
+The Dockerfile/docker-compose files are configured to place scripts and examples inside the docker container in the following directories:
+* **src**: `/opt/toolkit/src`
+* **examples**: `/opt/toolkit/examples`
+
+Note that, while source code is mounted as a volume _and_ copied inside the container, the examples folder is solely mounted as a volume.
+Also, be aware that the default woking dir of the container is `/opt/toolkit/src`, so there is no need to specify a path to the python script.
+
+### Adding requirements
+To add a new python package requirement, simply add it to the `requirements.txt` file and rebuild the image.
 
 ## Tools description
 These tools (coming from the requirements assessed for the different Research
@@ -59,11 +104,42 @@ creation and edition of different vector file formats
 images into one multi-layer file sorted in the order in which they are inserted by
 the user or by any other user specific parameter (e.g. time)
 
+## Tools Usage
+### **Radiometric Correction**
+TBD
 
+### **Optimal Interpolation**
+TBD
+
+### **Image crop**
+TBD
+
+### **Image mask**
+TBD
+
+### **SAR Speckle filtering**
+TBD
+
+### **Image statistics**
+TBD
+
+### **Geo-referencing**
+TBD
+
+### **Error metrics**
+TBD
+
+### **Vector creation and edition**
+TBD
+
+### **Layer stack creation**
+TBD
 ## CHANGE LOG
+* V0.2: December 14, 2017: Dockerization
+   * Dockerized toolkit
+   * Improved readme
 * V0.1: January 16, 2017: first release:
-   -> ADDED: Image Crop, Image Mask, Image Splitting, Image Stacking and Points-to-
-     -Grid tools.
+   * ADDED: Image Crop, Image Mask, Image Splitting, Image Stacking and Points-to-Grid tools.
 
 
 
