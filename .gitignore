@@ -1,0 +1,8 @@
+.vscode/settings.json
+src/LNEC/Config_Image.ini
+src/LNEC/Config_Inversion.ini
+src/LNEC/Config_Spectrum.ini
+src/LNEC/Info_Type.txt
+src/*.pyc
+src/*/*.pyc
+src/*/*/*.pyc
