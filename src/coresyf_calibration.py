@@ -1,20 +1,4 @@
 #!/usr/bin/env python
-# ==============================================================================
-#                         <coresyf_calibration.py>
-# ==============================================================================
-# Project   : Co-ReSyF
-# Company   : Deimos Engenharia
-# Component : Co-ReSyF Tools (Radiometric Calibration)
-# Language  : Python (v.2.6)
-# ------------------------------------------------------------------------------
-# Scope : Command line radiometric calibration for SNAP supported files
-# Usage : (see the following docstring)
-# ==============================================================================
-# $LastChangedRevision:  $:
-# $LastChangedBy:  $:
-# $LastChangedDate:  $:
-# ==============================================================================
-
 '''
 @summary: 
 This module runs the following Co-ReSyF tool:
@@ -41,118 +25,110 @@ Example 1 - Calibrate a Sentinel product S1A:
 - First release of the tool. 
 '''
 
-VERSION = '1.0'
-
-DefaultAuxFilesLookup = ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File']
-
-
-""" SYSTEM MODULES """
-import os
-import zipfile
-from argparse import ArgumentParser
-from os import path
-import shutil
-
-''' PROGRAM MODULES '''
 from gpt import call_gpt
 
+from coresyf_tool_base import CoReSyF_Tool
 
-TEMP_PATH_IN = os.path.abspath("temp_input") + "/"
+CONFIG = {
+    'name': 'CoReSyF calibration',
+    'description': 'CoReSyF calibration tool',
+    'arguments': [
+        {
+            'identifier': 'Ssource',
+            'name': 'source',
+            'description': "Sets source to <filepath>",
+            'type': 'data'
+        },
+
+        {
+            'identifier': 'PexternalAuxFile',
+            'name': 'external auxiliary file',
+            'description': "The antenna elevation pattern gain auxiliary data file.",
+            'type': 'data'
+        },
+        {
+            'identifier': 'PauxFile',
+            'name': 'auxiliary file',
+            'type': 'parameter',
+            'parameterType': 'string',
+            'description': "Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File'",
+            'options': ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File'],
+        },
+        {
+            'identifier': 'PcreateBetaBand',
+            'name': 'create beta band',
+            'type': 'parameter',
+            'parameterType': 'boolean',
+            'description': "Create beta0 virtual band."
+        },
+        {
+            'identifier': 'PcreateGammaBand',
+            'name': 'create gamma band',
+            'type': 'parameter',
+            'parameterType': 'boolean',
+            'description': "Create gamma0 virtual band."
+        },
+        {
+            'identifier': 'PoutputBetaBand',
+            'name': 'output beta band',
+            'type': 'parameter',
+            'parameterType': 'boolean',
+            'description': "Output beta0 band."
+        },
+        {
+            'identifier': 'PoutputGammaBand',
+            'name': 'output gamma band',
+            'type': 'parameter',
+            'parameterType': 'boolean',
+            'description': "Output gamma0 band."
+        },
+        {
+            'identifier': 'PoutputImageInComplex',
+            'name': 'output image in complex',
+            'type': 'parameter',
+            'parameterType': 'boolean',
+            'description': 'Output image in complex.'
+        },
+        {
+            'identifier': 'PoutputImageScaleInDb',
+            'name': 'output image scale in db',
+            'type': 'parameter',
+            'parameterType': 'boolean',
+            'description': "Output image scale."
+        },
+        {
+            'identifier': 'PoutputSigmaBand',
+            'name': 'output sigma band',
+            'type': 'parameter',
+            'parameterType': 'boolean',
+            'description': "Output sigma0 band."
+        },
+        {
+            'identifier': 'PsourceBands',
+            'name': 'source bands',
+            'type': 'parameter',
+            'description': "The list of source bands.",
+            'parameterType': 'string',
+        },
+        {
+            'identifier': 'Ttarget',
+            'name': 'target',
+            'description': "Sets the target to <filepath>",
+            'type': 'output'
+        }
+    ]
+}
 
 
-def main():
-    parser = ArgumentParser(version=VERSION)
+class CoReSyFCalibration(CoReSyF_Tool):
+    '''CoReSyF Calibration tool'''
 
-    # ==============================#
-    # Define command line options  #
-    # ==============================#
-    parser.add_argument('--Ssource',
-                        dest="Ssource", metavar='<filepath>',
-                        help="Sets source to <filepath>",
-                        required=True)
-    parser.add_argument('--Ttarget', metavar='<filepath>',
-                        dest="Ttarget",
-                        help="Sets the target to <filepath>")
-    parser.add_argument('--PauxFile',
-                        dest="PauxFile", metavar='<string>',
-                        help="Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File', "
-                             "'External Auxiliary File'.",
-                        default="Product Auxiliary File",
-                        choices=DefaultAuxFilesLookup)
-    parser.add_argument('--PcreateBetaBand',
-                        dest="PcreateBetaBand", metavar='<boolean>',
-                        help="Create beta0 virtual band.",
-                        type=bool,
-                        default=False)
-    parser.add_argument('--PcreateGammaBand',
-                        dest="PcreateGammaBand", metavar='<boolean>',
-                        help="Create gamma0 virtual band.",
-                        default=False,
-                        type=bool)
-    parser.add_argument('--PexternalAuxFile',
-                        dest="PexternalAuxFile", metavar='<file>',
-                        help="The antenna elevation pattern gain auxiliary data file.")
-    parser.add_argument('--PoutputBetaBand',
-                        dest="PoutputBetaBand", metavar='<boolean>',
-                        help="Output beta0 band.",
-                        type=bool,
-                        default=False)
-    parser.add_argument('--PoutputGammaBand',
-                        dest="PoutputGammaBand", metavar='<boolean>',
-                        help="Output gamma0 band.",
-                        type=bool,
-                        default=False)
-    parser.add_argument('--PoutputImageInComplex',
-                        dest="PoutputImageInComplex", metavar='<boolean>',
-                        help="Output image in complex.",
-                        type=bool,
-                        default=False)
-    parser.add_argument('--PoutputImageScaleInDb',
-                        dest="PoutputImageScaleInDb", metavar='<boolean>',
-                        help="Output image scale.",
-                        type=bool,
-                        default=False)
-    parser.add_argument("--PoutputSigmaBand", metavar='<boolean>',
-                        dest="PoutputSigmaBand",
-                        help="Output sigma0 band.",
-                        type=bool,
-                        default=True)
-    parser.add_argument("--PselectedPolarisations", metavar='<string,string,string,...>',
-                        dest="PselectedPolarisations",
-                        help="The list of polarisations.")
-    parser.add_argument("--PsourceBands", metavar='<string,string,string,...>',
-                        dest="PsourceBands",
-                        help="The list of source bands.")
-
-    opts = vars(parser.parse_args())
-
-    source = opts.pop("Ssource")
-    target = opts.pop("Ttarget")
-
-    if not os.path.exists(source):
-        parser.error("%s does not exists." % source)
-    if zipfile.is_zipfile(source):
-        myzip = zipfile.ZipFile(source, 'r')
-        if not myzip.infolist():
-            raise ("Input Zip file '%s' is empty!" % input_path)
-        myzip.extractall( TEMP_PATH_IN )
-        myzip.close()
-        input_list = [os.path.join(TEMP_PATH_IN, x) for x in os.listdir(TEMP_PATH_IN)] # input 
-        if input_list: 
-            source = input_list[0]
-
-    # ====================================#
-    #  CALL GPT                           #
-    # ====================================#
-    print ("Applying calibration %s..." % source)
-    call_gpt('Calibration', source, target, opts)
-    
-    # Cleaning temp data
-    if os.path.isdir(TEMP_PATH_IN):
-        print("Deleting temp data...")
-        datafolder = os.path.dirname(TEMP_PATH_IN)
-        shutil.rmtree( datafolder )
+    def run(self, bindings):
+        source = bindings.pop('Ssource')
+        target = bindings.pop('Ttarget')
+        call_gpt('Calibration', source, target, bindings)
 
 
 if __name__ == '__main__':
-    main()
+    TOOL = CoReSyFCalibration(CONFIG)
+    TOOL.execute()
