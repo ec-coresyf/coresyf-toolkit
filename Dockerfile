@@ -28,5 +28,3 @@ RUN mkdir -p /opt/toolkit/src
 
 WORKDIR /opt/toolkit/src
 COPY ./src /opt/toolkit/src
-
-ENTRYPOINT ["python"]
