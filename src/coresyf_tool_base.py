@@ -7,6 +7,8 @@ import zipfile
 
 import logging
 
+import json
+
 from cerberus import Validator
 from argparse import ArgumentParser
 
@@ -77,10 +79,12 @@ TOOL_DEF_SCHEMA_VALIDATOR = Validator(TOOL_DEF_SCHEMA)
 class InvalidToolDefinitionException(Exception):
     pass
 
+class ToolDefinitionFileNotFound(Exception):
+    pass
 
 class CoReSyF_Tool(object):
 
-    def __init__(self, tool_definition):
+    def __init__(self, tool_definition_file_name):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
@@ -88,10 +92,15 @@ class CoReSyF_Tool(object):
         self.inputs = []
         self.outputs = []
         self.arg_parser = ArgumentParser()
-        if not TOOL_DEF_SCHEMA_VALIDATOR.validate(tool_definition):
-            raise InvalidToolDefinitionException(
-                TOOL_DEF_SCHEMA_VALIDATOR.errors)
-        self._parse_arguments_(tool_definition)
+        try:
+            tool_definition_file = open(tool_definition_file_name)
+            tool_definition = json.loads(tool_definition_file.read())
+            if not TOOL_DEF_SCHEMA_VALIDATOR.validate(tool_definition):
+                raise InvalidToolDefinitionException(
+                    TOOL_DEF_SCHEMA_VALIDATOR.errors)
+            self._parse_arguments_(tool_definition)
+        except IOError:
+            raise ToolDefinitionFileNotFound(tool_definition_file_name)
 
     def _from_xsd_type_(self, xsd_type):
         if xsd_type == 'boolean':
