@@ -37,9 +37,9 @@ CONFIG = {
             'identifier': 'Ssource',
             'name': 'source',
             'description': "Sets source to <filepath>",
-            'type': 'data'
+            'type': 'data',
+            'required': True
         },
-
         {
             'identifier': 'PexternalAuxFile',
             'name': 'external auxiliary file',
