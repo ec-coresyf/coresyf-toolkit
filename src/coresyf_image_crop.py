@@ -97,8 +97,10 @@ def main():
     #   Check mandatory options    #
     #==============================#
     (opts, args) = parser.parse_args()
+
     
     if len(sys.argv) == 1:
+        
         print(USAGE)
         return
     if not opts.input_raster:
@@ -109,11 +111,11 @@ def main():
         print("No input polygon shapefile or crop limits provided. Nothing to do!")
         print(USAGE)
         return    
-    
     #================================#
     #        Check crop limits       #
     #================================#
     if opts.crop_limits:
+        
         try:
             crop_limits = [float(i) for i in opts.crop_limits.split(' ')]
             LonMin, LatMin, LonMax, LatMax = crop_limits
@@ -165,8 +167,8 @@ def main():
     #===========================#
     #print ('\n' + gdalwarp_command)
     #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
-    
     try:
+        
         process = subprocess.Popen( gdalwarp_command,
                                     shell  = True,
                                     stdin  = subprocess.PIPE,
@@ -175,11 +177,17 @@ def main():
         # Reads the output and waits for the process to exit before returning
         stdout, stderr = process.communicate()   
         print (stdout) 
+        print('I am runnin')
+        print(stderr)
+        
+        
         if stderr:      raise Exception (stderr)  # or  if process.returncode:
     except Exception, message:
+        
         print( str(message) )
+        
         sys.exit(process.returncode)
-
+    
 
 if __name__ == '__main__':
     main()
