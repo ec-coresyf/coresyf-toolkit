@@ -62,6 +62,9 @@ TOOL_DEF_SCHEMA = {
                     'schema': {
                         'type': 'string'
                     }
+                },
+                'required': {
+                    'type': 'boolean'
                 }
             }
         }
@@ -81,6 +84,7 @@ class CoReSyF_Tool(object):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
+        self.bindings = {}
         self.inputs = []
         self.outputs = []
         self.arg_parser = ArgumentParser()
@@ -104,6 +108,8 @@ class CoReSyF_Tool(object):
             kwargs['choices'] = arg['options']
         if 'default' in arg:
             kwargs['default'] = arg['default']
+        if 'required' in arg:
+            kwargs['required'] = arg['required']
         self.arg_parser.add_argument(name, type=_type, help=_help, **kwargs)
         self.logger.debug('Parsed %s parameter argument.', name)
 
@@ -119,20 +125,25 @@ class CoReSyF_Tool(object):
         name = arg['identifier']
         _help = arg['description']
         kwargs = {}
-        self.arg_parser.add_argument('--' + name, help=_help, **kwargs)
+        self.arg_parser.add_argument('--' + name, help=_help, required=True, **kwargs)
         self.outputs.append(name)
         self.logger.debug('Parsed %s output argument.', name)
 
     def _parse_arguments_(self, tool_definition):
+        has_required_input = False
         for arg in tool_definition['arguments']:
             if arg['type'] == 'parameter':
                 self._parse_parameter_arg_(arg)
             elif arg['type'] == 'data':
                 self._parse_data_arg_(arg)
+                if 'required' in arg and arg['required']:
+                    has_required_input = True
             elif arg['type'] == 'output':
                 self._parse_output_arg_(arg)
         if not self.inputs:
             self.arg_parser.error('Input data argument missing.')
+        if not has_required_input:
+            self.arg_parser.error('No input data argument is specified as required.')
         if not self.outputs:
             self.arg_parser.error('Output data argument missing.')
         self.arguments = self.arg_parser.parse_args()
