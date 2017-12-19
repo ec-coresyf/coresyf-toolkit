@@ -24,100 +24,15 @@ Example 1 - Calibrate a Sentinel product S1A:
 1.0
 - First release of the tool. 
 '''
+import os
+
+import json
 
 from gpt import call_gpt
 
 from coresyf_tool_base import CoReSyF_Tool
 
-CONFIG = {
-    'name': 'CoReSyF calibration',
-    'description': 'CoReSyF calibration tool',
-    'arguments': [
-        {
-            'identifier': 'Ssource',
-            'name': 'source',
-            'description': "Sets source to <filepath>",
-            'type': 'data',
-            'required': True
-        },
-        {
-            'identifier': 'PexternalAuxFile',
-            'name': 'external auxiliary file',
-            'description': "The antenna elevation pattern gain auxiliary data file.",
-            'type': 'data'
-        },
-        {
-            'identifier': 'PauxFile',
-            'name': 'auxiliary file',
-            'type': 'parameter',
-            'parameterType': 'string',
-            'description': "Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File'",
-            'options': ['Latest Auxiliary File', 'Product Auxiliary File', 'External Auxiliary File'],
-        },
-        {
-            'identifier': 'PcreateBetaBand',
-            'name': 'create beta band',
-            'type': 'parameter',
-            'parameterType': 'boolean',
-            'description': "Create beta0 virtual band."
-        },
-        {
-            'identifier': 'PcreateGammaBand',
-            'name': 'create gamma band',
-            'type': 'parameter',
-            'parameterType': 'boolean',
-            'description': "Create gamma0 virtual band."
-        },
-        {
-            'identifier': 'PoutputBetaBand',
-            'name': 'output beta band',
-            'type': 'parameter',
-            'parameterType': 'boolean',
-            'description': "Output beta0 band."
-        },
-        {
-            'identifier': 'PoutputGammaBand',
-            'name': 'output gamma band',
-            'type': 'parameter',
-            'parameterType': 'boolean',
-            'description': "Output gamma0 band."
-        },
-        {
-            'identifier': 'PoutputImageInComplex',
-            'name': 'output image in complex',
-            'type': 'parameter',
-            'parameterType': 'boolean',
-            'description': 'Output image in complex.'
-        },
-        {
-            'identifier': 'PoutputImageScaleInDb',
-            'name': 'output image scale in db',
-            'type': 'parameter',
-            'parameterType': 'boolean',
-            'description': "Output image scale."
-        },
-        {
-            'identifier': 'PoutputSigmaBand',
-            'name': 'output sigma band',
-            'type': 'parameter',
-            'parameterType': 'boolean',
-            'description': "Output sigma0 band."
-        },
-        {
-            'identifier': 'PsourceBands',
-            'name': 'source bands',
-            'type': 'parameter',
-            'description': "The list of source bands.",
-            'parameterType': 'string',
-        },
-        {
-            'identifier': 'Ttarget',
-            'name': 'target',
-            'description': "Sets the target to <filepath>",
-            'type': 'output'
-        }
-    ]
-}
+TOOL_DEF_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'coresyf_calibration_tool.json')
 
 
 class CoReSyFCalibration(CoReSyF_Tool):
@@ -130,5 +45,5 @@ class CoReSyFCalibration(CoReSyF_Tool):
 
 
 if __name__ == '__main__':
-    TOOL = CoReSyFCalibration(CONFIG)
+    TOOL = CoReSyFCalibration(TOOL_DEF_FILE)
     TOOL.execute()
