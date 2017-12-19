@@ -1,19 +1,4 @@
-#!/usr/bin/env python
-#==============================================================================
-#                         <gpt.py>
-#==============================================================================
-# Project   : Co-ReSyF
-# Company   : Deimos Engenharia
-# Component : Co-ReSyF Tools (snap command line api)
-# Language  : Python (v.2.7)
-#------------------------------------------------------------------------------
-# Scope : (see the following docstring)
-# Usage : ---
-#==============================================================================
-# $LastChangedRevision:  $:
-# $LastChangedBy:  $:
-# $LastChangedDate:  $:
-#==============================================================================
+
 
 '''
 This module is used to run the gpt executable in batch-mode.
@@ -23,6 +8,20 @@ This module is used to run the gpt executable in batch-mode.
 ''' SYSTEM MODULES '''
 import os
 import subprocess
+from coresyf_tool_base import CoReSyFTool
+
+class GPTCoReSyFTool(CoReSyFTool):
+
+    def __init__(self, tool_manifest, gpt_command):
+        super(GPTCoReSyFTool, self).__init__(tool_manifest)
+        self.gpt_command = gpt_command
+
+
+    def run(self, bindings):
+        source = bindings.pop('Ssource')
+        target = bindings.pop('Ttarget')
+        call_gpt(self.gpt_command, source, target, bindings)
+
 
 
 
