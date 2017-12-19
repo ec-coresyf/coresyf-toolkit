@@ -82,7 +82,7 @@ class InvalidToolDefinitionException(Exception):
 class ToolDefinitionFileNotFound(Exception):
     pass
 
-class CoReSyF_Tool(object):
+class CoReSyFTool(object):
 
     def __init__(self, tool_definition_file_name):
         self.logger = logging.getLogger(self.__class__.__name__)
