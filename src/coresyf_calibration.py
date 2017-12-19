@@ -28,22 +28,10 @@ import os
 
 import json
 
-from gpt import call_gpt
-
-from coresyf_tool_base import CoReSyFTool
+from gpt import GPTCoReSyFTool
 
 TOOL_DEF_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'coresyf_calibration_tool.json')
 
-
-class CoReSyFCalibration(CoReSyFTool):
-    '''CoReSyF Calibration tool'''
-
-    def run(self, bindings):
-        source = bindings.pop('Ssource')
-        target = bindings.pop('Ttarget')
-        call_gpt('Calibration', source, target, bindings)
-
-
 if __name__ == '__main__':
-    TOOL = CoReSyFCalibration(TOOL_DEF_FILE)
+    TOOL = GPTCoReSyFTool(TOOL_DEF_FILE, 'Calibration')
     TOOL.execute()
