@@ -23,14 +23,19 @@ class GPTCoReSyFTool(CoReSyFTool):
     DEFAULT_FORMAT = 'GeoTIFF'
     DEFAULT_EXT = 'tif'
 
-    def __init__(self, tool_manifest, gpt_command):
-        super(GPTCoReSyFTool, self).__init__(tool_manifest)
-        self.gpt_command = gpt_command
+    def _get_manifest_schema(self):
+        manifest_schema = super(GPTCoReSyFTool, self)._get_manifest_schema()
+        manifest_schema['operation'] = {
+            'type': 'string',
+            'required': True
+        }
+        return manifest_schema
 
     def run(self, bindings):
+        operation = self.manifest['operation']
         source = bindings.pop('Ssource')
         target = bindings.pop('Ttarget')
-        self._call_gpt(self.gpt_command, source, target, bindings)
+        self._call_gpt(operation, source, target, bindings)
         # This is needed because SNAP automatically adds file extensions, but
         # output files can not have a name different from the specified in
         # the command line.
