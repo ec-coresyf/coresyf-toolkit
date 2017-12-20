@@ -73,6 +73,7 @@ MANIFEST_SCHEMA = {
     }
 }
 
+
 class InvalidToolDefinitionException(Exception):
     pass
 
@@ -83,7 +84,7 @@ class ToolDefinitionFileNotFound(Exception):
 
 class CoReSyFTool(object):
 
-    def __init__(self, tool_definition_file_name):
+    def __init__(self, run_script_file_name):
         self.logger = logging.getLogger(CoReSyFTool.__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
@@ -91,8 +92,13 @@ class CoReSyFTool(object):
         self.inputs = []
         self.outputs = []
         self.arg_parser = ArgumentParser()
-        self.manifest = self._get_manifest(tool_definition_file_name)
+        manifest_file_name = self._get_manifest_file(run_script_file_name)
+        self.manifest = self._get_manifest(manifest_file_name)
         self._parse_arguments_(self.manifest)
+
+    def _get_manifest_file(self, run_script_file_name):
+        return os.path.join(os.path.dirname(
+            os.path.abspath(run_script_file_name)), 'manifest.json')
 
     def _get_manifest_schema(self):
         return MANIFEST_SCHEMA
