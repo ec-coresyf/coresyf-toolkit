@@ -14,7 +14,7 @@ from argparse import ArgumentParser
 
 TMP_DIR = os.path.abspath("tmp")
 
-TOOL_DEF_SCHEMA = {
+MANIFEST_SCHEMA = {
     'name': {
         'type': 'string',
         'required': True,
@@ -73,14 +73,13 @@ TOOL_DEF_SCHEMA = {
     }
 }
 
-TOOL_DEF_SCHEMA_VALIDATOR = Validator(TOOL_DEF_SCHEMA)
-
-
 class InvalidToolDefinitionException(Exception):
     pass
 
+
 class ToolDefinitionFileNotFound(Exception):
     pass
+
 
 class CoReSyFTool(object):
 
@@ -92,15 +91,23 @@ class CoReSyFTool(object):
         self.inputs = []
         self.outputs = []
         self.arg_parser = ArgumentParser()
+        self.manifest = self._get_manifest(tool_definition_file_name)
+        self._parse_arguments_(self.manifest)
+
+    def _get_manifest_schema(self):
+        return MANIFEST_SCHEMA
+
+    def _get_manifest(self, manifest_file_name):
         try:
-            tool_definition_file = open(tool_definition_file_name)
-            tool_definition = json.loads(tool_definition_file.read())
-            if not TOOL_DEF_SCHEMA_VALIDATOR.validate(tool_definition):
+            manifest_validator = Validator(self._get_manifest_schema())
+            manifest_file = open(manifest_file_name)
+            manifest = json.loads(manifest_file.read())
+            if not manifest_validator.validate(manifest):
                 raise InvalidToolDefinitionException(
-                    TOOL_DEF_SCHEMA_VALIDATOR.errors)
-            self._parse_arguments_(tool_definition)
+                    manifest_validator.errors)
+            return manifest
         except IOError:
-            raise ToolDefinitionFileNotFound(tool_definition_file_name)
+            raise ToolDefinitionFileNotFound(manifest_file_name)
 
     def _from_xsd_type_(self, xsd_type):
         if xsd_type == 'boolean':
@@ -134,7 +141,8 @@ class CoReSyFTool(object):
         name = arg['identifier']
         _help = arg['description']
         kwargs = {}
-        self.arg_parser.add_argument('--' + name, help=_help, required=True, **kwargs)
+        self.arg_parser.add_argument(
+            '--' + name, help=_help, required=True, **kwargs)
         self.outputs.append(name)
         self.logger.debug('Parsed %s output argument.', name)
 
@@ -152,7 +160,8 @@ class CoReSyFTool(object):
         if not self.inputs:
             self.arg_parser.error('Input data argument missing.')
         if not has_required_input:
-            self.arg_parser.error('No input data argument is specified as required.')
+            self.arg_parser.error(
+                'No input data argument is specified as required.')
         if not self.outputs:
             self.arg_parser.error('Output data argument missing.')
         self.arguments = self.arg_parser.parse_args()
@@ -162,7 +171,7 @@ class CoReSyFTool(object):
         logger.addHandler(logging.StreamHandler(sys.stdout))
         logger.setLevel(logging.INFO)
         return logger
-    
+
     def execute(self):
         self.logger.info('Executing.')
         self.bindings = vars(self.arguments)
@@ -195,7 +204,8 @@ class CoReSyFTool(object):
             if argname in arguments and arguments[argname]:
                 file_name = arguments[argname]
                 if not os.path.exists(file_name):
-                    self.arg_parser.error("{} does not exists.".format(file_name))
+                    self.arg_parser.error(
+                        "{} does not exists.".format(file_name))
                 else:
                     extracted_files = self._unzip_file_(file_name)
                     if extracted_files:
