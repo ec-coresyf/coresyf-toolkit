@@ -20,11 +20,11 @@ RUN apt update && apt install -y wget gdal-bin libgdal-dev
 # Environment variables for gdal setup
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
-
+ENV PATH=${PATH}:/usr/local/snap/bin
 # Install requirements
 COPY requirements.txt /requirements/
 RUN pip install -r /requirements/requirements.txt --no-cache-dir
-RUN mkdir -p /opt/toolkit/src
+RUN mkdir -p /opt/toolkit/src; mkdir -p /home/outputs
 
 WORKDIR /opt/toolkit/src
 COPY ./src /opt/toolkit/src
