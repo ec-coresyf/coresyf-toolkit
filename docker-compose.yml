@@ -9,6 +9,16 @@ services:
       - ./src:/opt/toolkit/src
       - ./examples:/opt/toolkit/examples
     command: ["python", "-m", "unittest", "discover", "-s", "/opt/toolkit/src", "-p", "tests.py"]
+  calibration:
+    image: "repo.coresyf.eu/toolkit:latest"
+    build:
+      context: .
+    volumes:
+      - ./inputs:/home/inputs
+      - ./src:/opt/toolkit/src
+      - ./examples:/opt/toolkit/examples
+    working_dir: '/opt/toolkit/src/LNEC'
+    command: ["python", "coresyf_calibration.py", "--Ssource", "/home/inputs/"]
   crop:
     image: "repo.coresyf.eu/toolkit:latest"
     build:
@@ -23,8 +33,18 @@ services:
     build:
       context: .
     volumes:
+      - ./inputs:/home/inputs
       - ./src:/opt/toolkit/src
       - ./examples:/opt/toolkit/examples
     working_dir: '/opt/toolkit/src/LNEC'
     command: ["/bin/bash", "Run_SAR_Bathymetry.sh"]
+  generic:
+    image: "repo.coresyf.eu/toolkit:latest"
+    build:
+      context: .
+    volumes:
+      - ./inputs:/home/inputs
+      - ./src:/opt/toolkit/src
+      - ./examples:/opt/toolkit/examples
+    working_dir: '/opt/toolkit/src/LNEC'
 
