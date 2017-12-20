@@ -2,7 +2,7 @@
 
 source `dirname $0`/helpers.sh
 
-INFILE=$1
+#INFILE=$1
 
 if [ -z "$INFILE" ]; then
 	echo 'An input file should be passed as parameter'
@@ -24,13 +24,17 @@ test -f out
 check "target specified"
 rm -f out
 
-src/coresyf_calibration.py --Ssource $INFILE.SAFE --Ttarget out --PauxFile 'Latest Auxiliary File' --PcreateBetaBand true --PcreateGammaBand true --PoutputBetaBand true --PoutputGammaBand true --PoutputImageInComplex true --PoutputImageScaleInDb true --PoutputSigmaBand true 
-##--PsourceBands 'HH'
+src/coresyf_calibration.py --Ssource $INFILE.SAFE --Ttarget out --PauxFile 'Latest Auxiliary File' --PcreateBetaBand true --PcreateGammaBand true --PoutputBetaBand true --PoutputGammaBand true --PoutputImageInComplex true --PoutputImageScaleInDb true --PoutputSigmaBand true
 test -f out
 check "all parameters"
 rm -f out
 
 #Error cases:
+src/coresyf_calibration.py --Ssource $INFILE.SAFE --Ttarget out --PauxFile 'Latest Auxiliary File' --PcreateBetaBand true --PcreateGammaBand true --PoutputBetaBand true --PoutputGammaBand true --PoutputImageInComplex true --PoutputImageScaleInDb true --PoutputSigmaBand true --PsourceBands 'HH'
+test $? -ne 0
+check "invalid band"
+rm -f out
+
 src/coresyf_calibration.py --Ssource $INFILE.SAFE
 test $? -ne 0
 check "target missing"
