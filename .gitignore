@@ -6,3 +6,4 @@ src/LNEC/Info_Type.txt
 src/*.pyc
 src/*/*.pyc
 src/*/*/*.pyc
+inputs
