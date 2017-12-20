@@ -85,7 +85,7 @@ class ToolDefinitionFileNotFound(Exception):
 class CoReSyFTool(object):
 
     def __init__(self, tool_definition_file_name):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = logging.getLogger(CoReSyFTool.__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
         self.bindings = {}
@@ -157,9 +157,16 @@ class CoReSyFTool(object):
             self.arg_parser.error('Output data argument missing.')
         self.arguments = self.arg_parser.parse_args()
 
+    def _get_logger(self):
+        logger = logging.getLogger(self.__class__.__name__)
+        logger.addHandler(logging.StreamHandler(sys.stdout))
+        logger.setLevel(logging.INFO)
+        return logger
+    
     def execute(self):
         self.logger.info('Executing.')
         self.bindings = vars(self.arguments)
+        self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
         self.logger.debug('Bindings: %s', str(self.bindings))
         self.logger.info('Preparing inputs.')
         self._prepare_inputs_(self.bindings)

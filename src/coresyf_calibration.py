@@ -28,7 +28,7 @@ import os
 
 import json
 
-from gpt import GPTCoReSyFTool
+from gpt_coresyf_tool import GPTCoReSyFTool
 
 TOOL_DEF_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'coresyf_calibration_tool.json')
 
