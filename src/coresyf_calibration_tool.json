@@ -1,6 +1,7 @@
 {
     "name": "CoReSyF calibration",
     "description": "CoReSyF calibration tool",
+    "operation": "Calibration",
     "arguments": [{
             "identifier": "Ssource",
             "name": "source",
