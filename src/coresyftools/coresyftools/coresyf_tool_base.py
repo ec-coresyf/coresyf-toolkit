@@ -74,15 +74,21 @@ MANIFEST_SCHEMA = {
 }
 
 
-class InvalidToolDefinitionException(Exception):
+class MalformedManifestException(Exception):
     pass
 
 
-class ToolDefinitionFileNotFound(Exception):
+class InvalidManifestException(Exception):
+    pass
+
+
+class ManifestFileNotFound(Exception):
     pass
 
 
 class CoReSyFTool(object):
+
+    MANIFEST_FILE_NAME = 'manifest.json'
 
     def __init__(self, run_script_file_name):
         self.logger = logging.getLogger(CoReSyFTool.__name__)
@@ -92,16 +98,20 @@ class CoReSyFTool(object):
         self.inputs = []
         self.outputs = []
         self.arg_parser = ArgumentParser()
-        manifest_file_name = self._get_manifest_file(run_script_file_name)
+        self.context_directory = self._get_context_directory(run_script_file_name)
+        manifest_file_name = os.path.join(self.context_directory, self.MANIFEST_FILE_NAME)
         self.manifest = self._get_manifest(manifest_file_name)
         self._parse_arguments_(self.manifest)
 
-    def _get_manifest_file(self, run_script_file_name):
-        return os.path.join(os.path.dirname(
-            os.path.abspath(run_script_file_name)), 'manifest.json')
+    def _get_context_directory(self, run_script_file_name):
+        return os.path.dirname(
+            os.path.abspath(run_script_file_name))
 
     def _get_manifest_schema(self):
         return MANIFEST_SCHEMA
+
+    def _validate_manifest(self, manifest):
+        return (True, [])
 
     def _get_manifest(self, manifest_file_name):
         try:
@@ -109,11 +119,15 @@ class CoReSyFTool(object):
             manifest_file = open(manifest_file_name)
             manifest = json.loads(manifest_file.read())
             if not manifest_validator.validate(manifest):
-                raise InvalidToolDefinitionException(
+                raise MalformedManifestException(
                     manifest_validator.errors)
+            is_valid, errors = self._validate_manifest(manifest)
+            if not is_valid:
+                raise InvalidManifestException(errors)
             return manifest
+
         except IOError:
-            raise ToolDefinitionFileNotFound(manifest_file_name)
+            raise ManifestFileNotFound(manifest_file_name)
 
     def _from_xsd_type_(self, xsd_type):
         if xsd_type == 'boolean':
