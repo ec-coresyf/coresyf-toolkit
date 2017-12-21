@@ -22,7 +22,7 @@ class GPTGraphFileNotFound(Exception):
 class GPTCoReSyFTool(CoReSyFTool):
     '''CoReSyF Tool consisting of a single SNAP gpt operation.'''
 
-    DEFAULT_FORMAT = 'GeoTIFF'
+    DEFAULT_FORMAT = 'GeoTIFF-BigTIFF'
     DEFAULT_EXT = 'tif'
     DEFAULT_GPT_GRAPH_FILE_NAME = 'gpt_graph.xml'
 
