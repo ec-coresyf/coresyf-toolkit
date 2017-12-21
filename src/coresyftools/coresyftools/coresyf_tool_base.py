@@ -55,10 +55,7 @@ MANIFEST_SCHEMA = {
                 'dataType': {
                     'type': 'string'
                 },
-                'default': {
-                    'type': 'string',
-                    'empty': False
-                },
+                'default': {},
                 'options': {
                     'type': 'list',
                     'schema': {
