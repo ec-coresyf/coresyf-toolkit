@@ -1,7 +1,7 @@
 {
     "name": "CoReSyF calibration",
     "description": "CoReSyF calibration tool",
-    "operation": "Calibration",
+    "graph": true,
     "arguments": [{
             "identifier": "Ssource",
             "name": "source",
@@ -10,74 +10,94 @@
             "required": true
         },
         {
-            "identifier": "PexternalAuxFile",
-            "name": "external auxiliary file",
-            "description": "The antenna elevation pattern gain auxiliary data file.",
-            "type": "data"
-        },
-        {
             "identifier": "PauxFile",
             "name": "auxiliary file",
             "type": "parameter",
             "parameterType": "string",
             "description": "Value must be one of 'Latest Auxiliary File' Product Auxiliary File'",
-            "options": ["Latest Auxiliary File", "Product Auxiliary File", "External Auxiliary File"]
+            "options": ["Latest Auxiliary File", "Product Auxiliary File", "External Auxiliary File"],
+            "default": "Product Auxiliary File"
         },
         {
             "identifier": "PcreateBetaBand",
             "name": "create beta band",
             "type": "parameter",
             "parameterType": "boolean",
-            "description": "Create beta0 virtual band."
+            "description": "Create beta0 virtual band.",
+            "default": false
         },
         {
             "identifier": "PcreateGammaBand",
             "name": "create gamma band",
             "type": "parameter",
             "parameterType": "boolean",
-            "description": "Create gamma0 virtual band."
+            "description": "Create gamma0 virtual band.",
+            "default": false
         },
         {
             "identifier": "PoutputBetaBand",
             "name": "output beta band",
             "type": "parameter",
             "parameterType": "boolean",
-            "description": "Output beta0 band."
+            "description": "Output beta0 band.",
+            "default": false
         },
         {
             "identifier": "PoutputGammaBand",
             "name": "output gamma band",
             "type": "parameter",
             "parameterType": "boolean",
-            "description": "Output gamma0 band."
+            "description": "Output gamma0 band.",
+            "default": false
         },
         {
             "identifier": "PoutputImageInComplex",
             "name": "output image in complex",
             "type": "parameter",
             "parameterType": "boolean",
-            "description": "Output image in complex."
+            "description": "Output image in complex.",
+            "default": false
         },
         {
             "identifier": "PoutputImageScaleInDb",
             "name": "output image scale in db",
             "type": "parameter",
             "parameterType": "boolean",
-            "description": "Output image scale."
+            "description": "Output image scale.",
+            "default": false
         },
         {
             "identifier": "PoutputSigmaBand",
             "name": "output sigma band",
             "type": "parameter",
             "parameterType": "boolean",
-            "description": "Output sigma0 band."
+            "description": "Output sigma0 band.",
+            "default": true
         },
         {
-            "identifier": "PsourceBands",
-            "name": "source bands",
+            "identifier": "PimgResamplingMethod",
+            "name": "imgResamplingMethod",
+            "description": "Image Resampling Method. Value must be one of NEAREST_NEIGHBOUR', 'BILINEAR_INTERPOLATION', 'CUBIC_CONVOLUTION'",
             "type": "parameter",
-            "description": "The list of source bands.",
-            "parameterType": "string"
+            "parameterType": "string",
+            "options": ["NEAREST_NEIGHBOUR", "BILINEAR_INTERPOLATION", "CUBIC_CONVOLUTION"],
+            "default": "BILINEAR_INTERPOLATION"
+        },
+        {
+            "identifier": "PpixelSpacingInDegree",
+            "name": "pixelSpacingInDegree",
+            "description": "The pixel spacing in degrees. Default value is '0'.",
+            "type": "parameter",
+            "parameterType": "string",
+            "default": "0"
+        },
+        {
+            "identifier": "PpixelSpacingInMeter",
+            "name": "pixelSpacingInMeter",
+            "description": "The pixel spacing in meters. Default value is '0'.",
+            "type": "parameter",
+            "parameterType": "string",
+            "default": "0"
         },
         {
             "identifier": "Ttarget",
