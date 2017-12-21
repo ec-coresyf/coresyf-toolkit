@@ -16,26 +16,49 @@ class GPTExecutionException(Exception):
             os.linesep) if self.ERROR_REGEX.match(line)]
         super(GPTExecutionException, self).__init__(self.errors)
 
+class GPTGraphFileNotFound(Exception):
+    pass
 
 class GPTCoReSyFTool(CoReSyFTool):
     '''CoReSyF Tool consisting of a single SNAP gpt operation.'''
 
     DEFAULT_FORMAT = 'GeoTIFF'
     DEFAULT_EXT = 'tif'
+    DEFAULT_GPT_GRAPH_FILE_NAME = 'gpt_graph.xml'
 
     def _get_manifest_schema(self):
         manifest_schema = super(GPTCoReSyFTool, self)._get_manifest_schema()
         manifest_schema['operation'] = {
             'type': 'string',
-            'required': True
+        }
+        manifest_schema['graph'] = {
+            'type': 'boolean'
         }
         return manifest_schema
 
+    def _validate_manifest(self, manifest):
+        is_valid = True
+        errors = []
+        if 'operation' not in manifest and ('graph' not in manifest or not manifest['graph']):
+            is_valid = False
+            errors.append('A operation or graph flag should be present.')
+        if 'operation' in manifest and 'graph' in manifest and manifest['graph']:
+            is_valid = False
+            errors.append('Can not be operation and graph at same time.')
+        return (is_valid, errors)
+
     def run(self, bindings):
-        operation = self.manifest['operation']
+        operator = None
+        if 'operation' in self.manifest:
+            operator = self.manifest['operation']
+        elif 'graph' in self.manifest and self.manifest['graph']:
+            graph_file = os.path.join(self.context_directory, self.DEFAULT_GPT_GRAPH_FILE_NAME)
+            if not os.path.exists(graph_file):
+                raise GPTGraphFileNotFound(graph_file)
+            operator = graph_file
         source = bindings.pop('Ssource')
         target = bindings.pop('Ttarget')
-        self._call_gpt(operation, source, target, bindings)
+        self._call_gpt(operator, source, target, bindings)
         # This is needed because SNAP automatically adds file extensions, but
         # output files can not have a name different from the specified in
         # the command line.
@@ -62,7 +85,7 @@ class GPTCoReSyFTool(CoReSyFTool):
                                    stderr=subprocess.PIPE)
         # Reads the output and waits for the process to exit before returning
         stdout, stderr = process.communicate()
-        self._get_logger().debug(stderr)
+        self._get_logger().info(stderr)
         if process.returncode:
             raise GPTExecutionException(process.returncode, stderr)
 
