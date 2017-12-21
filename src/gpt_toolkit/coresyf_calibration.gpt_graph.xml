@@ -1,0 +1,71 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Calibration">
+    <operator>Calibration</operator>
+    <sources>
+      <sourceProduct>${sourceProduct}</sourceProduct>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands/>
+      <externalAuxFile/>
+      <auxFile>${auxFile}</auxFile>
+      <outputImageInComplex>${outputImageInComplex}</outputImageInComplex>
+      <outputImageScaleInDb>${outputImageScaleInDb}</outputImageScaleInDb>
+      <createGammaBand>${createGammaBand}</createGammaBand>
+      <createBetaBand>${createBetaBand}</createBetaBand>
+      <selectedPolarisations/>
+      <outputSigmaBand>${outputSigmaBand}</outputSigmaBand>
+      <outputGammaBand>${PoutputGammaBand}</outputGammaBand>
+      <outputBetaBand>${outputBetaBand}</outputBetaBand>
+    </parameters>
+  </node>
+  <node id="Ellipsoid-Correction-RD">
+    <operator>Ellipsoid-Correction-RD</operator>
+    <sources>
+      <sourceProduct refid="Calibration"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands/>
+      <demName>SRTM 3Sec</demName>
+      <externalDEMFile/>
+      <externalDEMNoDataValue>0.0</externalDEMNoDataValue>
+      <externalDEMApplyEGM>true</externalDEMApplyEGM>
+      <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
+      <imgResamplingMethod>${imgResamplingMethod}</imgResamplingMethod>
+      <pixelSpacingInMeter>${pixelSpacingInMeter}</pixelSpacingInMeter>
+      <pixelSpacingInDegree>${pixelSpacingInDegree}</pixelSpacingInDegree>
+      <mapProjection>GEOGCS[&quot;WGS84(DD)&quot;, 
+  DATUM[&quot;WGS84&quot;, 
+    SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], 
+  PRIMEM[&quot;Greenwich&quot;, 0.0], 
+  UNIT[&quot;degree&quot;, 0.017453292519943295], 
+  AXIS[&quot;Geodetic longitude&quot;, EAST], 
+  AXIS[&quot;Geodetic latitude&quot;, NORTH]]</mapProjection>
+      <nodataValueAtSea>true</nodataValueAtSea>
+      <saveDEM>false</saveDEM>
+      <saveLatLon>false</saveLatLon>
+      <saveIncidenceAngleFromEllipsoid>false</saveIncidenceAngleFromEllipsoid>
+      <saveLocalIncidenceAngle>false</saveLocalIncidenceAngle>
+      <saveProjectedLocalIncidenceAngle>false</saveProjectedLocalIncidenceAngle>
+      <saveSelectedSourceBand>true</saveSelectedSourceBand>
+      <outputComplex>false</outputComplex>
+      <applyRadiometricNormalization>false</applyRadiometricNormalization>
+      <saveSigmaNought>false</saveSigmaNought>
+      <saveGammaNought>false</saveGammaNought>
+      <saveBetaNought>false</saveBetaNought>
+      <incidenceAngleForSigma0>Use projected local incidence angle from DEM</incidenceAngleForSigma0>
+      <incidenceAngleForGamma0>Use projected local incidence angle from DEM</incidenceAngleForGamma0>
+      <auxFile>Latest Auxiliary File</auxFile>
+      <externalAuxFile/>
+    </parameters>
+  </node>
+  <applicationData id="Presentation">
+    <Description/>
+    <node id="Calibration">
+      <displayPosition x="136.0" y="133.0"/>
+    </node>
+    <node id="Ellipsoid-Correction-RD">
+      <displayPosition x="259.0" y="137.0"/>
+    </node>
+  </applicationData>
+</graph>
