@@ -1,0 +1,18 @@
+#!/usr/bin/python2
+from coresyftools.coresyf_tool_base import CoReSyFTool
+import sys
+
+
+class DummyTool(CoReSyFTool):
+
+    def run(self, bindings):
+        if 'error' in bindings and bindings['error']:
+            raise Exception()
+        if 'errmsg' in bindings:
+            sys.stderr.write(bindings['errmsg'])
+        with open(bindings['output'], 'w') as output:
+            output.write('output')
+
+
+if __name__ == '__main__':
+    DummyTool(__file__).execute()
