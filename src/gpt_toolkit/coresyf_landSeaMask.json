@@ -1,0 +1,66 @@
+{
+    "name": "CoReSyF Land-Sea-Mask",
+    "description": "CoReSyF Land Sea Mask tool",
+    "graph": false,
+    "arguments": [{
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "data",
+            "required": true
+        },
+        {
+            "identifier": "Pgeometry",
+            "name": "geometry",
+            "description": "Sets geometry to <string>",
+            "type": "parameter",
+            "parameterType": "string",
+            "required": false
+        },
+        {
+            "identifier": "PinvertGeometry",
+            "name": "invertGeometry",
+            "description": "Sets invertGeometry to <boolean>",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PlandMask",
+            "name": "landMask",
+            "description": "sets landMaks to <boolean>",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "default": true
+        },
+        {
+            "identifier": "PshorelineExtension",
+            "name": "shorelineExtension",
+            "description": "Sets shorelineExtension to <integer>",
+            "type": "parameter",
+            "parameterType": "integer",
+            "default": 0
+        },
+        {
+            "identifier": "PsourceBands",
+            "name": "sourceBands",
+            "description": "The list of source bands",
+            "type": "parameter",
+            "parameterType": "list"
+        },
+        {
+            "identifier": "PuseSRTM",
+            "name": "useSRTM",
+            "description": "Set useSRTM to <boolean>",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "default": true
+        },
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "output"
+        }
+    ]
+}
