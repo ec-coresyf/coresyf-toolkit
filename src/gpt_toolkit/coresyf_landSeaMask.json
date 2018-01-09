@@ -1,6 +1,7 @@
 {
     "name": "CoReSyF Land-Sea-Mask",
     "description": "CoReSyF Land Sea Mask tool",
+    "operation": "Land-Sea-Mask",
     "graph": false,
     "arguments": [{
             "identifier": "Ssource",
@@ -14,8 +15,7 @@
             "name": "geometry",
             "description": "Sets geometry to <string>",
             "type": "parameter",
-            "parameterType": "string",
-            "required": false
+            "parameterType": "string"
         },
         {
             "identifier": "PinvertGeometry",
