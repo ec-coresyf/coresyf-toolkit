@@ -4,6 +4,8 @@ from os import mkdir, rename, listdir
 from os.path import join, basename, splitext
 from glob import glob
 from shutil import copy, make_archive
+import subprocess
+import unittest
 
 
 def prepare_tool(output_dir, name, run_file, manifest_file, gpt_graph_file=None):
@@ -26,6 +28,7 @@ def prepare_toolkit(toolkit_dir, output_dir):
         if not os.path.exists(gpt_graph_file):
             gpt_graph_file = None
         prepare_tool(output_dir, tool_name, run_file, manifest_file, gpt_graph_file)
+
 
 
 if __name__ == '__main__':
