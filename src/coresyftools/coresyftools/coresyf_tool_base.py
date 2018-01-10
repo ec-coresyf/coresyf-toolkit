@@ -9,6 +9,8 @@ import logging
 
 import json
 
+from datetime import date
+
 from cerberus import Validator
 from argparse import ArgumentParser
 
@@ -50,7 +52,8 @@ MANIFEST_SCHEMA = {
                     'empty': False
                 },
                 'parameterType': {
-                    'type': 'string'
+                    'type': 'string',
+                    'allowed': ['string', 'boolean', 'int', 'float', 'date']
                 },
                 'dataType': {
                     'type': 'string'
@@ -92,7 +95,7 @@ class CoReSyFArgParser():
     MANIFEST_FILE_NAME = 'manifest.json'
 
     def __init__(self, manifest, args=None, logger=None):
-        self.logger =  logger or logging.getLogger(__name__)
+        self.logger = logger or logging.getLogger(__name__)
         self.bindings = {}
         self.inputs = []
         self.outputs = []
@@ -118,7 +121,13 @@ class CoReSyFArgParser():
     def _from_xsd_type_(self, xsd_type):
         if xsd_type == 'boolean':
             return bool
-        else:
+        elif xsd_type == 'int':
+            return int
+        elif xsd_type == 'float':
+            return float
+        elif xsd_type == 'date':
+            return date
+        elif xsd_type == 'string':
             return str
 
     def _parse_parameter_arg_(self, arg):
@@ -152,7 +161,7 @@ class CoReSyFArgParser():
         self.outputs.append(name)
         self.logger.debug('Parsed %s output argument.', name)
 
-    def parse_arguments(self, args=None):
+    def _config_arg_parser(self):
         tool_definition = self.manifest
         has_required_input = False
         for arg in tool_definition['arguments']:
@@ -171,6 +180,9 @@ class CoReSyFArgParser():
                 'No input data argument is specified as required.')
         if not self.outputs:
             self.arg_parser.error('Output data argument missing.')
+
+    def parse_arguments(self, args=None):
+        self._config_arg_parser()
         self.arguments = self.arg_parser.parse_args(args)
         self.bindings = vars(self.arguments)
         self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
