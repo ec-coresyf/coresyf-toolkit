@@ -2,6 +2,7 @@ import sys
 import os
 import logging
 import subprocess
+from os.path import exists, getsize
 from coresyf_tool_base import CoReSyFArgParser, get_manifest
 
 
@@ -29,7 +30,8 @@ class ToolExampleCommand(object):
     def _parse_arguments(self):
         self.arg_parser = CoReSyFArgParser(self.manifest)
         self.arg_parser.parse_arguments(self.command[1:])
-        self.outputs = self.arg_parser.outputs
+        self.outputs = [self.arg_parser.bindings[arg] for arg in
+                        self.arg_parser.outputs]
 
     def run(self):
         proc = subprocess.Popen(self.command, stdin=subprocess.PIPE,
@@ -94,11 +96,18 @@ class ToolTester(object):
     def _byte_to_str(self, _bytes):
         return _bytes.decode('utf-8')[1:-1]
 
+    def _output_errors(self, command):
+        for output in command.outputs:
+            self.logger.debug('Checking for output %s', output)
+            if not exists(output):
+                return NoOutputFile(output)
+            if not getsize(output) > 0:
+                return EmptyOutputFile(output)
+
     def test(self):
-        self.errors = [] 
+        self.errors = []
         self.log = {}
         for command in self.example_commands:
-            self.logger.info('################################################################################')
             self.logger.info(command.title)
             self.logger.info(command.description)
             self.logger.info('Running %s', str(command))
@@ -109,9 +118,13 @@ class ToolTester(object):
                                    self._byte_to_str(stderror)))
             elif stderror:
                 self.errors.append(NonEmptyStderr(self._byte_to_str(stderror)))
+            else:
+                output_error = self._output_errors(command)
+                if output_error:
+                    self.errors.append(output_error)
 
 
-class TestFailure():
+class TestFailure(Exception):
     pass
 
 
@@ -132,3 +145,15 @@ class NonEmptyStderr(TestFailure):
 
     def __str__(self):
         return self.message
+
+
+class NoOutputFile(TestFailure):
+
+    def __init__(self, file):
+        self.file = file
+
+
+class EmptyOutputFile(TestFailure):
+
+    def __init__(self, file):
+        self.file = file

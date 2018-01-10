@@ -172,6 +172,8 @@ class CoReSyFArgParser():
         if not self.outputs:
             self.arg_parser.error('Output data argument missing.')
         self.arguments = self.arg_parser.parse_args(args)
+        self.bindings = vars(self.arguments)
+        self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
 
 
 def get_manifest(manifest_file_name):
@@ -192,6 +194,7 @@ class CoReSyFTool(object):
         self.manifest = get_manifest(self.manifest_file_name)
         self.arg_parser = CoReSyFArgParser(self.manifest)
         self.arg_parser.parse_arguments()
+        self.bindings = self.arg_parser.bindings
         self.logger = logging.getLogger(CoReSyFTool.__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
@@ -210,8 +213,6 @@ class CoReSyFTool(object):
 
     def execute(self):
         self.logger.info('Executing.')
-        self.bindings = vars(self.arg_parser.arguments)
-        self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
         self.logger.debug('Bindings: %s', str(self.bindings))
         self.logger.info('Preparing inputs.')
         self._prepare_inputs_(self.bindings)

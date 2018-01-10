@@ -9,3 +9,11 @@
 #A simple stderr test
 #Test stderr message
 ./dummy_tool --input input --output output --errmsg "stderrmsg"
+
+#A simple without output
+#Test no output
+./dummy_tool --input input --output void_output --noutput true
+
+#A simple without output
+#Test no output
+./dummy_tool --input input --output empty_output --empty_output true 

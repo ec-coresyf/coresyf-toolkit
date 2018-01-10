@@ -10,8 +10,10 @@ class DummyTool(CoReSyFTool):
             raise Exception()
         if 'errmsg' in bindings:
             sys.stderr.write(bindings['errmsg'])
-        #with open(bindings['output'], 'w') as output:
-            #output.write('output')
+        if 'noutput' not in bindings or not bindings['noutput']:
+            with open(bindings['output'], 'w') as output:
+                if 'empty_output' not in bindings or not bindings['empty_output']:
+                    output.write('output')
 
 
 if __name__ == '__main__':
