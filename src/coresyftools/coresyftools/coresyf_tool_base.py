@@ -71,6 +71,10 @@ MANIFEST_SCHEMA = {
 }
 
 
+class ManifestSyntaxError(Exception):
+    pass
+
+
 class MalformedManifestException(Exception):
     pass
 
@@ -83,26 +87,18 @@ class ManifestFileNotFound(Exception):
     pass
 
 
-class CoReSyFTool(object):
+class CoReSyFArgParser():
 
     MANIFEST_FILE_NAME = 'manifest.json'
 
-    def __init__(self, run_script_file_name):
-        self.logger = logging.getLogger(CoReSyFTool.__name__)
-        self.logger.addHandler(logging.StreamHandler(sys.stdout))
-        self.logger.setLevel(logging.DEBUG)
+    def __init__(self, manifest, args=None, logger=None):
+        self.logger =  logger or logging.getLogger(__name__)
         self.bindings = {}
         self.inputs = []
         self.outputs = []
         self.arg_parser = ArgumentParser()
-        self.context_directory = self._get_context_directory(run_script_file_name)
-        manifest_file_name = os.path.join(self.context_directory, self.MANIFEST_FILE_NAME)
-        self.manifest = self._get_manifest(manifest_file_name)
-        self._parse_arguments_(self.manifest)
-
-    def _get_context_directory(self, run_script_file_name):
-        return os.path.dirname(
-            os.path.abspath(run_script_file_name))
+        self.manifest = manifest
+        self._validate_manifest_schema()
 
     def _get_manifest_schema(self):
         return MANIFEST_SCHEMA
@@ -110,21 +106,14 @@ class CoReSyFTool(object):
     def _validate_manifest(self, manifest):
         return (True, [])
 
-    def _get_manifest(self, manifest_file_name):
-        try:
-            manifest_validator = Validator(self._get_manifest_schema())
-            manifest_file = open(manifest_file_name)
-            manifest = json.loads(manifest_file.read())
-            if not manifest_validator.validate(manifest):
-                raise MalformedManifestException(
-                    manifest_validator.errors)
-            is_valid, errors = self._validate_manifest(manifest)
-            if not is_valid:
-                raise InvalidManifestException(errors)
-            return manifest
-
-        except IOError:
-            raise ManifestFileNotFound(manifest_file_name)
+    def _validate_manifest_schema(self):
+        manifest_validator = Validator(self._get_manifest_schema())
+        if not manifest_validator.validate(self.manifest):
+            raise MalformedManifestException(
+                manifest_validator.errors)
+        is_valid, errors = self._validate_manifest(self.manifest)
+        if not is_valid:
+            raise InvalidManifestException(errors)
 
     def _from_xsd_type_(self, xsd_type):
         if xsd_type == 'boolean':
@@ -163,7 +152,8 @@ class CoReSyFTool(object):
         self.outputs.append(name)
         self.logger.debug('Parsed %s output argument.', name)
 
-    def _parse_arguments_(self, tool_definition):
+    def parse_arguments(self, args=None):
+        tool_definition = self.manifest
         has_required_input = False
         for arg in tool_definition['arguments']:
             if arg['type'] == 'parameter':
@@ -181,7 +171,32 @@ class CoReSyFTool(object):
                 'No input data argument is specified as required.')
         if not self.outputs:
             self.arg_parser.error('Output data argument missing.')
-        self.arguments = self.arg_parser.parse_args()
+        self.arguments = self.arg_parser.parse_args(args)
+
+
+def get_manifest(manifest_file_name):
+    try:
+        with open(manifest_file_name) as manifest_file:
+            return json.loads(manifest_file.read())
+    except IOError:
+        raise ManifestFileNotFound(manifest_file_name)
+    except ValueError:
+        raise ManifestSyntaxError()
+
+
+class CoReSyFTool(object):
+
+    def __init__(self, run_script_file_name):
+        self.context_directory = self._get_context_directory(run_script_file_name)
+        self.manifest_file_name = os.path.join(self.context_directory, self.MANIFEST_FILE_NAME)
+        self.manifest = get_manifest(self.manifest_file_name)
+        self.arg_parser = CoReSyFArgParser(self.manifest)
+        self.arg_parser.parse_arguments()
+        self.logger = logging.getLogger(CoReSyFTool.__name__)
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger.setLevel(logging.DEBUG)
+
+   
 
     def _get_logger(self):
         logger = logging.getLogger(self.__class__.__name__)
@@ -189,9 +204,13 @@ class CoReSyFTool(object):
         logger.setLevel(logging.INFO)
         return logger
 
+    def _get_context_directory(self, run_script_file_name):
+        return os.path.dirname(
+            os.path.abspath(run_script_file_name))
+
     def execute(self):
         self.logger.info('Executing.')
-        self.bindings = vars(self.arguments)
+        self.bindings = vars(self.arg_parser.arguments)
         self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
         self.logger.debug('Bindings: %s', str(self.bindings))
         self.logger.info('Preparing inputs.')
@@ -208,7 +227,7 @@ class CoReSyFTool(object):
             self.logger.info('Extracting %s .', file_name)
             archive = zipfile.ZipFile(file_name, 'r')
             if not archive.infolist():
-                self.arg_parser.error(
+                self.arg_parser.arg_parser.error(
                     "Input zip file '{}' is empty.".format(file_name))
             archive.extractall(TMP_DIR)
             archive.close()
@@ -217,11 +236,11 @@ class CoReSyFTool(object):
         return extracted_files
 
     def _prepare_inputs_(self, arguments):
-        for argname in self.inputs:
+        for argname in self.arg_parser.inputs:
             if argname in arguments and arguments[argname]:
                 file_name = arguments[argname]
                 if not os.path.exists(file_name):
-                    self.arg_parser.error(
+                    self.arg_parser.arg_parser.error(
                         "{} does not exists.".format(file_name))
                 else:
                     extracted_files = self._unzip_file_(file_name)
