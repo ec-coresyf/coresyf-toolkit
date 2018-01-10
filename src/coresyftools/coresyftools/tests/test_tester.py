@@ -6,7 +6,7 @@ from tool_tester import ToolTester
 class TestTester(TestCase):
 
     def test_tester(self):
-        tester = ToolTester('./dummy_tool')
+        tester = ToolTester('tests/dummy_tool')
         tester.test()
         self.assertEqual(len(tester.errors), 2)
         self.assertEqual(tester.errors[0].returncode, 1)

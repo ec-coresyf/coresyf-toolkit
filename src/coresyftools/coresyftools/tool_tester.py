@@ -1,8 +1,9 @@
 import sys
 import os
-from os.path import join, abspath
 import logging
 import subprocess
+from coresyf_tool_base import CoReSyFArgParser, get_manifest
+
 
 class InvalidCommandException(Exception):
     pass
@@ -18,14 +19,17 @@ class ExampleDescriptionMissingException(Exception):
 
 class ToolExampleCommand(object):
 
-    def __init__(self, title, description, command):
+    def __init__(self, manifest, title, description, command):
         self.title = title
         self.description = description
         self.command = command
-        self._validate()
+        self.manifest = manifest
+        self._parse_arguments()
 
-    def _validate(self):
-        pass
+    def _parse_arguments(self):
+        self.arg_parser = CoReSyFArgParser(self.manifest)
+        self.arg_parser.parse_arguments(self.command[1:])
+        self.outputs = self.arg_parser.outputs
 
     def run(self):
         proc = subprocess.Popen(self.command, stdin=subprocess.PIPE,
@@ -41,13 +45,14 @@ def normalize_variable_name(name):
     return name
 
 
-class ToolTester():
+class ToolTester(object):
 
     def __init__(self, tool_dir):
         os.chdir(tool_dir)
         examples_file = 'examples.sh'
+        self.manifest_file_name = 'manifest.json'
+        self.manifest = get_manifest(self.manifest_file_name)
         self._load_examples_file(examples_file)
-        super(ToolTester, self).__init__()
         self.logger = logging.getLogger()
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
@@ -63,16 +68,17 @@ class ToolTester():
                     continue
                 if self._is_comment(line):
                     if not title:
-                        title = line[1:]
+                        title = line[1:-1]
                     else:
-                        description += line[1:]
+                        description += line[1:-1]
                 elif self._is_valid_command(line):
                     if not title:
                         raise ExampleTitleMissingException(ln)
                     if not description:
                         raise ExampleDescriptionMissingException(ln)
                     self.example_commands.append(
-                        ToolExampleCommand(title, description, line.split()))
+                        ToolExampleCommand(self.manifest, title, description,
+                                           line.split()))
                     title = None
                     description = ''
                 else:
@@ -92,12 +98,15 @@ class ToolTester():
         self.errors = [] 
         self.log = {}
         for command in self.example_commands:
+            self.logger.info('################################################################################')
+            self.logger.info(command.title)
+            self.logger.info(command.description)
             self.logger.info('Running %s', str(command))
             returncode, stdout, stderror = command.run()
             self.log[command] = stdout
             if returncode:
                 self.errors.append(NonZeroReturnCode(returncode,
-                                                     self._byte_to_str(stderror)))
+                                   self._byte_to_str(stderror)))
             elif stderror:
                 self.errors.append(NonEmptyStderr(self._byte_to_str(stderror)))
 
@@ -111,7 +120,7 @@ class NonZeroReturnCode(TestFailure):
     def __init__(self, returncode, stderror):
         self.returncode = returncode
         self.stderr = stderror
-    
+
     def __str__(self):
         return '({}, {})'.format(self.returncode, self.stderr)
 
@@ -120,6 +129,6 @@ class NonEmptyStderr(TestFailure):
 
     def __init__(self, stderror):
         self.message = stderror
-    
+
     def __str__(self):
         return self.message

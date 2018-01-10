@@ -1,0 +1,8 @@
+.mypy_cache
+S1A_EW_GRDM_1SDH_20171001T060648_20171001T060753_018615_01F62E_EE7F.SAFE
+S1A_EW_GRDM_1SDH_20171001T060648_20171001T060753_018615_01F62E_EE7F
+.vscode/
+*.pyc
+src/coresyftools/CoReSyF_tools.egg-info/
+target/
+src/coresyftools/dist
