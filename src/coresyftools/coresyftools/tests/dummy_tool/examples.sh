@@ -1,19 +1,19 @@
-#Test ok
-#A simple test of ok
+#PASSING EXECUTION
+#Example of a passing execution
 ./dummy_tool --input input --output output
 
-#Test non ok
-#A simple test of failure
+#NON ZERO EXITCODE
+#Example of a non zero exitcode execution
 ./dummy_tool --input input --output output --error true
 
-#A simple stderr test
-#Test stderr message
+#NON ENPTY STDERR 
+#Example of a non empty stderr execution
 ./dummy_tool --input input --output output --errmsg "stderrmsg"
 
-#A simple without output
-#Test no output
+#NO OUPUT
+#Example of an execution without output
 ./dummy_tool --input input --output void_output --noutput true
 
-#A simple without output
-#Test no output
+#EMPTY OUTPUT
+#Exemple of an execution with an empty output
 ./dummy_tool --input input --output empty_output --empty_output true 
