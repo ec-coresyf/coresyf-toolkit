@@ -2,7 +2,8 @@ from unittest import TestCase
 import json
 import os
 
-from gpt_coresyf_tool import GPTCoReSyFTool
+from gpt_coresyf_tool import GPTCoReSyFTool, GPTGraphFileNotFound
+from coresyf_manifest import InvalidManifestException
 
 
 class TestGPTTool(TestCase):
@@ -43,7 +44,7 @@ class TestGPTTool(TestCase):
 
     def test_atomic_command(self):
         manifest = self.manifest.copy()
-        manifest['operation'] = {'operation': 'LandSeaMask'}
+        manifest['operation'] = {'operation': 'Land-Sea-Mask'}
         self.write_manifest(manifest)
         tool = GPTCoReSyFTool(self.runfile)
 
@@ -58,18 +59,59 @@ class TestGPTTool(TestCase):
         with open('input', 'w') as infile:
             infile.write('input')
 
+       
+
         cmd = '--Ssource input --Ttarget output --param val'.split()
         tool.execute(cmd)
 
-        gpt_cmd = 'gpt LandSeaMask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
+        gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
             os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
         self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        os.remove('input')
 
     def test_graph(self):
-        pass
+        manifest = self.manifest.copy()
+        manifest['operation'] = {'graph': True}
+        self.write_manifest(manifest)
+
+        with open('gpt_graph.xml', 'w'):
+            pass
+
+        tool = GPTCoReSyFTool(self.runfile)
+
+        class CallShellCommandMock():
+            def __call__(self, args):
+                self.args = args
+
+        call_shell_command_mock = CallShellCommandMock()
+
+        tool._call_shell_command = call_shell_command_mock
+
+        with open('input', 'w') as infile:
+            infile.write('input')
+
+        
+
+        cmd = '--Ssource input --Ttarget output --param val'.split()
+        tool.execute(cmd)
+
+        gpt_cmd = 'gpt {} -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
+            os.path.join(os.getcwd(), 'gpt_graph.xml'),
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
+        self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        os.remove('input')
+        os.remove('gpt_graph.xml')
 
     def test_missing_operation_and_graph(self):
-        pass
+        manifest = self.manifest.copy()
+        self.write_manifest(manifest)
+        self.assertRaises(InvalidManifestException,
+                          lambda: GPTCoReSyFTool(self.runfile))
 
-    def test_missing_graph(self):
-        pass
+    def test_graph_not_found(self):
+        manifest = self.manifest.copy()
+        manifest['operation'] = {'graph': True}
+        self.write_manifest(manifest)
+        self.assertRaises(GPTGraphFileNotFound,
+                          lambda: GPTCoReSyFTool(self.runfile))
+
