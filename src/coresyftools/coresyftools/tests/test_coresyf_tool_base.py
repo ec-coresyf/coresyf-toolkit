@@ -76,6 +76,7 @@ class TestCoReSyFTool(TestCase):
         tool.execute(cmd)
         self.assertEqual(tool.input_text, 'input')
         os.remove('f1.zip')
+        os.remove('f1')
 
     def test_empty_zip_input(self):
         class MockCoReSyFTool(CoReSyFTool):
