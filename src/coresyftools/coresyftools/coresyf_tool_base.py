@@ -21,9 +21,14 @@ class CoReSyFTool(object):
         self.context_directory = self._get_context_directory(run_script_file_name)
         self.manifest_file_name = os.path.join(self.context_directory, self.MANIFEST_FILE_NAME)
         self.manifest = get_manifest(self.manifest_file_name)
+        self.arg_parser = CoReSyFArgParser(self.manifest)
+        self.operation = self.manifest.get('operation', {})
+        self._validate_operation(self.operation)
+    
+    def _validate_operation(self, operation_dict):
+        return (True, [])
     
     def _parse_args(self, args=None):
-        self.arg_parser = CoReSyFArgParser(self.manifest)
         self.arg_parser.parse_arguments(args)
         self.bindings = self.arg_parser.bindings
         self.logger = logging.getLogger(CoReSyFTool.__name__)
