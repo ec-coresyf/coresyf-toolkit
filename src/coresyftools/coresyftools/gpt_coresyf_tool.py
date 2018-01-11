@@ -5,6 +5,7 @@ import re
 from coresyf_tool_base import CoReSyFTool
 
 
+
 class GPTExecutionException(Exception):
     '''Error occurred during a SNAP gpt execution'''
 
@@ -16,8 +17,10 @@ class GPTExecutionException(Exception):
             os.linesep) if self.ERROR_REGEX.match(line)]
         super(GPTExecutionException, self).__init__(self.errors)
 
+
 class GPTGraphFileNotFound(Exception):
     pass
+
 
 class GPTCoReSyFTool(CoReSyFTool):
     '''CoReSyF Tool consisting of a single SNAP gpt operation.'''
