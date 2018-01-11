@@ -148,7 +148,8 @@ class CoReSyFArgParser():
         name = arg['identifier']
         _help = arg['description']
         kwargs = {}
-        self.arg_parser.add_argument('--' + name, help=_help, **kwargs)
+        self.arg_parser.add_argument('--' + name, help=_help, required=True,
+                                     **kwargs)
         self.inputs.append(name)
         self.logger.debug('Parsed %s data argument.', name)
 
