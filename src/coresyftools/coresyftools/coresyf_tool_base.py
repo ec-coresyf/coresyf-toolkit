@@ -90,6 +90,32 @@ class ManifestFileNotFound(Exception):
     pass
 
 
+class MissingInputArgument(Exception):
+    pass
+
+
+class MissingOutputArgument(Exception):
+    pass
+
+
+def validate_manifest(manifest):
+    manifest_validator = Validator(MANIFEST_SCHEMA)
+    if not manifest_validator.validate(manifest):
+        raise MalformedManifestException(
+            manifest_validator.errors)
+    has_input = False
+    has_output = False
+    for arg in manifest['arguments']:
+        if arg['type'] == 'data':
+            has_input = True
+        if arg['type'] == 'output':
+            has_output = True
+    if not has_input:
+        raise MissingInputArgument()
+    if not has_output:
+        raise MissingOutputArgument()
+
+
 class CoReSyFArgParser():
 
     MANIFEST_FILE_NAME = 'manifest.json'
@@ -101,22 +127,16 @@ class CoReSyFArgParser():
         self.outputs = []
         self.arg_parser = ArgumentParser()
         self.manifest = manifest
-        self._validate_manifest_schema()
+        validate_manifest(self.manifest)
+        is_valid, errors = self._validate_manifest(self.manifest)
+        if not is_valid:
+            raise InvalidManifestException(errors)
 
     def _get_manifest_schema(self):
         return MANIFEST_SCHEMA
 
     def _validate_manifest(self, manifest):
         return (True, [])
-
-    def _validate_manifest_schema(self):
-        manifest_validator = Validator(self._get_manifest_schema())
-        if not manifest_validator.validate(self.manifest):
-            raise MalformedManifestException(
-                manifest_validator.errors)
-        is_valid, errors = self._validate_manifest(self.manifest)
-        if not is_valid:
-            raise InvalidManifestException(errors)
 
     def _from_xsd_type_(self, xsd_type):
         if xsd_type == 'boolean':
@@ -174,14 +194,7 @@ class CoReSyFArgParser():
                     has_required_input = True
             elif arg['type'] == 'output':
                 self._parse_output_arg_(arg)
-        if not self.inputs:
-            self.arg_parser.error('Input data argument missing.')
-        if not has_required_input:
-            self.arg_parser.error(
-                'No input data argument is specified as required.')
-        if not self.outputs:
-            self.arg_parser.error('Output data argument missing.')
-
+      
     def parse_arguments(self, args=None):
         self._config_arg_parser()
         self.arguments = self.arg_parser.parse_args(args)
