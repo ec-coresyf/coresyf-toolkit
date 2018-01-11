@@ -1,9 +1,51 @@
 from unittest import TestCase
+import os
+
+from coresyf_tool_base import CoReSyFTool
+
 
 class TestCoReSyFTool(TestCase):
 
     def test_nominal_execution(self):
-        pass
+
+        class MockCoReSyFTool(CoReSyFTool):
+            def run(self, bindings):
+                self.run_bindings = bindings
+
+        manifest = {
+            'name': 'dummy tool',
+            'arguments': [
+                {
+                    'identifier': 'input',
+                    'name': 'input',
+                    'description': 'description',
+                    'type': 'data'
+                },
+                {
+                    'identifier': 'output',
+                    'name': 'output',
+                    'description': 'description',
+                    'type': 'output'
+                },
+                {
+                    'identifier': 'param',
+                    'name': 'param',
+                    'description': 'description',
+                    'type': 'parameter',
+                    'parameterType': 'string'
+                }
+            ]
+        }
+        tool = MockCoReSyFTool(manifest=manifest)
+
+        with open('f1', 'w') as f1:
+            f1.write('input')
+
+        cmd = '--input f1 --output f2 --param astr'.split()
+        tool.execute(cmd)
+        self.assertEqual(
+            tool.bindings, {'input': 'f1', 'output': 'f2', 'param': 'astr'})
+        os.remove('f1')
 
     def test_non_existent_input(self):
         pass
@@ -13,10 +55,10 @@ class TestCoReSyFTool(TestCase):
 
     def test_empty_zip_input(self):
         pass
-    
+
     def test_temporary_data_cleaning(self):
         pass
-    
+
     def test_no_output(self):
         pass
 
