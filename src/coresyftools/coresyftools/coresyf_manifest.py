@@ -58,6 +58,10 @@ MANIFEST_SCHEMA = {
                 }
             }
         }
+    },
+    'operation': {
+        'type': 'dict',
+        'required': False
     }
 }
 
