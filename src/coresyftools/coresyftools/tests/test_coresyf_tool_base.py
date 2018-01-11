@@ -4,6 +4,8 @@ from zipfile import ZipFile
 
 from coresyf_tool_base import CoReSyFTool
 
+import json
+
 
 class TestCoReSyFTool(TestCase):
 
@@ -32,13 +34,18 @@ class TestCoReSyFTool(TestCase):
                 }
             ]
         }
-
+        with open('manifest.json', 'w') as manifest_file:
+            json.dump(self.manifest, manifest_file)
+        self.runfile = os.path.join(os.getcwd(), 'run')
+    
+    def tearDown(self):
+        os.remove('manifest.json')
+        
     def test_nominal_execution(self):
         class MockCoReSyFTool(CoReSyFTool):
             def run(self, bindings):
                 self.run_bindings = bindings
-
-        tool = MockCoReSyFTool(manifest=self.manifest)
+        tool = MockCoReSyFTool(self.runfile)
 
         with open('f1', 'w') as f1:
             f1.write('input')
@@ -54,7 +61,7 @@ class TestCoReSyFTool(TestCase):
             def run(self, bindings):
                 self.run_bindings = bindings
 
-        tool = MockCoReSyFTool(manifest=self.manifest)
+        tool = MockCoReSyFTool(self.runfile)
         cmd = '--input f --output f2 --param astr'.split()
         self.assertRaises(SystemExit, lambda: tool.execute(cmd))
 
@@ -65,7 +72,7 @@ class TestCoReSyFTool(TestCase):
                 with open(f1) as inputfile:
                     self.input_text = inputfile.read()
 
-        tool = MockCoReSyFTool(manifest=self.manifest)
+        tool = MockCoReSyFTool(self.runfile)
 
         with open('f1', 'w') as f1:
             f1.write('input')
@@ -85,7 +92,7 @@ class TestCoReSyFTool(TestCase):
                 with open(f1) as inputfile:
                     self.input_text = inputfile.read()
 
-        tool = MockCoReSyFTool(manifest=self.manifest)
+        tool = MockCoReSyFTool(self.runfile)
 
         with ZipFile('f1.zip', 'w'):
             pass
@@ -100,7 +107,7 @@ class TestCoReSyFTool(TestCase):
                 with open(os.path.join(self.get_temporary_directory(),
                                        'tempfile'), 'w'):
                     pass
-        tool = MockCoReSyFTool(manifest=self.manifest)
+        tool = MockCoReSyFTool(self.runfile)
 
         with open('f1', 'w') as f1:
             f1.write('input')
