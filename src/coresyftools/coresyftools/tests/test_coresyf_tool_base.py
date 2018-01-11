@@ -23,12 +23,25 @@ class TestCoReSyFArgParser(TestCase):
             }]
         }
 
-    def parse_with_arg(self, arg_def, args):
+    def parse_with_arg(self, arg_def=None, args=[]):
         manifest = self.base_manifest.copy()
-        manifest['arguments'].append(arg_def)
+        if arg_def:
+            manifest['arguments'].append(arg_def)
         arg_parser = CoReSyFArgParser(manifest)
         arg_parser.parse_arguments(args)
+        print(arg_parser.arg_parser.__class__.__module__)
+
         return arg_parser
+
+    def test_parse_without_intput(self):
+        command = '--output f2'
+        self.assertRaises(SystemExit,
+                          lambda: self.parse_with_arg(None, command.split()))
+
+    def test_parse_without_output(self):
+        command = '--input f1'
+        self.assertRaises(SystemExit,
+                          lambda: self.parse_with_arg(None, command.split()))
 
     def test_basic_parse_args(self):
         arg = {
@@ -122,9 +135,40 @@ class TestCoReSyFArgParser(TestCase):
             "name": "options parameter",
             "description": "options parameter description",
             "type": "parameter",
-            "parameterType": "int",
+            "parameterType": "string",
             "options": ["1", "2", "3"]
         }
-        command = '--input f1 --output f2 --optparam "2"'
+        command = '--input f1 --output f2 --optparam 2'
         arg_parser = self.parse_with_arg(arg, command.split())
         self.assertEqual(arg_parser.bindings['optparam'], "2")
+
+    def test_parse_req_param(self):
+        arg = {
+            "identifier": "reqparam",
+            "name": "required parameter",
+            "description": "required parameter description",
+            "type": "parameter",
+            "parameterType": "int",
+            "required": True
+        }
+        command = '--input f1 --output f2 --reqparam 1'
+        arg_parser = self.parse_with_arg(arg, command.split())
+        self.assertEqual(arg_parser.bindings['reqparam'], 1)
+
+    def test_parse_without_req_param(self):
+        arg = {
+            "identifier": "reqparam",
+            "name": "required parameter",
+            "description": "required parameter description",
+            "type": "parameter",
+            "parameterType": "int",
+            "required": True
+        }
+        command = '--input f1 --output f2'
+
+        def parse():
+            self.parse_with_arg(arg, command.split())
+        self.assertRaises(SyntaxError, parse)
+
+
+
