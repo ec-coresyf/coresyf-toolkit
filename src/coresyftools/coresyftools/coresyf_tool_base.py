@@ -15,14 +15,13 @@ TMP_DIR = os.path.abspath("tmp")
 
 class CoReSyFTool(object):
 
-    def __init__(self, run_script_file_name=None, manifest=None):
-        if run_script_file_name:
-            self.context_directory = self._get_context_directory(run_script_file_name)
-            self.manifest_file_name = os.path.join(self.context_directory, self.MANIFEST_FILE_NAME)
-            self.manifest = get_manifest(self.manifest_file_name)
-        if manifest:
-            self.manifest = manifest
+    MANIFEST_FILE_NAME = 'manifest.json'
 
+    def __init__(self, run_script_file_name):
+        self.context_directory = self._get_context_directory(run_script_file_name)
+        self.manifest_file_name = os.path.join(self.context_directory, self.MANIFEST_FILE_NAME)
+        self.manifest = get_manifest(self.manifest_file_name)
+    
     def _parse_args(self, args=None):
         self.arg_parser = CoReSyFArgParser(self.manifest)
         self.arg_parser.parse_arguments(args)
