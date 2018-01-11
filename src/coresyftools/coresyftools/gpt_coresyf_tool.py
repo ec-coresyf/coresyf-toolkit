@@ -29,32 +29,22 @@ class GPTCoReSyFTool(CoReSyFTool):
     DEFAULT_EXT = 'tif'
     DEFAULT_GPT_GRAPH_FILE_NAME = 'gpt_graph.xml'
 
-    def _get_manifest_schema(self):
-        manifest_schema = super(GPTCoReSyFTool, self)._get_manifest_schema()
-        manifest_schema['operation'] = {
-            'type': 'string',
-        }
-        manifest_schema['graph'] = {
-            'type': 'boolean'
-        }
-        return manifest_schema
-
-    def _validate_manifest(self, manifest):
+    def _validate_operation(self, operation):
         is_valid = True
         errors = []
-        if 'operation' not in manifest and ('graph' not in manifest or not manifest['graph']):
+        if 'operation' not in operation and ('graph' not in operation or not operation['graph']):
             is_valid = False
             errors.append('A operation or graph flag should be present.')
-        if 'operation' in manifest and 'graph' in manifest and manifest['graph']:
+        if 'operation' in operation and 'graph' in operation and operation['graph']:
             is_valid = False
             errors.append('Can not be operation and graph at same time.')
         return (is_valid, errors)
 
     def run(self, bindings):
         operator = None
-        if 'operation' in self.manifest:
-            operator = self.manifest['operation']
-        elif 'graph' in self.manifest and self.manifest['graph']:
+        if 'operation' in self.operation:
+            operator = self.operation['operation']
+        elif 'graph' in self.operation and self.operation['graph']:
             graph_file = os.path.join(self.context_directory, self.DEFAULT_GPT_GRAPH_FILE_NAME)
             if not os.path.exists(graph_file):
                 raise GPTGraphFileNotFound(graph_file)
