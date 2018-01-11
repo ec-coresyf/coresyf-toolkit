@@ -6,13 +6,8 @@ from coresyf_tool_base import CoReSyFTool
 
 class TestCoReSyFTool(TestCase):
 
-    def test_nominal_execution(self):
-
-        class MockCoReSyFTool(CoReSyFTool):
-            def run(self, bindings):
-                self.run_bindings = bindings
-
-        manifest = {
+    def setUp(self):
+        self.manifest = {
             'name': 'dummy tool',
             'arguments': [
                 {
@@ -36,7 +31,13 @@ class TestCoReSyFTool(TestCase):
                 }
             ]
         }
-        tool = MockCoReSyFTool(manifest=manifest)
+
+    def test_nominal_execution(self):
+        class MockCoReSyFTool(CoReSyFTool):
+            def run(self, bindings):
+                self.run_bindings = bindings
+
+        tool = MockCoReSyFTool(manifest=self.manifest)
 
         with open('f1', 'w') as f1:
             f1.write('input')
@@ -48,7 +49,13 @@ class TestCoReSyFTool(TestCase):
         os.remove('f1')
 
     def test_non_existent_input(self):
-        pass
+        class MockCoReSyFTool(CoReSyFTool):
+            def run(self, bindings):
+                self.run_bindings = bindings
+
+        tool = MockCoReSyFTool(manifest=self.manifest)
+        cmd = '--input f --output f2 --param astr'.split()
+        self.assertRaises(SystemExit, lambda: tool.execute(cmd))
 
     def test_zip_input(self):
         pass
