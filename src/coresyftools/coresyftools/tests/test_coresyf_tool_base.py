@@ -1,5 +1,6 @@
 from unittest import TestCase
 import os
+from zipfile import ZipFile
 
 from coresyf_tool_base import CoReSyFTool
 
@@ -58,7 +59,23 @@ class TestCoReSyFTool(TestCase):
         self.assertRaises(SystemExit, lambda: tool.execute(cmd))
 
     def test_zip_input(self):
-        pass
+        class MockCoReSyFTool(CoReSyFTool):
+            def run(self, bindings):
+                f1 = bindings['input']
+                with open(f1) as inputfile:
+                    self.input_text = inputfile.read()
+
+        tool = MockCoReSyFTool(manifest=self.manifest)
+
+        with open('f1', 'w') as f1:
+            f1.write('input')
+        with ZipFile('f1.zip', 'w') as f1zip:
+            f1zip.write('f1')
+
+        cmd = '--input f1.zip --output f2 --param astr'.split()
+        tool.execute(cmd)
+        self.assertEqual(tool.input_text, 'input')
+        os.remove('f1.zip')
 
     def test_empty_zip_input(self):
         pass
