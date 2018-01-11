@@ -73,10 +73,10 @@ def main():
                       help=("output polygon shapefile "
                             "(default: 'polygonized_raster.shp')"),
                       default="polygonized_raster.shp")
-    '''parser.add_option('--o_format',
+    parser.add_option('--o_format',
                       dest="output_format", metavar=' ',
                       help="GDAL format for output file (default: 'ESRI Shapefile')",
-                      default="ESRI Shapefile")'''
+                      default="ESRI Shapefile")
     parser.add_option('-n',
                       dest="fieldname", metavar=' ',
                       help=("The name of the file to create "
@@ -118,8 +118,9 @@ def main():
         # Building gdal_translate command line #
         #--------------------------------------#
         gdal_exe = 'gdal_polygonize.py '
-        output_opts = '%s -b %s -f "ESRI Shapefile" %s %s %s' % (opts.input_raster,
+        output_opts = '%s -b %s -f "%s" %s %s %s' % (opts.input_raster,
                                                      r_bandsIDs[i],
+                                                     opts.output_format,
                                                      output_files[i],
                                                      output_files[i],
                                                      opts.fieldname)
