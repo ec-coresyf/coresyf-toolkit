@@ -78,7 +78,19 @@ class TestCoReSyFTool(TestCase):
         os.remove('f1.zip')
 
     def test_empty_zip_input(self):
-        pass
+        class MockCoReSyFTool(CoReSyFTool):
+            def run(self, bindings):
+                f1 = bindings['input']
+                with open(f1) as inputfile:
+                    self.input_text = inputfile.read()
+
+        tool = MockCoReSyFTool(manifest=self.manifest)
+
+        with ZipFile('f1.zip', 'w'):
+            pass
+
+        cmd = '--input f1.zip --output f2 --param astr'.split()
+        self.assertRaises(SystemExit, lambda: tool.execute(cmd))
 
     def test_temporary_data_cleaning(self):
         pass
