@@ -2,8 +2,8 @@ from unittest import TestCase
 import json
 import os
 
-from gpt_coresyf_tool import GPTCoReSyFTool, GPTGraphFileNotFound
-from coresyf_manifest import InvalidManifestException
+from ..gpt_coresyf_tool import GPTCoReSyFTool, GPTGraphFileNotFound
+from ..coresyf_manifest import InvalidManifestException
 
 
 class TestGPTTool(TestCase):

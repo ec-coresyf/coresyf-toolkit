@@ -1,5 +1,5 @@
 from unittest import TestCase
-from coresyf_tool_base import CoReSyFArgParser
+from ..coresyf_tool_base import CoReSyFArgParser
 
 
 class TestCoReSyFArgParser(TestCase):
