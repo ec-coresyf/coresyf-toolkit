@@ -26,7 +26,7 @@ class WingsShipper(object):
         """Initiates shipper class and instantiates manage data and components.
 
         :param str wings_url: url for the wings instance to use
-        :param str wings_domain: the wings domain to use        
+        :param str wings_domain: the wings domain to use
         :param str wings_user: username of user where component
         shall be added
         :param str wings_pass: password to login the user
@@ -44,15 +44,14 @@ class WingsShipper(object):
         self.read_manifest()
         self.create_component_type()
         self.create_component()
+        inputs_list = self.read_inputs()
+        print(inputs_list)
+        # params_list = self.read_parameters()
+        # outputs_list = self.read_outputs()
 
     def read_manifest(self):
         """Reads the manifest file and loads it into a dict"""
         self.manifest = json.load(open(self.manifest_path))
-
-    def get_component_type_id(self):
-        """Returns the component type, which consists of appending 
-        the keyword 'type' at the end of the component"""
-        return '{}Type'.format(self.get_component_id())
 
     def create_component_type(self):
         """Attempts to retrieve a component type. If it doesn't exist in wings,
@@ -62,24 +61,37 @@ class WingsShipper(object):
     def create_component(self):
         """Attempts to retrieve a component. If it doesn't exist in wings,
         it creates a new one"""
-        self.component_manager.add_component(self.get_component_type_id(), 
+        self.component_manager.add_component(self.get_component_type_id(),
                                              self.get_component_id())
+
+    def get_component_type_id(self):
+        """Returns the component type, which consists of appending
+        the keyword 'type' at the end of the component"""
+        return '{}Type'.format(self.get_component_id())
 
     def get_component_id(self):
         """Reads the manifest file and returns the component ID.
-        
+
         It consists of stripping the name of the component from spaces.
         """
         return self.manifest['name'].replace(' ', '')
 
-
+    def read_inputs(self):
+        inputs_list = []
+        for _input in self.manifest['inputs']:
+            self.create_data_type(_input['type'])
+            inputs_list.append({
+                'role': _input['identifier'],
+                'type': _input['type'],
+                'prefix': '--{}'.format(_input['identifier']),
+                'dimensionality': _input['dimensionality']
+            })
+        return inputs_list
 
     def create_data_type(self, data_type):
         """Attempts to retrieve a data type. If it doesn't exist in wings,
         it creates a new one"""
         pass
-
-    
 
 
 if __name__ == '__main__':
