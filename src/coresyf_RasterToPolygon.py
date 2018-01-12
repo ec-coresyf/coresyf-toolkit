@@ -114,16 +114,16 @@ def main():
     output_basepath = os.path.dirname(opts.output_polygon)
     print("Creating output file names from output basename...")
     if r_bands == 1:
-        output_file = opts.output_polygon
+        output_file = opts.output_polygon + '_band1'
         output_opts = '%s -b %s -f "%s" %s %s %s' % (opts.input_raster,
                                                         1,
                                                         opts.output_format,
-                                                        output_file + '_band1',
-                                                        output_file + '_band1',
+                                                        output_file,
+                                                        output_file,
                                                         opts.fieldname)
-        directory_name = opts.output_polygon + '_band1'
+        directory_name = output_file
     elif r_bands > 1:
-        output_files = [os.path.join(output_basepath, str(i) + '_' + output_name) for i in range(1, r_bands+1)]
+        output_files = [opts.output_polygon + '_band' + str(i) for i in range(1, r_bands+1)]
         for i in range(0, len(r_bandsIDs)):
             print("Creating output file for band #%d..." % r_bandsIDs[i])
 
@@ -136,6 +136,7 @@ def main():
                                                         output_files[i],
                                                         str(i+1) + output_name,
                                                         opts.fieldname)
+            directory_name = output_files[i]
     gdal_exe = 'gdal_polygonize.py '
     gdal_polygonize_command = gdal_exe + output_opts
 
@@ -161,7 +162,7 @@ def main():
         print(str(message))
         sys.exit(process.returncode)
 
-    wingsUtils.compressData(directory_name, opts.output_polygon + '.zip')
+    wingsUtils.compressData(directory_name, opts.output_polygon)
 
 if __name__ == '__main__':
     main()
