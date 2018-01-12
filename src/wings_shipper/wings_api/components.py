@@ -81,8 +81,9 @@ class ManageComponents(UserOperation):
         :raises AttributeErrror: if the component is invalid in wings context (code 500)
         """
         payload_data = {'cid': self.get_component_id(component_id)}
-        resp = self.session.get(self.get_request_url() + 'components/getComponentJSON',
-                                params=payload_data)
+        resp = self.session.get(
+            '{}components/getComponentJSON'.format(self.get_request_url()),
+            params=payload_data)
         if resp.status_code == 500:
             raise AttributeError(
                 'Component {} has an invalid attribute (rdf)'.format(component_id))
@@ -102,8 +103,8 @@ class ManageComponents(UserOperation):
             'cid': self.get_component_id(cid),
             'load_concrete': 'false'
         }
-        self.session.post(self.get_request_url() +
-                          'components/addComponent', payload_params)
+        self.session.post('{}components/type/addComponent'.format(
+            self.get_request_url()), payload_params)
         return payload_params
 
     def add_component(self, parent_id, cid):
@@ -120,8 +121,8 @@ class ManageComponents(UserOperation):
             'cid': self.get_component_id(cid),
             'load_concrete': 'true'
         }
-        self.session.post(self.get_request_url() +
-                          'components/addComponent', payload_params)
+        self.session.post(
+            '{}components/addComponent'.format(self.get_request_url()), payload_params)
         return payload_params
 
     def add_component_parameters(self, component_id, inputs, parameters, outputs, rules):
@@ -167,8 +168,9 @@ class ManageComponents(UserOperation):
             'load_concrete': True
         }
 
-        self.session.post(self.get_request_url() + 'components/saveComponentJSON',
-                          data=payload_params)
+        self.session.post(
+            '{}components/saveComponentJSON'.format(self.get_request_url()),
+            data=payload_params)
 
         return payload_params
 
