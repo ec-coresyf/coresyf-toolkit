@@ -74,10 +74,10 @@ def main():
                       help=("output polygon shapefile "
                             "(default: 'polygonized_raster.shp')"),
                       default="polygonized_raster.shp")
-    parser.add_option('--o_format',
+    '''parser.add_option('--o_format',
                       dest="output_format", metavar=' ',
                       help="GDAL format for output file (default: 'ESRI Shapefile')",
-                      default="ESRI Shapefile")
+                      default="ESRI Shapefile")'''
     parser.add_option('-n',
                       dest="fieldname", metavar=' ',
                       help=("The name of the file to create "
@@ -112,6 +112,7 @@ def main():
     #====================================#
     output_name = os.path.basename(opts.output_polygon)
     output_basepath = os.path.dirname(opts.output_polygon)
+    output_format = 'ESRI Shapefile'
     print("Creating output file names from output basename...")
 
     #--------------------------------------#
@@ -121,11 +122,36 @@ def main():
         output_file = opts.output_polygon + '_band1'
         output_opts = '%s -b %s -f "%s" %s %s %s' % (opts.input_raster,
                                                         1,
-                                                        opts.output_format,
+                                                        output_format,
                                                         output_file,
                                                         output_file,
                                                         opts.fieldname)
         directory_name = output_file
+        gdal_exe = 'gdal_polygonize.py '
+        gdal_polygonize_command = gdal_exe + output_opts
+        #==================================#
+        # Run gdal_polygonize command line #
+        #==================================#
+        print ('\n' + gdal_polygonize_command)
+        #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
+
+        try:
+            process = subprocess.Popen(gdal_polygonize_command,
+                                        shell=True,
+                                        stdin=subprocess.PIPE,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE,)
+            # Reads the output and waits for the process to exit before returning
+            stdout, stderr = process.communicate()
+            print(stdout)
+            if stderr:
+                raise Exception(stderr)  # or  if process.returncode:
+        except Exception as message:
+            print(str(message))
+            sys.exit(process.returncode)
+
+        wingsUtils.compressData(directory_name, opts.output_polygon)
+
     elif r_bands > 1:
         output_files = [opts.output_polygon + '_band' + str(i) for i in range(1, r_bands+1)]
         for i in range(0, len(r_bandsIDs)):
@@ -133,37 +159,39 @@ def main():
 
             output_opts = '%s -b %s -f "%s" %s %s %s' % (opts.input_raster,
                                                         r_bandsIDs[i],
-                                                        opts.output_format,
+                                                        output_format,
                                                         output_files[i],
                                                         output_files[i],
                                                         opts.fieldname)
             directory_name = output_files[i]
-    gdal_exe = 'gdal_polygonize.py '
-    gdal_polygonize_command = gdal_exe + output_opts
+            gdal_exe = 'gdal_polygonize.py '
+            gdal_polygonize_command = gdal_exe + output_opts
+
+            #==================================#
+            # Run gdal_polygonize command line #
+            #==================================#
+            print ('\n' + gdal_polygonize_command)
+            #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
+
+            try:
+                process = subprocess.Popen(gdal_polygonize_command,
+                                            shell=True,
+                                            stdin=subprocess.PIPE,
+                                            stdout=subprocess.PIPE,
+                                            stderr=subprocess.PIPE,)
+                # Reads the output and waits for the process to exit before returning
+                stdout, stderr = process.communicate()
+                print(stdout)
+                if stderr:
+                    raise Exception(stderr)  # or  if process.returncode:
+            except Exception as message:
+                print(str(message))
+                sys.exit(process.returncode)
+
+            wingsUtils.compressData(directory_name, opts.output_polygon)
 
 
-    #==================================#
-    # Run gdal_polygonize command line #
-    #==================================#
-    print ('\n' + gdal_polygonize_command)
-    #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
-
-    try:
-        process = subprocess.Popen(gdal_polygonize_command,
-                                    shell=True,
-                                    stdin=subprocess.PIPE,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE,)
-        # Reads the output and waits for the process to exit before returning
-        stdout, stderr = process.communicate()
-        print(stdout)
-        if stderr:
-            raise Exception(stderr)  # or  if process.returncode:
-    except Exception as message:
-        print(str(message))
-        sys.exit(process.returncode)
-
-    wingsUtils.compressData(directory_name, opts.output_polygon)
+    
 
 if __name__ == '__main__':
     main()
