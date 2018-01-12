@@ -116,7 +116,6 @@ class TestCoReSyFTool(TestCase):
         self.assertRaises(SystemExit, lambda: tool.execute(cmd))
 
     def test_temporary_data_cleaning(self):
-        self.fail('not implemented')
         class MockCoReSyFTool(CoReSyFTool):
             def run(self, bindings):
                 with open(os.path.join(self.get_temporary_directory(),
@@ -148,7 +147,7 @@ class TestCoReSyFTool(TestCase):
         with open('f1', 'w') as f1:
             f1.write('input')
 
-        cmd = '--input f1 --output f2 --param astr'.split()
+        cmd = '--input f1 --output f3 --param astr'.split()
         self.assertRaises(NoOutputFile, lambda: tool.execute(cmd))
         os.remove('f1')
 
