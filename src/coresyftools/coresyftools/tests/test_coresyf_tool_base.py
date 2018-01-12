@@ -152,6 +152,18 @@ class TestCoReSyFTool(TestCase):
         self.assertRaises(NoOutputFile, lambda: tool.execute(cmd))
         os.remove('f1')
 
-
     def test_empty_output(self):
-        self.fail('not implemented')
+        class MockCoReSyFTool(CoReSyFTool):
+            def run(self, bindings):
+                self.run_bindings = bindings
+                with open('f2', 'w'):
+                    pass
+
+        tool = MockCoReSyFTool(self.runfile)
+
+        with open('f1', 'w') as f1:
+            f1.write('input')
+
+        cmd = '--input f1 --output f2 --param astr'.split()
+        self.assertRaises(EmptyOutputFile, lambda: tool.execute(cmd))
+        os.remove('f1')
