@@ -14,6 +14,7 @@ class CoReSyFArgParser():
         self.bindings = {}
         self.inputs = []
         self.outputs = []
+        self.options = []
         self.arg_parser = ArgumentParser()
         self.manifest = manifest
         validate_manifest(self.manifest)
@@ -29,7 +30,18 @@ class CoReSyFArgParser():
 
     def _from_xsd_type_(self, xsd_type):
         if xsd_type == 'boolean':
-            return bool
+            def parse_boolean(value):
+                if value == 'true':
+                    return True
+                elif value == 'false':
+                    return False
+                elif value == 1:
+                    return True
+                elif value == 0:
+                    return False
+                else:
+                    raise ValueError('invalid literal for boolean: {}'.format(value))
+            return parse_boolean
         elif xsd_type == 'int':
             return int
         elif xsd_type == 'float':
@@ -52,6 +64,8 @@ class CoReSyFArgParser():
             kwargs['required'] = arg['required']
         self.arg_parser.add_argument(name, type=_type, help=_help, **kwargs)
         self.logger.debug('Parsed %s parameter argument.', name)
+        if arg['parameterType'] == 'boolean':
+            self.options.append(arg['identifier'])
 
     def _parse_data_arg_(self, arg):
         name = arg['identifier']
@@ -89,5 +103,6 @@ class CoReSyFArgParser():
         self.arguments = self.arg_parser.parse_args(args)
         self.bindings = vars(self.arguments)
         self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
-
+        for opt in self.options:
+            self.bindings[opt] = self.bindings[opt] if opt in self.bindings else False
 

@@ -87,9 +87,20 @@ class TestCoReSyFArgParser(TestCase):
             "parameterType": "boolean",
             "description": "boolean parameter description"
         }
-        command = '--input f1 --output f2 --boolparam 0'
+        command = '--input f1 --output f2 --boolparam false'
         arg_parser = self.parse_with_arg(arg, command.split())
         self.assertEqual(arg_parser.bindings['boolparam'], False)
+    
+    def test_parse_invalid_bool_param(self):
+        arg = {
+            "identifier": "boolparam",
+            "name": "boolean parameter",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "description": "boolean parameter description"
+        }
+        command = '--input f1 --output f2 --boolparam invalid_value'
+        self.assertRaises(SystemExit, lambda: self.parse_with_arg(arg, command.split()))
 
     def test_parse_int_param(self):
         arg = {
