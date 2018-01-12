@@ -1,12 +1,12 @@
 from unittest import TestCase
 
-from tool_tester import ToolTester, NonZeroReturnCode, NonEmptyStderr, NoOutputFile, EmptyOutputFile
+from ..tool_tester import ToolTester, NonZeroReturnCode, NonEmptyStderr, NoOutputFile, EmptyOutputFile
 
 
 class TestTester(TestCase):
 
     def test_tester(self):
-        tester = ToolTester('tests/dummy_tool')
+        tester = ToolTester('coresyftools/tests/dummy_tool')
         tester.test()
         self.assertEqual(len(tester.errors), 4)
         self.assertIsInstance(tester.errors[0], NonZeroReturnCode)

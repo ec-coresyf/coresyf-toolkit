@@ -1,5 +1,5 @@
 from unittest import TestCase
-from coresyf_manifest import MalformedManifestException, validate_manifest, MissingInputArgument , MissingOutputArgument
+from ..coresyf_manifest import MalformedManifestException, validate_manifest, MissingInputArgument , MissingOutputArgument
 
 
 
