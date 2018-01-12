@@ -44,10 +44,11 @@ class WingsShipper(object):
         self.read_manifest()
         self.create_component_type()
         self.create_component()
-        inputs_list = self.read_inputs()
+        inputs_list = self.parse_data_argument(self.manifest['inputs'])
         print(inputs_list)
         # params_list = self.read_parameters()
-        # outputs_list = self.read_outputs()
+        outputs_list = self.parse_data_argument(self.manifest['outputs'])
+        print(outputs_list)
 
     def read_manifest(self):
         """Reads the manifest file and loads it into a dict"""
@@ -76,17 +77,17 @@ class WingsShipper(object):
         """
         return self.manifest['name'].replace(' ', '')
 
-    def read_inputs(self):
-        inputs_list = []
-        for _input in self.manifest['inputs']:
-            self.create_data_type(_input['type'])
-            inputs_list.append({
-                'role': _input['identifier'],
-                'type': _input['type'],
-                'prefix': '--{}'.format(_input['identifier']),
-                'dimensionality': _input['dimensionality']
+    def parse_data_argument(self, raw_data):
+        data_list = []
+        for _data in raw_data:
+            self.create_data_type(_data['type'])
+            data_list.append({
+                'role': _data['identifier'],
+                'type': _data['type'],
+                'prefix': '--{}'.format(_data['identifier']),
+                'dimensionality': _data['dimensionality']
             })
-        return inputs_list
+        return data_list
 
     def create_data_type(self, data_type):
         """Attempts to retrieve a data type. If it doesn't exist in wings,
