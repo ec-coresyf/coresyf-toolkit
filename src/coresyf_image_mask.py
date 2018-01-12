@@ -67,7 +67,7 @@ USAGE   = ( "\n"
             "coresyf_image_mask.py [-r <InputRaster>] [--r_band=<Value>]\n"
             "                      [-m <InputMask>] [--m_band=<Value>] [--m_range=<min1:max1,min2:max2...>]\n"
             "                      [-o <OutputRaster>] [--o_format=<OutputFileFormat>]\n"
-            "                      [--o_type=<DataType>] [--no_data_value <Value>]\n"
+            "                      [--o_type=<DataType>] [--no_data_value=<Value>]\n"
             "                      [--all_bands]" 
             "\n")
 
@@ -166,15 +166,15 @@ def main():
                 minV, maxV = part.split(':')
                 if minV:
                     minV = int(minV)
-                    part_exp += '(B>%d)' % minV
+                    part_exp += '(B>=%d)' % minV
                 if maxV:
                     maxV = int(maxV)
                     if part_exp:  part_exp += ' & '
-                    part_exp += '(B<%d)' % maxV
+                    part_exp += '(B<=%d)' % maxV
                 
-                part_exp = '(' + part_exp + ')'    # ((B>0) & (B<10))
+                part_exp = '(' + part_exp + ')'    # ((B>=0) & (B<=10))
                 if ranges_exp: ranges_exp += ' | '
-                ranges_exp += part_exp   # ((B>0) & (B<10)) | ((B>15) & (B<16))
+                ranges_exp += part_exp   # ((B>=0) & (B<=10)) | ((B>=15) & (B<=16))
             
             ranges_exp = '(' + ranges_exp + ')'      
         except:
@@ -250,7 +250,7 @@ def main():
             print (stdout)
             if stderr:            raise Exception (stderr)  # or  if process.returncode:
             if 'Error' in stdout: raise Exception() # Dummy! gdal_calc.py returncode is always 0!
-        except Exception, message:
+        except Exception as message:
             print( str(message) )
             sys.exit(1)  # or sys.exit(process.returncode)
     
@@ -272,7 +272,7 @@ def main():
             stdout, stderr = process.communicate()   
             print (stdout) 
             if stderr:      raise Exception (stderr)  # or  if process.returncode:
-        except Exception, message:
+        except Exception as message:
             print( str(message) )
             sys.exit(process.returncode)
         
