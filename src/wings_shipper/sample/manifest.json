@@ -1,5 +1,6 @@
 {
   "name": "Dummier Tool",
+  "type": "DummyType",
   "description": "Tool for testing proposes only",
   "inputs": [
     {
