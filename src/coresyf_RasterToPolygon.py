@@ -113,6 +113,10 @@ def main():
     output_name = os.path.basename(opts.output_polygon)
     output_basepath = os.path.dirname(opts.output_polygon)
     print("Creating output file names from output basename...")
+
+    #--------------------------------------#
+    # Building gdal_translate command line #
+    #--------------------------------------#
     if r_bands == 1:
         output_file = opts.output_polygon + '_band1'
         output_opts = '%s -b %s -f "%s" %s %s %s' % (opts.input_raster,
@@ -127,9 +131,6 @@ def main():
         for i in range(0, len(r_bandsIDs)):
             print("Creating output file for band #%d..." % r_bandsIDs[i])
 
-            #--------------------------------------#
-            # Building gdal_translate command line #
-            #--------------------------------------#
             output_opts = '%s -b %s -f "%s" %s %s %s' % (opts.input_raster,
                                                         r_bandsIDs[i],
                                                         opts.output_format,
