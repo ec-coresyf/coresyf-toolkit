@@ -135,7 +135,7 @@ def main():
                                                         r_bandsIDs[i],
                                                         opts.output_format,
                                                         output_files[i],
-                                                        str(i+1) + output_name,
+                                                        output_files[i],
                                                         opts.fieldname)
             directory_name = output_files[i]
     gdal_exe = 'gdal_polygonize.py '
