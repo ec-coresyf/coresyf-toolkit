@@ -5,7 +5,11 @@ import re
 from tool import CoReSyFTool
 from manifest import InvalidManifestException
 
+class TooManyInputArgumentsException(Exception):
+    pass
 
+class ToManyOutputArgumentsException(Exception):
+    pass
 
 class GPTExecutionException(Exception):
     '''Error occurred during a SNAP gpt execution'''
@@ -41,6 +45,11 @@ class GPTCoReSyFTool(CoReSyFTool):
                 raise GPTGraphFileNotFound(graph_file)
 
     def run(self, bindings):
+        if len(self.arg_parser.inputs) > 1:
+            raise TooManyInputArgumentsException()
+        if len(self.arg_parser.outputs) > 1:
+            raise TooManyInputArgumentsException()
+
         bindings = bindings.copy()
         operator = None
         if 'operation' in self.operation:
@@ -53,8 +62,8 @@ class GPTCoReSyFTool(CoReSyFTool):
         if 'parameters' in self.operation:
             parameters = self.operation['parameters']
             bindings.update(parameters)
-        source = bindings.pop('Ssource')
-        target = bindings.pop('Ttarget')
+        source = bindings.pop(self.arg_parser.inputs[0])
+        target = bindings.pop(self.arg_parser.outputs[0])
         self._call_gpt(operator, source, target, bindings)
         # This is needed because SNAP automatically adds file extensions, but
         # output files can not have a name different from the specified in
