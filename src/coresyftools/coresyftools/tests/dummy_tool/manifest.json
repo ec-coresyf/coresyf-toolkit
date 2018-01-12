@@ -5,8 +5,7 @@
             "identifier": "input",
             "name": "input",
             "description": "Sets input file to <filepath>",
-            "type": "data",
-            "required": true
+            "type": "data"
         },
         {
             "identifier": "error",

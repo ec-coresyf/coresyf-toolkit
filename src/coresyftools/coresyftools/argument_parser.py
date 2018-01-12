@@ -2,7 +2,7 @@ from datetime import date
 import logging
 
 from argparse import ArgumentParser
-from coresyf_manifest import validate_manifest, InvalidManifestException, MANIFEST_SCHEMA
+from manifest import validate_manifest, InvalidManifestException, MANIFEST_SCHEMA
 
 
 class CoReSyFArgumentParser():

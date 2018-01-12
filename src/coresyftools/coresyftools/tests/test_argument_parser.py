@@ -1,5 +1,5 @@
 from unittest import TestCase
-from ..coresyf_tool_base import CoReSyFArgParser
+from ..argument_parser import CoReSyFArgumentParser
 
 
 class TestCoReSyFArgParser(TestCase):
@@ -26,7 +26,7 @@ class TestCoReSyFArgParser(TestCase):
         manifest = self.base_manifest.copy()
         if arg_def:
             manifest['arguments'].append(arg_def)
-        arg_parser = CoReSyFArgParser(manifest)
+        arg_parser = CoReSyFArgumentParser(manifest)
         arg_parser.parse_arguments(args)
         print(arg_parser.arg_parser.__class__.__module__)
 

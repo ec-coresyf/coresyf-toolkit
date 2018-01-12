@@ -1,7 +1,8 @@
 #!/usr/bin/python2
-from coresyftools.coresyf_tool_base import CoReSyFTool
-import sys
 
+import sys 
+sys.path.insert(0, '../../')
+from tool import CoReSyFTool 
 
 class DummyTool(CoReSyFTool):
 
