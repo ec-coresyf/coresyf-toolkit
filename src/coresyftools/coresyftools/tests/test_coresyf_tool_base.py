@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 from zipfile import ZipFile
 
-from coresyf_tool_base import CoReSyFTool
+from coresyf_tool_base import CoReSyFTool, EmptyOutputFile, NoOutputFile
 
 import json
 
@@ -45,6 +45,10 @@ class TestCoReSyFTool(TestCase):
         class MockCoReSyFTool(CoReSyFTool):
             def run(self, bindings):
                 self.run_bindings = bindings
+                with open('f2', 'w') as out:
+                    out.write('output')
+
+
         tool = MockCoReSyFTool(self.runfile)
 
         with open('f1', 'w') as f1:
@@ -55,12 +59,16 @@ class TestCoReSyFTool(TestCase):
         self.assertEqual(
             tool.bindings, {'input': 'f1', 'output': 'f2', 'param': 'astr'})
         os.remove('f1')
+        os.remove('f2')
 
     def test_non_existent_input(self):
         class MockCoReSyFTool(CoReSyFTool):
             def run(self, bindings):
                 self.run_bindings = bindings
+                with open('f2', 'w') as out:
+                    out.write('output')
 
+                 
         tool = MockCoReSyFTool(self.runfile)
         cmd = '--input f --output f2 --param astr'.split()
         self.assertRaises(SystemExit, lambda: tool.execute(cmd))
@@ -71,6 +79,9 @@ class TestCoReSyFTool(TestCase):
                 f1 = bindings['input']
                 with open(f1) as inputfile:
                     self.input_text = inputfile.read()
+                    with open('f2', 'w') as out:
+                        out.write('output')
+
 
         tool = MockCoReSyFTool(self.runfile)
 
@@ -84,6 +95,7 @@ class TestCoReSyFTool(TestCase):
         self.assertEqual(tool.input_text, 'input')
         os.remove('f1.zip')
         os.remove('f1')
+        os.remove('f2')
 
     def test_empty_zip_input(self):
         class MockCoReSyFTool(CoReSyFTool):
@@ -91,6 +103,9 @@ class TestCoReSyFTool(TestCase):
                 f1 = bindings['input']
                 with open(f1) as inputfile:
                     self.input_text = inputfile.read()
+                    with open('f2', 'w') as out:
+                        out.write('output')
+
 
         tool = MockCoReSyFTool(self.runfile)
 
@@ -107,6 +122,9 @@ class TestCoReSyFTool(TestCase):
                 with open(os.path.join(self.get_temporary_directory(),
                                        'tempfile'), 'w'):
                     pass
+                with open('f2', 'w') as out:
+                    out.write('output')
+
         tool = MockCoReSyFTool(self.runfile)
 
         with open('f1', 'w') as f1:
@@ -117,10 +135,23 @@ class TestCoReSyFTool(TestCase):
         self.assertEqual(
             tool.bindings, {'input': 'f1', 'output': 'f2', 'param': 'astr'})
         os.remove('f1')
+        os.remove('f2')
         self.assertFalse(os.path.exists('tmp/tempfile'))
 
     def test_no_output(self):
-        self.fail('not implemented')
+        class MockCoReSyFTool(CoReSyFTool):
+            def run(self, bindings):
+                self.run_bindings = bindings
+
+        tool = MockCoReSyFTool(self.runfile)
+
+        with open('f1', 'w') as f1:
+            f1.write('input')
+
+        cmd = '--input f1 --output f2 --param astr'.split()
+        self.assertRaises(NoOutputFile, lambda: tool.execute(cmd))
+        os.remove('f1')
+
 
     def test_empty_output(self):
         self.fail('not implemented')
