@@ -1,0 +1,20 @@
+#!/usr/bin/python2
+from coresyftools.coresyf_tool_base import CoReSyFTool
+import sys
+
+
+class DummyTool(CoReSyFTool):
+
+    def run(self, bindings):
+        if 'error' in bindings and bindings['error']:
+            raise Exception()
+        if 'errmsg' in bindings:
+            sys.stderr.write(bindings['errmsg'])
+        if 'noutput' not in bindings or not bindings['noutput']:
+            with open(bindings['output'], 'w') as output:
+                if 'empty_output' not in bindings or not bindings['empty_output']:
+                    output.write('output')
+
+
+if __name__ == '__main__':
+    DummyTool(__file__).execute()
