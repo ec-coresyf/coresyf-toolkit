@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from coresyf_manifest import validate_manifest, InvalidManifestException, MANIFEST_SCHEMA
 
 
-class CoReSyFArgParser():
+class CoReSyFArgumentParser():
 
     MANIFEST_FILE_NAME = 'manifest.json'
 
