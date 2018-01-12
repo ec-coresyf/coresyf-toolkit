@@ -101,7 +101,7 @@ class WingsShipper(object):
     def create_data_type(self, data_type):
         """Attempts to retrieve a data type. If it doesn't exist in wings,
         it creates a new one"""
-        pass
+        self.data_manager.new_data_type(data_type)
 
 
 if __name__ == '__main__':
