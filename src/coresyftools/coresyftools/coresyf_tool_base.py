@@ -60,6 +60,10 @@ class CoReSyFTool(object):
     def _get_context_directory(self, run_script_file_name):
         return os.path.dirname(
             os.path.abspath(run_script_file_name))
+        
+    def get_temporary_directory(self):
+        os.mkdir(TMP_DIR)
+        return TMP_DIR
 
     def execute(self, args=None):
         self._parse_args(args)
