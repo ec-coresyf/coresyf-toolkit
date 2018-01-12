@@ -3,7 +3,8 @@ import os
 import logging
 import subprocess
 from os.path import exists, getsize
-from coresyf_tool_base import CoReSyFArgParser, get_manifest
+from argument_parser import CoReSyFArgumentParser
+from manifest import get_manifest
 
 
 class InvalidCommandException(Exception):
@@ -28,7 +29,7 @@ class ToolExampleCommand(object):
         self._parse_arguments()
 
     def _parse_arguments(self):
-        self.arg_parser = CoReSyFArgParser(self.manifest)
+        self.arg_parser = CoReSyFArgumentParser(self.manifest)
         self.arg_parser.parse_arguments(self.command[1:])
         self.outputs = [self.arg_parser.bindings[arg] for arg in
                         self.arg_parser.outputs]
@@ -50,9 +51,9 @@ def normalize_variable_name(name):
 class ToolTester(object):
 
     def __init__(self, tool_dir):
-        os.chdir(tool_dir)
+        self.tool_dir = tool_dir
         examples_file = 'examples.sh'
-        self.manifest_file_name = 'manifest.json'
+        self.manifest_file_name = os.path.join(tool_dir, 'manifest.json')
         self.manifest = get_manifest(self.manifest_file_name)
         self._load_examples_file(examples_file)
         self.logger = logging.getLogger()
@@ -60,32 +61,37 @@ class ToolTester(object):
         self.logger.setLevel(logging.DEBUG)
 
     def _load_examples_file(self, file_name):
-        with open(file_name) as examples_file:
-            self.example_commands = []
-            title = None
-            description = ''
-            ln = 0
-            for line in examples_file:
-                if not line.strip():
-                    continue
-                if self._is_comment(line):
-                    if not title:
-                        title = line[1:-1]
+        cwd = os.getcwd()
+        os.chdir(self.tool_dir)
+        try:
+            with open(file_name) as examples_file:
+                self.example_commands = []
+                title = None
+                description = ''
+                ln = 0
+                for line in examples_file:
+                    if not line.strip():
+                        continue
+                    if self._is_comment(line):
+                        if not title:
+                            title = line[1:-1]
+                        else:
+                            description += line[1:-1]
+                    elif self._is_valid_command(line):
+                        if not title:
+                            raise ExampleTitleMissingException(ln)
+                        if not description:
+                            raise ExampleDescriptionMissingException(ln)
+                        self.example_commands.append(
+                            ToolExampleCommand(self.manifest, title, description,
+                                            line.split()))
+                        title = None
+                        description = ''
                     else:
-                        description += line[1:-1]
-                elif self._is_valid_command(line):
-                    if not title:
-                        raise ExampleTitleMissingException(ln)
-                    if not description:
-                        raise ExampleDescriptionMissingException(ln)
-                    self.example_commands.append(
-                        ToolExampleCommand(self.manifest, title, description,
-                                           line.split()))
-                    title = None
-                    description = ''
-                else:
-                    raise InvalidCommandException(line)
-                ln += 1
+                        raise InvalidCommandException(line)
+                    ln += 1
+        finally:
+            os.chdir(cwd)
 
     def _is_comment(self, line):
         return line.startswith('#')
@@ -105,6 +111,8 @@ class ToolTester(object):
                 return EmptyOutputFile(output)
 
     def test(self):
+        cwd = os.getcwd()
+        os.chdir(self.tool_dir)
         self.errors = []
         self.log = {}
         for command in self.example_commands:
@@ -117,11 +125,12 @@ class ToolTester(object):
                 self.errors.append(NonZeroReturnCode(returncode,
                                    self._byte_to_str(stderror)))
             elif stderror:
-                self.errors.append(NonEmptyStderr(self._byte_to_str(stderror)))
+                self.errors.append(NonEmptyStderr(stderror))
             else:
                 output_error = self._output_errors(command)
                 if output_error:
                     self.errors.append(output_error)
+        os.chdir(cwd)
 
 
 class TestFailure(Exception):

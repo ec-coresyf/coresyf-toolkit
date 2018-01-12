@@ -2,8 +2,8 @@
 import os
 import subprocess
 import re
-from coresyf_tool_base import CoReSyFTool
-from coresyf_manifest import InvalidManifestException
+from tool import CoReSyFTool
+from manifest import InvalidManifestException
 
 
 

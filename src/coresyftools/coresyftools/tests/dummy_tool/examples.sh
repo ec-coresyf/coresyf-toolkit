@@ -8,7 +8,7 @@
 
 #NON ENPTY STDERR 
 #Example of a non empty stderr execution
-./dummy_tool --input input --output output --errmsg "stderrmsg"
+./dummy_tool --input input --output output --errmsg stderrmsg
 
 #NO OUPUT
 #Example of an execution without output

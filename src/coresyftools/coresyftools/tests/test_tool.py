@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 from zipfile import ZipFile
 
-from ..coresyf_tool_base import CoReSyFTool, EmptyOutputFile, NoOutputFile
+from ..tool import CoReSyFTool, EmptyOutputFile, NoOutputFile
 
 import json
 

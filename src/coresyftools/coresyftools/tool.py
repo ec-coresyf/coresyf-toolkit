@@ -7,8 +7,8 @@ import zipfile
 
 import logging
 
-from coresyf_manifest import get_manifest
-from coresyf_argument_parser import CoReSyFArgParser
+from manifest import get_manifest
+from argument_parser import CoReSyFArgumentParser
 
 TMP_DIR = os.path.abspath("tmp")
 
@@ -37,7 +37,7 @@ class CoReSyFTool(object):
         self.manifest_file_name = os.path.join(
             self.context_directory, self.MANIFEST_FILE_NAME)
         self.manifest = get_manifest(self.manifest_file_name)
-        self.arg_parser = CoReSyFArgParser(self.manifest)
+        self.arg_parser = CoReSyFArgumentParser(self.manifest)
         self.operation = self.manifest.get('operation', {})
         self._validate_operation(self.operation)
 
