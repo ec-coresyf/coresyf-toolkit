@@ -13,21 +13,37 @@ from coresyf_argument_parser import CoReSyFArgParser
 TMP_DIR = os.path.abspath("tmp")
 
 
+class NoOutputFile(Exception):
+
+    def __init__(self, file):
+        super(NoOutputFile, self).__init__()
+        self.file = file
+
+
+class EmptyOutputFile(Exception):
+
+    def __init__(self, file):
+        super(EmptyOutputFile, self).__init__()
+        self.file = file
+
+
 class CoReSyFTool(object):
 
     MANIFEST_FILE_NAME = 'manifest.json'
 
     def __init__(self, run_script_file_name):
-        self.context_directory = self._get_context_directory(run_script_file_name)
-        self.manifest_file_name = os.path.join(self.context_directory, self.MANIFEST_FILE_NAME)
+        self.context_directory = self._get_context_directory(
+            run_script_file_name)
+        self.manifest_file_name = os.path.join(
+            self.context_directory, self.MANIFEST_FILE_NAME)
         self.manifest = get_manifest(self.manifest_file_name)
         self.arg_parser = CoReSyFArgParser(self.manifest)
         self.operation = self.manifest.get('operation', {})
         self._validate_operation(self.operation)
-    
+
     def _validate_operation(self, operation_dict):
         return (True, [])
-    
+
     def _parse_args(self, args=None):
         self.arg_parser.parse_arguments(args)
         self.bindings = self.arg_parser.bindings
@@ -53,8 +69,17 @@ class CoReSyFTool(object):
         self._prepare_inputs_(self.bindings)
         self.logger.info('Running.')
         self.run(self.bindings)
+        self._check_outputs()
         self.logger.info('Cleaning temporary data.')
         self._clean_tmp_()
+
+    def _check_outputs(self):
+        for out_arg in self.arg_parser.outputs:
+            output = self.bindings[out_arg]
+            if not os.path.exists(output):
+                raise NoOutputFile(output)
+            elif not os.path.getsize(output) > 0:
+                raise EmptyOutputFile(output)
 
     def _unzip_file_(self, file_name):
         extracted_files = None

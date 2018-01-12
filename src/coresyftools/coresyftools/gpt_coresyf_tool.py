@@ -41,6 +41,7 @@ class GPTCoReSyFTool(CoReSyFTool):
                 raise GPTGraphFileNotFound(graph_file)
 
     def run(self, bindings):
+        bindings = bindings.copy()
         operator = None
         if 'operation' in self.operation:
             operator = self.operation['operation']

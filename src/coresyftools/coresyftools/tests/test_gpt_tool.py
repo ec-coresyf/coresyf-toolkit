@@ -33,9 +33,12 @@ class TestGPTTool(TestCase):
                 }
             ]
         }
+        with open('output', 'w') as output:
+            output.write('output')
     
     def tearDown(self):
         self.rm_manifest()
+        os.remove('output')
 
     def write_manifest(self, manifest):
         with open('manifest.json', 'w') as manifest_file:
