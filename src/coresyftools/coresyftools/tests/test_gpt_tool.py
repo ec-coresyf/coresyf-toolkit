@@ -118,3 +118,36 @@ class TestGPTTool(TestCase):
         self.assertRaises(GPTGraphFileNotFound,
                           lambda: GPTCoReSyFTool(self.runfile))
 
+    def test_atomic_command_with_constant_parameters(self):
+        manifest = self.manifest.copy()
+        manifest['operation'] = {
+                                    'operation': 'Land-Sea-Mask',
+                                    'parameters': {
+                                        'const': 1,
+                                        'opt': 'a'
+                                    }
+                                }
+        self.write_manifest(manifest)
+        tool = GPTCoReSyFTool(self.runfile)
+
+        class CallShellCommandMock():
+            def __call__(self, args):
+                self.args = args
+
+        call_shell_command_mock = CallShellCommandMock()
+
+        tool._call_shell_command = call_shell_command_mock
+
+        with open('input', 'w') as infile:
+            infile.write('input')
+
+       
+
+        cmd = '--Ssource input --Ttarget output --param val'.split()
+        tool.execute(cmd)
+
+        gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -opt=a -const=1 -param=val {}'.format(
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
+        self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        os.remove('input')
+

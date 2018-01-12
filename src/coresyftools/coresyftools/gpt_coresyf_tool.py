@@ -49,6 +49,9 @@ class GPTCoReSyFTool(CoReSyFTool):
             if not os.path.exists(graph_file):
                 raise GPTGraphFileNotFound(graph_file)
             operator = graph_file
+        if 'parameters' in self.operation:
+            parameters = self.operation['parameters']
+            bindings.update(parameters)
         source = bindings.pop('Ssource')
         target = bindings.pop('Ttarget')
         self._call_gpt(operator, source, target, bindings)
