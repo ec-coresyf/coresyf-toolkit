@@ -15,7 +15,7 @@ def deploy_application(ipath, wurl, wdomain, wuser, wpass):
     """The wrapper function to deploy the wings app"""
     click.echo('Deploying application to wings. Reading from %s' % ipath)
     shipper = WingsShipper(wurl, wdomain, wuser, wpass, ipath)
-    shipper.parse_manifest()
+    shipper.ship_wings_tool()
 
 
 class WingsShipper(object):
@@ -38,26 +38,32 @@ class WingsShipper(object):
         self.component_manager.login(wings_pass)
         self.manifest_path = manifest_path
         self.manifest = {}
+
+    def ship_wings_tool(self):
+        """Ships the tool to wings, adding it as a new component"""
         self.read_manifest()
+        self.create_component_type()
 
     def read_manifest(self):
         """Reads the manifest file and loads it into a dict"""
         self.manifest = json.load(open(self.manifest_path))
 
-    def parse_manifest(self):
-        """Converts the manifest file into valid parameters to be uploaded to
-        wings."""
-        # A component's ID should not have spaces in the name.
-        component_id = self.manifest['name'].replace(' ', '')
-        component_type_id = '{}{}'.format(component_id, 'Type')
+    def get_component_id(self):
+        """Reads the manifest file and returns the component ID.
+        
+        It consists of stripping the name of the component from spaces.
+        """
+        return self.manifest['name'].replace(' ', '')
 
-        self.create_component_type(component_type_id)
+    def get_component_type_id(self):
+        """Returns the component type, which consists of appending 
+        the keyword 'type' at the end of the component"""
+        return '{}Type'.format(self.get_component_id())
 
-    def create_component_type(self, component_type_id):
+    def create_component_type(self):
         """Attempts to retrieve a component type. If it doesn't exist in wings,
         it creates a new one"""
-        self.data_manager.new_data_type('MyType')
-        self.component_manager.add_component_type(component_type_id)
+        self.component_manager.add_component_type(self.get_component_type_id())
 
     def create_component(self, component_type_id):
         """Attempts to retrieve a component. If it doesn't exist in wings,
@@ -69,9 +75,7 @@ class WingsShipper(object):
         it creates a new one"""
         pass
 
-    def ship_wings_tool(self):
-        """Ships the tool to wings, adding it as a new component"""
-        pass
+    
 
 
 if __name__ == '__main__':
