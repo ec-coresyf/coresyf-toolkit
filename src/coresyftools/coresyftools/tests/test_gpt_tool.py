@@ -13,13 +13,13 @@ class TestGPTTool(TestCase):
             'name': 'dummy tool',
             'arguments': [
                 {
-                    'identifier': 'Ssource',
+                    'identifier': 'input',
                     'name': 'input',
                     'description': 'description',
                     'type': 'data'
                 },
                 {
-                    'identifier': 'Ttarget',
+                    'identifier': 'output',
                     'name': 'output',
                     'description': 'description',
                     'type': 'output'
@@ -67,7 +67,7 @@ class TestGPTTool(TestCase):
 
        
 
-        cmd = '--Ssource input --Ttarget output --param val'.split()
+        cmd = '--input input --output output --param val'.split()
         tool.execute(cmd)
 
         gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
@@ -98,7 +98,7 @@ class TestGPTTool(TestCase):
 
         
 
-        cmd = '--Ssource input --Ttarget output --param val'.split()
+        cmd = '--input input --output output --param val'.split()
         tool.execute(cmd)
 
         gpt_cmd = 'gpt {} -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
@@ -146,7 +146,7 @@ class TestGPTTool(TestCase):
 
        
 
-        cmd = '--Ssource input --Ttarget output --param val'.split()
+        cmd = '--input input --output output --param val'.split()
         tool.execute(cmd)
 
         gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -opt=a -const=1 -param=val {}'.format(
