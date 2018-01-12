@@ -43,17 +43,11 @@ class WingsShipper(object):
         """Ships the tool to wings, adding it as a new component"""
         self.read_manifest()
         self.create_component_type()
+        self.create_component()
 
     def read_manifest(self):
         """Reads the manifest file and loads it into a dict"""
         self.manifest = json.load(open(self.manifest_path))
-
-    def get_component_id(self):
-        """Reads the manifest file and returns the component ID.
-        
-        It consists of stripping the name of the component from spaces.
-        """
-        return self.manifest['name'].replace(' ', '')
 
     def get_component_type_id(self):
         """Returns the component type, which consists of appending 
@@ -65,10 +59,20 @@ class WingsShipper(object):
         it creates a new one"""
         self.component_manager.add_component_type(self.get_component_type_id())
 
-    def create_component(self, component_type_id):
+    def create_component(self):
         """Attempts to retrieve a component. If it doesn't exist in wings,
         it creates a new one"""
-        pass
+        self.component_manager.add_component(self.get_component_type_id(), 
+                                             self.get_component_id())
+
+    def get_component_id(self):
+        """Reads the manifest file and returns the component ID.
+        
+        It consists of stripping the name of the component from spaces.
+        """
+        return self.manifest['name'].replace(' ', '')
+
+
 
     def create_data_type(self, data_type):
         """Attempts to retrieve a data type. If it doesn't exist in wings,
