@@ -17,5 +17,5 @@ class UserOperation(Auth):
 
     def get_export_url(self):
         """Builds an URL with exports for the user"""
-        return 'http://localhost:8080/wings/export/users/{}/{}'.format(
+        return 'http://localhost:8080/wings/export/users/{}/{}/'.format(
             self.userid, self.domain)
