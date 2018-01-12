@@ -12,8 +12,10 @@ class UserOperation(Auth):
 
     def get_request_url(self):
         """Builds an URL to make requests to Wings"""
-        return self.server + "/users/" + self.userid + "/" + self.domain + "/"
+        return '{}/users/{}/{}/'.format(
+            self.server, self.userid, self.domain)
 
     def get_export_url(self):
         """Builds an URL with exports for the user"""
-        return self.server + "/export/users/" + self.userid + "/" + self.domain + "/"
+        return 'http://localhost:8080/wings/export/users/{}/{}'.format(
+            self.userid, self.domain)
