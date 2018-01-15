@@ -103,14 +103,17 @@ class CoReSyFTool(object):
     def _prepare_inputs_(self, arguments):
         for argname in self.arg_parser.inputs:
             if argname in arguments and arguments[argname]:
-                file_name = arguments[argname]
-                if not os.path.exists(file_name):
-                    self.arg_parser.arg_parser.error(
-                        "{} does not exists.".format(file_name))
-                else:
-                    extracted_files = self._unzip_file_(file_name)
-                    if extracted_files:
-                        self.bindings[argname] = extracted_files[0]
+                files = arguments[argname]
+                if not hasattr(files, '__iter__'):
+                    files = [files]
+                for file_name in files:
+                    if not os.path.exists(file_name):
+                        self.arg_parser.arg_parser.error(
+                            "{} does not exists.".format(file_name))
+                    else:
+                        extracted_files = self._unzip_file_(file_name)
+                        if extracted_files:
+                            self.bindings[argname] = extracted_files[0]
 
     def _clean_tmp_(self):
         if os.path.isdir(TMP_DIR):

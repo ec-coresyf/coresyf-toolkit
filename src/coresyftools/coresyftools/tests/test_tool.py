@@ -59,6 +59,46 @@ class TestCoReSyFTool(TestCase):
         os.remove('f1')
         os.remove('f2')
 
+    def test_collection_input(self):
+        class MockCoReSyFTool(CoReSyFTool):
+            def run(self, bindings):
+                self.run_bindings = bindings
+                with open('f2', 'w') as out:
+                    out.write('output')
+        
+        manifest = self.manifest.copy()
+        manifest['inputs'] = [
+            {
+                'identifier': 'input',
+                'name': 'input',
+                'description': 'desc',
+                'collection': True
+            }
+        ]
+        with open('manifest.json', 'w') as manifest_file:
+            json.dump(manifest, manifest_file)
+        self.runfile = os.path.join(os.getcwd(), 'run')
+
+        tool = MockCoReSyFTool(self.runfile)
+
+        with open('f1', 'w') as f1:
+            f1.write('input')
+        with open('f12', 'w') as f1:
+            f1.write('input')
+        with open('f13', 'w') as f1:
+            f1.write('input')
+
+        cmd = '--input f1 f12 f13 --output f2 --param astr'.split()
+        tool.execute(cmd)
+        self.assertEqual(
+            tool.bindings, {'input': ['f1', 'f12', 'f13'], 'output': 'f2', 'param': 'astr'})
+        os.remove('f1')
+        os.remove('f12')
+        os.remove('f13')
+        os.remove('f2')
+
+        self.setUp()
+
     def test_non_existent_input(self):
         class MockCoReSyFTool(CoReSyFTool):
             def run(self, bindings):
