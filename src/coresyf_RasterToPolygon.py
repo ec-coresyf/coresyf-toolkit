@@ -53,8 +53,9 @@ USAGE = ('\n'
 ''' SYSTEM MODULES '''
 import subprocess
 import sys
+import os
+import wingsUtils
 from optparse import OptionParser
-
 from osgeo import gdal
 
 
@@ -101,8 +102,7 @@ def main():
     try:
         r_bands = gdal.Open(opts.input_raster, gdal.GA_ReadOnly).RasterCount
         r_bandsIDs = [i for i in range(1, r_bands+1)]
-        print("Creating output file names from output basename...")
-        output_files = [str(i) + '_' + opts.output_polygon for i in range(1, r_bands+1)]
+        
     except:
         print("Unable to determine the number of bands of the input file!")
         sys.exit(1)
@@ -110,34 +110,37 @@ def main():
     #====================================#
     #    LOOP THROUGH ALL RASTER BANDS   #
     #====================================#
+    output_name = os.path.basename(opts.output_polygon)
+    output_basepath = os.path.dirname(opts.output_polygon)
+    output_format = 'ESRI Shapefile'
+    print("Creating output file names from output basename...")
 
-    for i in range(0, len(r_bandsIDs)):
-        print("Creating output file for band #%d..." % r_bandsIDs[i])
-
-        #--------------------------------------#
-        # Building gdal_translate command line #
-        #--------------------------------------#
+    #--------------------------------------#
+    # Building gdal_translate command line #
+    #--------------------------------------#
+    if r_bands == 1:
+        output_file = opts.output_polygon + '_band1'
+        output_opts = '%s -b %s -f "%s" %s %s %s' % (opts.input_raster,
+                                                        1,
+                                                        output_format,
+                                                        output_file,
+                                                        output_file,
+                                                        opts.fieldname)
+        directory_name = output_file
         gdal_exe = 'gdal_polygonize.py '
-        output_opts = '%s -b %s -f "ESRI Shapefile" %s %s %s' % (opts.input_raster,
-                                                     r_bandsIDs[i],
-                                                     output_files[i],
-                                                     output_files[i],
-                                                     opts.fieldname)
         gdal_polygonize_command = gdal_exe + output_opts
-
-
         #==================================#
         # Run gdal_polygonize command line #
         #==================================#
-        #print ('\n' + gdal_polygonize_command)
+        print ('\n' + gdal_polygonize_command)
         #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
 
         try:
             process = subprocess.Popen(gdal_polygonize_command,
-                                       shell=True,
-                                       stdin=subprocess.PIPE,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE,)
+                                        shell=True,
+                                        stdin=subprocess.PIPE,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE,)
             # Reads the output and waits for the process to exit before returning
             stdout, stderr = process.communicate()
             print(stdout)
@@ -147,6 +150,48 @@ def main():
             print(str(message))
             sys.exit(process.returncode)
 
+        wingsUtils.compressData(directory_name, opts.output_polygon)
+
+    elif r_bands > 1:
+        output_files = [opts.output_polygon + '_band' + str(i) for i in range(1, r_bands+1)]
+        for i in range(0, len(r_bandsIDs)):
+            print("Creating output file for band #%d..." % r_bandsIDs[i])
+
+            output_opts = '%s -b %s -f "%s" %s %s %s' % (opts.input_raster,
+                                                        r_bandsIDs[i],
+                                                        output_format,
+                                                        output_files[i],
+                                                        output_files[i],
+                                                        opts.fieldname)
+            directory_name = output_files[i]
+            gdal_exe = 'gdal_polygonize.py '
+            gdal_polygonize_command = gdal_exe + output_opts
+
+            #==================================#
+            # Run gdal_polygonize command line #
+            #==================================#
+            print ('\n' + gdal_polygonize_command)
+            #print("\nRunning using Python version %s.%s.%s..." % sys.version_info[:3])
+
+            try:
+                process = subprocess.Popen(gdal_polygonize_command,
+                                            shell=True,
+                                            stdin=subprocess.PIPE,
+                                            stdout=subprocess.PIPE,
+                                            stderr=subprocess.PIPE,)
+                # Reads the output and waits for the process to exit before returning
+                stdout, stderr = process.communicate()
+                print(stdout)
+                if stderr:
+                    raise Exception(stderr)  # or  if process.returncode:
+            except Exception as message:
+                print(str(message))
+                sys.exit(process.returncode)
+
+            wingsUtils.compressData(directory_name, opts.output_polygon)
+
+
+    
 
 if __name__ == '__main__':
     main()

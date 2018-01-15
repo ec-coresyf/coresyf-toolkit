@@ -105,7 +105,7 @@ def prepareOutputData(output_path, temp_path=TEMP_PATH_OUT):
 # Compress data   #
 #=================#
 def compressData(dataFolder, filepath_zip):
-    myzip = zipfile.ZipFile(filepath_zip, "w" )
+    myzip = zipfile.ZipFile(filepath_zip, "a" )
     
     for file in os.listdir(dataFolder):
         file_path = os.path.abspath( os.path.join(dataFolder, file) )
