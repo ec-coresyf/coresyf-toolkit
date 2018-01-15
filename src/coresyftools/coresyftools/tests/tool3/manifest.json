@@ -1,0 +1,42 @@
+{
+    "name": "Dummy Tool",
+    "description": "Tool for testing proposes only",
+    "inputs": [{
+        "identifier": "input",
+        "name": "input",
+        "description": "Sets input file to <filepath>"
+    }],
+    "parameters": [{
+            "identifier": "error",
+            "name": "error flag",
+            "type": "boolean",
+            "description": "flag to indicate if the execution throws an error",
+            "default": false
+        },
+        {
+            "identifier": "errmsg",
+            "name": "error message option",
+            "type": "string",
+            "description": "option to pass a error message for stderr"
+        },
+        {
+            "identifier": "noutput",
+            "name": "noutput",
+            "description": "does not generate output",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "empty_output",
+            "name": "empty output",
+            "description": "does not generate output",
+            "type": "boolean",
+            "default": false
+        }
+    ],
+    "outputs": [{
+        "identifier": "output",
+        "name": "output",
+        "description": "Sets the output file name to <filepath>"
+    }]
+}

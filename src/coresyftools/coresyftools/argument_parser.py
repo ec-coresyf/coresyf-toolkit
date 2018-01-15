@@ -53,7 +53,7 @@ class CoReSyFArgumentParser():
 
     def _parse_parameter_arg_(self, arg):
         name = '--' + arg['identifier']
-        _type = self._from_xsd_type_(arg['parameterType'])
+        _type = self._from_xsd_type_(arg['type'])
         _help = arg['description']
         kwargs = {}
         if 'options' in arg:
@@ -64,7 +64,7 @@ class CoReSyFArgumentParser():
             kwargs['required'] = arg['required']
         self.arg_parser.add_argument(name, type=_type, help=_help, **kwargs)
         self.logger.debug('Parsed %s parameter argument.', name)
-        if arg['parameterType'] == 'boolean':
+        if arg['type'] == 'boolean':
             self.options.append(arg['identifier'])
 
     def _parse_data_arg_(self, arg):
@@ -87,15 +87,12 @@ class CoReSyFArgumentParser():
 
     def _config_arg_parser(self):
         tool_definition = self.manifest
-        has_required_input = False
-        for arg in tool_definition['arguments']:
-            if arg['type'] == 'parameter':
+        if 'parameters' in tool_definition:
+            for arg in tool_definition['parameters']:
                 self._parse_parameter_arg_(arg)
-            elif arg['type'] == 'data':
-                self._parse_data_arg_(arg)
-                if 'required' in arg and arg['required']:
-                    has_required_input = True
-            elif arg['type'] == 'output':
+        for arg in tool_definition['inputs']:
+            self._parse_data_arg_(arg)
+        for arg in tool_definition['outputs']:
                 self._parse_output_arg_(arg)
       
     def parse_arguments(self, args=None):

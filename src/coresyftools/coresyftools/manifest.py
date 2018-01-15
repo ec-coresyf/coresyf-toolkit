@@ -3,7 +3,6 @@ from cerberus import Validator
 import json
 
 
-
 MANIFEST_SCHEMA = {
     'name': {
         'type': 'string',
@@ -13,7 +12,7 @@ MANIFEST_SCHEMA = {
     'description': {
         'type': 'string'
     },
-    'arguments': {
+    'inputs': {
         'type': 'list',
         'required': True,
         'schema': {
@@ -34,17 +33,33 @@ MANIFEST_SCHEMA = {
                     'required': True
                 },
                 'type': {
+                    'type': 'string'
+                }
+            }
+        }
+    },
+    'parameters': {
+        'type': 'list',
+        'schema': {
+            'type': 'dict',
+            'schema': {
+                'identifier': {
                     'type': 'string',
-                    'allowed': ['data', 'parameter', 'output'],
                     'required': True,
                     'empty': False
                 },
-                'parameterType': {
+                'name': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False
+                },
+                'description': {
+                    'type': 'string',
+                    'required': True
+                },
+                'type': {
                     'type': 'string',
                     'allowed': ['string', 'boolean', 'int', 'float', 'date']
-                },
-                'dataType': {
-                    'type': 'string'
                 },
                 'default': {},
                 'options': {
@@ -55,6 +70,32 @@ MANIFEST_SCHEMA = {
                 },
                 'required': {
                     'type': 'boolean'
+                }
+            }
+        }
+    },
+    'outputs': {
+        'type': 'list',
+        'required': True,
+        'schema': {
+            'type': 'dict',
+            'schema': {
+                'identifier': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False
+                },
+                'name': {
+                    'type': 'string',
+                    'required': True,
+                    'empty': False
+                },
+                'description': {
+                    'type': 'string',
+                    'required': True
+                },
+                'type': {
+                    'type': 'string'
                 }
             }
         }
@@ -95,17 +136,7 @@ def validate_manifest(manifest):
     if not manifest_validator.validate(manifest):
         raise MalformedManifestException(
             manifest_validator.errors)
-    has_input = False
-    has_output = False
-    for arg in manifest['arguments']:
-        if arg['type'] == 'data':
-            has_input = True
-        if arg['type'] == 'output':
-            has_output = True
-    if not has_input:
-        raise MissingInputArgument()
-    if not has_output:
-        raise MissingOutputArgument()
+
 
 def get_manifest(manifest_file_name):
     try:

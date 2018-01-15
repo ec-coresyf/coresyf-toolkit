@@ -11,31 +11,31 @@ class TestGPTTool(TestCase):
     def setUp(self):
         self.manifest = {
             'name': 'dummy tool',
-            'arguments': [
+            'inputs': [
                 {
                     'identifier': 'input',
                     'name': 'input',
                     'description': 'description',
-                    'type': 'data'
-                },
+                }],
+            'outputs': [
                 {
                     'identifier': 'output',
                     'name': 'output',
                     'description': 'description',
-                    'type': 'output'
-                },
+                }
+            ],
+            'parameters': [
                 {
                     'identifier': 'param',
                     'name': 'param',
                     'description': 'description',
-                    'type': 'parameter',
-                    'parameterType': 'string'
+                    'type': 'string'
                 }
             ]
         }
         with open('output', 'w') as output:
             output.write('output')
-    
+
     def tearDown(self):
         self.rm_manifest()
         os.remove('output')
@@ -64,8 +64,6 @@ class TestGPTTool(TestCase):
 
         with open('input', 'w') as infile:
             infile.write('input')
-
-       
 
         cmd = '--input input --output output --param val'.split()
         tool.execute(cmd)
@@ -96,8 +94,6 @@ class TestGPTTool(TestCase):
         with open('input', 'w') as infile:
             infile.write('input')
 
-        
-
         cmd = '--input input --output output --param val'.split()
         tool.execute(cmd)
 
@@ -124,12 +120,12 @@ class TestGPTTool(TestCase):
     def test_atomic_command_with_constant_parameters(self):
         manifest = self.manifest.copy()
         manifest['operation'] = {
-                                    'operation': 'Land-Sea-Mask',
-                                    'parameters': {
-                                        'const': 1,
-                                        'opt': 'a'
-                                    }
-                                }
+            'operation': 'Land-Sea-Mask',
+            'parameters': {
+                'const': 1,
+                'opt': 'a'
+            }
+        }
         self.write_manifest(manifest)
         tool = GPTCoReSyFTool(self.runfile)
 
@@ -144,8 +140,6 @@ class TestGPTTool(TestCase):
         with open('input', 'w') as infile:
             infile.write('input')
 
-       
-
         cmd = '--input input --output output --param val'.split()
         tool.execute(cmd)
 
@@ -153,4 +147,3 @@ class TestGPTTool(TestCase):
             os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
         self.assertEqual(call_shell_command_mock.args, gpt_cmd)
         os.remove('input')
-

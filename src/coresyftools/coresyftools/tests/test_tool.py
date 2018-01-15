@@ -12,42 +12,40 @@ class TestCoReSyFTool(TestCase):
     def setUp(self):
         self.manifest = {
             'name': 'dummy tool',
-            'arguments': [
+            'inputs': [
                 {
                     'identifier': 'input',
                     'name': 'input',
                     'description': 'description',
-                    'type': 'data'
-                },
+                }],
+            'outputs': [
                 {
                     'identifier': 'output',
                     'name': 'output',
                     'description': 'description',
-                    'type': 'output'
-                },
+                }],
+            'parameters': [
                 {
                     'identifier': 'param',
                     'name': 'param',
                     'description': 'description',
-                    'type': 'parameter',
-                    'parameterType': 'string'
+                    'type': 'string'
                 }
             ]
         }
         with open('manifest.json', 'w') as manifest_file:
             json.dump(self.manifest, manifest_file)
         self.runfile = os.path.join(os.getcwd(), 'run')
-    
+
     def tearDown(self):
         os.remove('manifest.json')
-        
+
     def test_nominal_execution(self):
         class MockCoReSyFTool(CoReSyFTool):
             def run(self, bindings):
                 self.run_bindings = bindings
                 with open('f2', 'w') as out:
                     out.write('output')
-
 
         tool = MockCoReSyFTool(self.runfile)
 
@@ -68,7 +66,6 @@ class TestCoReSyFTool(TestCase):
                 with open('f2', 'w') as out:
                     out.write('output')
 
-                 
         tool = MockCoReSyFTool(self.runfile)
         cmd = '--input f --output f2 --param astr'.split()
         self.assertRaises(SystemExit, lambda: tool.execute(cmd))
@@ -81,7 +78,6 @@ class TestCoReSyFTool(TestCase):
                     self.input_text = inputfile.read()
                     with open('f2', 'w') as out:
                         out.write('output')
-
 
         tool = MockCoReSyFTool(self.runfile)
 
@@ -105,7 +101,6 @@ class TestCoReSyFTool(TestCase):
                     self.input_text = inputfile.read()
                     with open('f2', 'w') as out:
                         out.write('output')
-
 
         tool = MockCoReSyFTool(self.runfile)
 
