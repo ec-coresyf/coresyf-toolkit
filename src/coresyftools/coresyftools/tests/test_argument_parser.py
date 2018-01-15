@@ -179,3 +179,4 @@ class TestCoReSyFArgParser(TestCase):
         def parse():
             self.parse_with_arg(arg, command.split())
         self.assertRaises(SystemExit, parse)
+

@@ -1,6 +1,7 @@
+import os
 from unittest import TestCase
 from ..packager import Packager, ToolDirectoryNotFoundException, TargetDirectoryNotFoundException, MissingRunFileException, MissingManifestFileException, MissingExamplesFileException, ToolErrorsException
-
+from zipfile import ZipFile
 
 class TestPackager(TestCase):
 
@@ -35,4 +36,17 @@ class TestPackager(TestCase):
             packager.pack_tool()
 
     def test_successful_packing(self):
-        pass
+        packager = Packager('./coresyftools/tests/tool4/',
+                            './coresyftools/tests/target')
+        packager.pack_tool()
+        self.assertTrue(
+            os.path.exists('./coresyftools/tests/target/Dummy Tool.zip'))
+        zipfile = ZipFile('./coresyftools/tests/target/Dummy Tool.zip')
+        fileset = set(zipfile.namelist())
+        print(fileset)
+        self.assertTrue('run' in fileset)
+        self.assertTrue('manifest.json' in fileset)
+        self.assertTrue('examples.sh' in fileset)
+
+        
+
