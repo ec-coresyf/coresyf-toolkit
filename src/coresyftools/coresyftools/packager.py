@@ -2,6 +2,7 @@ import os
 from os import mkdir, rename, listdir
 from os.path import join, basename, splitext, exists
 from shutil import copy, make_archive
+from .tool_tester import ToolTester
 
 
 class ToolDirectoryNotFoundException(Exception):
@@ -24,6 +25,12 @@ class MissingExamplesFileException(Exception):
     pass
 
 
+class ToolErrorsException(Exception):
+
+    def __init__(self, errors):
+        self.errors = errors
+
+
 class Packager():
 
     def __init__(self, tool_dir, target_dir):
@@ -42,11 +49,11 @@ class Packager():
         if not exists(join(self.tool_dir, 'examples.sh')):
             raise MissingExamplesFileException()
 
-    def _prepare_tool_dir(self):
-        pass
-
     def _test(self):
-        pass
+        tester = ToolTester(self.tool_dir)
+        tester.test()
+        if tester.errors:
+            raise ToolErrorsException(tester.errors)
 
     def _archive(self):
         make_archive(self.tool_dir, 'zip', self.tool_dir)
@@ -54,5 +61,4 @@ class Packager():
     def pack_tool(self):
         self._check_tool_directory_structure()
         self._test()
-        self._prepare_tool_dir()
         self._archive()

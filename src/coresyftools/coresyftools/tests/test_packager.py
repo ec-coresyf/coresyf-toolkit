@@ -1,5 +1,5 @@
 from unittest import TestCase
-from ..packager import Packager, ToolDirectoryNotFoundException, TargetDirectoryNotFoundException, MissingRunFileException, MissingManifestFileException, MissingExamplesFileException
+from ..packager import Packager, ToolDirectoryNotFoundException, TargetDirectoryNotFoundException, MissingRunFileException, MissingManifestFileException, MissingExamplesFileException, ToolErrorsException
 
 
 class TestPackager(TestCase):
@@ -30,7 +30,9 @@ class TestPackager(TestCase):
             packager._check_tool_directory_structure()
 
     def test_faling_test(self):
-        pass
+        packager = Packager('./coresyftools/tests/dummy_tool/', '.')
+        with self.assertRaises(ToolErrorsException):
+            packager.pack_tool()
 
     def test_successful_packing(self):
         pass
