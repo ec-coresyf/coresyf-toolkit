@@ -79,11 +79,14 @@ class CoReSyFTool(object):
 
     def _check_outputs(self):
         for out_arg in self.arg_parser.outputs:
-            output = self.bindings[out_arg]
-            if not os.path.exists(output):
-                raise NoOutputFile(output)
-            elif not os.path.getsize(output) > 0:
-                raise EmptyOutputFile(output)
+            outputs = self.bindings[out_arg]
+            if not hasattr(outputs, '__iter__'):
+                outputs = [outputs]
+            for output in outputs:
+                if not os.path.exists(output):
+                    raise NoOutputFile(output)
+                elif not os.path.getsize(output) > 0:
+                    raise EmptyOutputFile(output)
 
     def _unzip_file_(self, file_name):
         extracted_files = None
