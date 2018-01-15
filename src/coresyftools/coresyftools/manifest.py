@@ -34,6 +34,9 @@ MANIFEST_SCHEMA = {
                 },
                 'type': {
                     'type': 'string'
+                },
+                'collection': {
+                    'type': 'boolean'
                 }
             }
         }
@@ -96,6 +99,9 @@ MANIFEST_SCHEMA = {
                 },
                 'type': {
                     'type': 'string'
+                },
+                'collection': {
+                    'type': 'boolean'
                 }
             }
         }

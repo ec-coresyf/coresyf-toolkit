@@ -71,6 +71,8 @@ class CoReSyFArgumentParser():
         name = arg['identifier']
         _help = arg['description']
         kwargs = {}
+        if 'collection' in arg and arg['collection']:
+            kwargs['nargs'] = '+'
         self.arg_parser.add_argument('--' + name, help=_help, required=True,
                                      **kwargs)
         self.inputs.append(name)
@@ -80,6 +82,8 @@ class CoReSyFArgumentParser():
         name = arg['identifier']
         _help = arg['description']
         kwargs = {}
+        if 'collection' in arg and arg['collection']:
+            kwargs['nargs'] = '+'
         self.arg_parser.add_argument(
             '--' + name, help=_help, required=True, **kwargs)
         self.outputs.append(name)

@@ -167,3 +167,29 @@ class TestCoReSyFArgParser(TestCase):
             self.parse_with_arg(arg, command.split())
         self.assertRaises(SystemExit, parse)
 
+    def test_collection_input(self):
+        manifest = self.base_manifest.copy()
+        manifest['inputs'].append({
+            'identifier': 'colinput',
+            'name': 'collection input',
+            'description': 'collection input description',
+            'collection': True
+        })
+        command = '--input f1 --colinput fc1 fc2 fc3 --output f2'
+        arg_parser = CoReSyFArgumentParser(manifest)
+        arg_parser.parse_arguments(command.split())
+        self.assertEqual(arg_parser.bindings['colinput'], ['fc1', 'fc2', 'fc3'])
+    
+    def test_collection_output(self):
+        manifest = self.base_manifest.copy()
+        manifest['outputs'].append({
+            'identifier': 'coloutput',
+            'name': 'collection output',
+            'description': 'collection output description',
+            'collection': True
+        })
+        command = '--input f1 --output f2 --coloutput fc2 fc3 fc4'
+        arg_parser = CoReSyFArgumentParser(manifest)
+        arg_parser.parse_arguments(command.split())
+        self.assertEqual(arg_parser.bindings['coloutput'],
+                         ['fc2', 'fc3', 'fc4'])
