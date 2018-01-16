@@ -45,7 +45,7 @@ VERSION = '1.0'
 USAGE = ('\n'
          'coresyf_RasterToPolygon.py [-r <InputRaster>]'
          "[-o <OutputRaster>] [-n <FieldName>]"
- #        "[--o_type=<DataType>]"
+#        "[--o_type=<DataType>]"
          "\n")
 
 

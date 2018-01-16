@@ -1,8 +1,8 @@
 {
     "name": "CoReSyF Land-Sea-Mask",
     "description": "CoReSyF Land Sea Mask tool",
-    "operation": "Land-Sea-Mask",
-    "graph": false,
+    "operation": {"operation": "Land-Sea-Mask",
+                  "graph": false},
     "arguments": [{
             "identifier": "Ssource",
             "name": "source",
@@ -38,7 +38,7 @@
             "name": "shorelineExtension",
             "description": "Sets shorelineExtension to <integer>",
             "type": "parameter",
-            "parameterType": "integer",
+            "parameterType": "int",
             "default": 0
         },
         {
@@ -46,7 +46,7 @@
             "name": "sourceBands",
             "description": "The list of source bands",
             "type": "parameter",
-            "parameterType": "list"
+            "parameterType": "string"
         },
         {
             "identifier": "PuseSRTM",
