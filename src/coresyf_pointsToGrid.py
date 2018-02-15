@@ -72,6 +72,7 @@ InterpolationAlgo  = [ "invdist", "invdistnn", "average", "nearest", "linear"]
 from optparse import OptionParser
 import sys
 import subprocess
+import os
 
 
 def main():
@@ -169,7 +170,7 @@ def main():
     if opts.data_type:
         output_opts += '-ot %s ' % opts.data_type 
 
-    input_opts = '-l %s %s ' % (opts.input_source.split('.')[0],
+    input_opts = '-l %s %s ' % (os.path.splitext(os.path.basename(opts.input_source))[0],
                                 opts.input_source)
     
     
