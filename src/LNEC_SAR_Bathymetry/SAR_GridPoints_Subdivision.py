@@ -38,7 +38,7 @@ parser = argparse.ArgumentParser(description='Co-ReSyF: SAR Bathymetry Research 
 #input output
 parser.add_argument('-a', '--param', help='Parameters file for Wings (.ini file)', default = 'Config_Inversion.ini',required=False)
 parser.add_argument('-i', '--input', nargs='+', help='Input grid point files (spectrum.out) for point subdivision', required=False)
-parser.add_argument('-o', '--output', nargs='+', help='Output transfer file (exception.out & Computation#.out)', required=False)
+parser.add_argument('-o', '--output', help='Output transfer file (exception.out & Computation#.out)', required=False)
 #inversion parameters
 parser.add_argument('-l', '--tide', help='Tide level for depth correction', default=0,  required=False)
 parser.add_argument('-T', '--Tp', help='Peak Wave Period (buoys or model data)', default=12,  required=False)
@@ -99,7 +99,7 @@ InversionParameters_reference = CL.InversionParameters(parameters.HydrodynamicPa
 
 #exception points
 if len(ExceptionPoints.DeepWaterPoints)>0 or len(ExceptionPoints.ShallowWaterPoints)>0:
-	fname = 'ExceptionPoints.out'
+	fname = args.output
 	UT.Pickle_File(fname, ExceptionPoints)
 
 # global computation points
@@ -108,7 +108,7 @@ if len(ComputationPoints.QuasiDeepWaterPoints)>0:
 	InversionParameters = InversionParameters_reference
 	filename = 'QuasiDeepwaterPoints'
 	for i,point in enumerate(np.asarray(ComputationPoints.QuasiDeepWaterPoints)):
-		fname = filename+str(i)+'.out'
+		fname = args.output
 		data = CL.InversionData(InversionParameters, point) 
 		data.pickle(fname)
 # global points
@@ -116,16 +116,8 @@ if len(ComputationPoints.GlobalPoints)>0:
 	filename = 'ComputationPoints'
 	InversionParameters = InversionParameters_global
 	for i,point in enumerate(np.asarray(ComputationPoints.GlobalPoints)):
-		fname = filename+str(i)+'.out'
+		fname = args.output
 		data = CL.InversionData(InversionParameters, point) 
 		data.pickle(fname)
-
-
-#remove unused temporary files
-if args.input:
-	os.remove(args.input)
-else:
-	for filename in FileList:
-		os.remove(filename)
 
 
