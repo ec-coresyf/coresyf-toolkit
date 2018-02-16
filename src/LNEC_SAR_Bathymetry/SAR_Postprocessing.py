@@ -32,12 +32,10 @@ args = parser.parse_args()
 
 if args.verbose:
 	print '|--------------------------------|'
-	print '|	Post-Processing		 |'
+	print '|	Post-Processing		        |'
 	print '|--------------------------------|'
 
-# get list of parameters and image data
-fname2='Image.out'
-data = UT.Unpickle_File(fname2)
+
 
 # merge all computed point data in an array
 BathymetryPoints = []
@@ -76,16 +74,19 @@ if args.verbose:
 	print 'number of Processed Points', len(ProcessedPoints)
 
 # post-processing step
-POST.BathymetryMap(ProcessedPoints, args.output)
-#print 'OK1_Main'
-POST.PostProcessing(ProcessedPoints, data)
-#print 'OK2_Main'
+###################################################
+#POST.BathymetryMap(ProcessedPoints, args.output)
+#==================================================
+# sort points by coordinates
+Points = POST.SortGridPoints(ProcessedPoints)
+
+# write point information and bathy to file
+OutputFile = open(args.output[0], "w")
+OutputFile.write("ID,Longitude,Latitude,WaveDirect,Period,Wavelength,Bathymetry\n")
+for n,point in enumerate(Points):
+	OutputFile.write("%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f" % (n+1,point.easting, point.northing, point.Spectrum.WaveDirection, point.Tp, point.wavelength, point.bathymetry)+"\n")
+OutputFile.close()
+###################################################
 
 
-# clean directory
-if args.input:
-	os.remove(args.input)
-else:
-	for filename in FileList:
-		os.remove(filename)
-[os.remove(L) for L in glob.glob('*.out')], [os.remove(L) for L in glob.glob('*.tif')]
+
