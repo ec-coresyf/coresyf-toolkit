@@ -29,9 +29,7 @@ ComputingParameterSpectrum, args = SP.InputSpectrumParameters()
 
 
 # read parameters, point and subset data
-cwd = os.getcwd()
-path = cwd+'/'
-fname = path + args.input
+fname = args.input
 index = int(filter(str.isdigit, fname))
 Subset = UT.Unpickle_File(fname)
 SubsetsParameters, point, Subsets = Subset.parameters, Subset.point, Subset.SubsetData
@@ -72,7 +70,4 @@ pt =  CL.GridPointsData(point.IndexEasting, point.IndexNorthing, point.easting, 
 
 #save point information
 UT.Create_TransferFile(args,pt,'Spectrum')
-
-#remove subsets info file
-os.remove(args.input)
 
