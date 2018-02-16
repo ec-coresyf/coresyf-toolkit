@@ -176,19 +176,8 @@ def BathymetryTextFile(Points, OutputFile):
 	# write bathymetry in a .txt file 
 	# 		with: index, coordinates, direction, wavelength, bathy
 	#-------------------------------------------------------------------------
-	#path
-	cwd = os.getcwd()
-	path = cwd+'/Output/Bathymetry/'
-
-	# output file name
-	if OutputFile:	
-		pattern=re.compile(".*(txt).*")
-		filen = [m.group(0) for l in OutputFile for m in [pattern.search(l)] if m]
-		filename = str(filen[0])
-	else:
-		filename='Bathymetry.txt'
-
-	fname= path + filename	
+	
+	fname = OutputFile
 	# write point information and bathy to file
 	OutputFile=open(fname,"w")
 	for n,point in enumerate(Points):
