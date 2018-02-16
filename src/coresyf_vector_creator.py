@@ -30,7 +30,7 @@ Refs: https://pcjericks.github.io/py-gdalogr-cookbook/geometry.html#create-a-poi
 @example:
 
 Example 1 - Create a shapefile using text file with data field values separated by comma character: 
-./coresyf_vector_creator.py -o ../examples/VectorCreator/newshapefile.shp --o_crs EPSG:4326 --data_file ../examples/VectorCreator/data_to_create.txt
+./coresyf_vector_creator.py -o ../examples/VectorCreator/newshapefile.shp --o_crs 4326 --data_file ../examples/VectorCreator/data_to_create.txt
 
 Example 2 - Updating the previous shapefile with new data field values contained in 'data2.txt':
 ./coresyf_vector_creator.py -i ../examples/VectorCreator/newshapefile.shp -o ../examples/VectorCreator/editedfile.shp --data_file ../examples/VectorCreator/data_to_edit.txt
@@ -138,7 +138,7 @@ def createGeoFromWKT (wkt_code):
 #createGeoFromWKT('POINT (10 0)')
 
 
-def createVector(file_path, data_file, format_name='ESRI Shapefile', crs_ref='EPSG:4326' ):
+def createVector(file_path, data_file, format_name='ESRI Shapefile', crs_ref=4326):
     
     # set up the shapefile driver
     driver = ogr.GetDriverByName( format_name )
@@ -148,13 +148,14 @@ def createVector(file_path, data_file, format_name='ESRI Shapefile', crs_ref='EP
     # create the data source
     dst_datasource = driver.CreateDataSource( file_path )    
     # Create layer with the spatial reference, WGS84
-    proj = osr.SpatialReference()
-    proj.SetWellKnownGeogCS( crs_ref )
+    out_srs = osr.SpatialReference()
+    out_srs.ImportFromEPSG(int(crs_ref))
+    
     layer_name = os.path.splitext(os.path.basename(file_path))[0]
-    dst_layer = dst_datasource.CreateLayer(layer_name, srs=proj, geom_type = ogr.wkbPoint)
+    dst_layer = dst_datasource.CreateLayer(layer_name, srs=out_srs, geom_type = ogr.wkbPoint)
     
     # Read data from data file
-    data = csv.DictReader(open(data_file,"rb"), delimiter=',', quoting=csv.QUOTE_NONE)
+    data = csv.DictReader(open(data_file, 'rb'), delimiter=',', quoting=csv.QUOTE_NONE)
     
     # Add a new fields
     for field in data.fieldnames:
@@ -168,7 +169,7 @@ def createVector(file_path, data_file, format_name='ESRI Shapefile', crs_ref='EP
         for field in data.fieldnames:
             feature.SetField(field, row[field])
         # create the geometry from WKT
-        wkt = "POINT(%f %f)" %  (float(row['Longitude']) , float(row['Latitude']))
+        wkt = 'POINT(%f %f)' %  (float(row['Longitude']) , float(row['Latitude']))
         point = ogr.CreateGeometryFromWkt(wkt)    
         feature.SetGeometry( point )
         dst_layer.CreateFeature(feature)
@@ -179,7 +180,7 @@ def createVector(file_path, data_file, format_name='ESRI Shapefile', crs_ref='EP
 #createVector('/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/myshape.shp', '/home/rccc/_CORESYF/coresyf_toolkit/examples/VectorCreator/data_to_create.txt')
 
 
-def editVector(input_path, data_file, output_path="", format_name='ESRI Shapefile' ):
+def editVector(input_path, data_file, output_path='', format_name='ESRI Shapefile' ):
     # set up the shapefile driver
     driver = ogr.GetDriverByName( format_name )
     
@@ -195,7 +196,7 @@ def editVector(input_path, data_file, output_path="", format_name='ESRI Shapefil
     inLayer = inDataSource.GetLayer()
     
     # Read data from data file
-    data = csv.DictReader(open(data_file,"rb"), delimiter=',', quoting=csv.QUOTE_NONE)
+    data = csv.DictReader(open(data_file, 'rb'), delimiter=',', quoting=csv.QUOTE_NONE)
     
     # Add a new fields
     for field in data.fieldnames:
@@ -244,9 +245,10 @@ def main():
                       default="ESRI Shapefile" )
     parser.add_option('--o_crs', 
                       dest="output_crs", metavar=' ',
-                      help= ("Coordinate reference system of the output vector, some possible references are"
-                             " 'EPSG:4326', 'EPSG:3857'  (default: 'EPSG:4326')"),
-                      default="EPSG:4326" )      
+                      help= ("Spatial reference system EPSG code of the coordinates in the "
+                             "input data_file and, therefore, of the output vector, some possible "
+                             "EPSG codes are '4326', '3857'  (default: '4326')"),
+                      default="4326" )      
     parser.add_option('--data_file', 
                       dest="data_file", metavar=' ',
                       help= ("Delimited text file with data fields separated by tab character"),
