@@ -162,7 +162,7 @@ def Create_TransferFile(args, point, datatype):
 	
 	#file name 
 	if args.output:
-		transfer_file = path + args.output
+		transfer_file = args.output
 	else:
 		num = re.findall('\d+', args.input)
 		transfer_file = path + fname + str(num[0]) + '.out'
