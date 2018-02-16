@@ -55,5 +55,3 @@ else:
 #save point information
 UT.Create_TransferFile(args,Point,'Inversion')
 
-#clean directory
-os.remove(args.input)
