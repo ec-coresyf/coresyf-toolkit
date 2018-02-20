@@ -1,0 +1,60 @@
+{
+    "name": "Coresyf Adaptive Thresholding",
+    "description": "Co-ReSyF Adaptive Thresholding Tool",
+    "graph": false,
+    "arguments": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "sets source to <filepath>",
+            "type": "data",
+            "required": true
+        },
+        {
+            "identifier": "PbackgroundWindowSizeInMeter",
+            "name": "Background Window Size in Meters",
+            "description": "Background window size",
+            "type": "parameter",
+            "parameterType": "double",
+            "default": 800.0
+        },
+        {
+            "identifier": "PestimateBackground",
+            "name": "Estimate Background",
+            "description": "Rough estimation of background threshold for quicker processing",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PguardWindowSizeInMeter",
+            "name": "Guard Window Size in Meters",
+            "description": "Guard window size",
+            "type": "parameter",
+            "parameterType": "double",
+            "default": 500.0
+        },
+        {
+            "identifier": "Ppfa",
+            "name": "Probability of False Alarm",
+            "description": "Probability of false alarm",
+            "type": "parameter",
+            "parameterType": "double",
+            "default": 6.5
+        },
+        {
+            "identifier": "PguardWindowSizeInMeter",
+            "name": "Guard Window Size In Meters",
+            "description": "Target window size",
+            "type": "parameter",
+            "parameterType": "integer",
+            "default": 50
+        },
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "output"
+        }
+    ]
+}
