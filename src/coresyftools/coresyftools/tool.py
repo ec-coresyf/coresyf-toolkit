@@ -10,7 +10,7 @@ import logging
 from manifest import get_manifest
 from argument_parser import CoReSyFArgumentParser
 
-TMP_DIR = os.path.abspath("tmp")
+TMP_DIR = os.path.abspath('tmp')
 
 
 class NoOutputFile(Exception):
