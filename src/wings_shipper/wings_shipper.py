@@ -129,6 +129,8 @@ class WingsShipper(object):
             self.manifest['parameters'])
         outputs_list = self.parse_data_argument(self.manifest['outputs'])
         self.add_component_properties(inputs_list, params_list, outputs_list)
+        self.component_manager.upload_component(self.tool_zip_path)
+        self.component_manager.set_component_location(self.get_component_id())
 
     def create_component_type(self):
         """Attempts to retrieve a component type. If it doesn't exist in wings,
