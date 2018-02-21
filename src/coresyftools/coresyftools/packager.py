@@ -1,9 +1,11 @@
+#!/usr/bin/python2
 import os
 from os import mkdir, rename, listdir
 from os.path import join, basename, splitext, exists
 from shutil import copy, make_archive, move
-from .tool_tester import ToolTester
+from tool_tester import ToolTester
 from manifest import get_manifest
+import click
 
 
 class ToolDirectoryNotFoundException(Exception):
@@ -70,3 +72,15 @@ class Packager():
         self._test()
         self._archive()
 
+
+@click.command()
+@click.option('--tool_dir', type=click.Path(), default='.')
+@click.option('--target_dir', type=click.Path(), default='..')
+def pack_tool(tool_dir, target_dir):
+    click.echo('Packaging {} to {}..'.format(tool_dir, target_dir))
+    packager = Packager(tool_dir, target_dir)
+    packager.pack_tool()
+    click.echo('Packaging finished.')
+
+if __name__ == '__main__':
+    pack_tool()

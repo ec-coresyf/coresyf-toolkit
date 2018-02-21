@@ -2,6 +2,7 @@ import os
 from unittest import TestCase
 from ..packager import Packager, ToolDirectoryNotFoundException, TargetDirectoryNotFoundException, MissingRunFileException, MissingManifestFileException, MissingExamplesFileException, ToolErrorsException
 from zipfile import ZipFile
+from sarge import run
 
 class TestPackager(TestCase):
 
@@ -48,5 +49,32 @@ class TestPackager(TestCase):
         self.assertTrue('manifest.json' in fileset)
         self.assertTrue('examples.sh' in fileset)
 
-        
+    def test_package_command(self):
+        cur_dir = os.getcwd()
+        os.chdir('./coresyftools/tests/tool4')
+        run('../../packager.py')
+        self.assertTrue(
+            os.path.exists('../Dummy Tool.zip'))
+        zipfile = ZipFile('../Dummy Tool.zip')
+        fileset = set(zipfile.namelist())
+        print(fileset)
+        self.assertTrue('run' in fileset)
+        self.assertTrue('manifest.json' in fileset)
+        self.assertTrue('examples.sh' in fileset)
+        os.remove('../Dummy Tool.zip')
+        os.chdir(cur_dir)
 
+    def test_package_command_with_opts(self):
+        cur_dir = os.getcwd()
+        os.chdir('./coresyftools')
+        run('./packager.py --tool_dir=./tests/tool4 --target_dir=./tests/target')
+        self.assertTrue(
+            os.path.exists('./tests/target/Dummy Tool.zip'))
+        zipfile = ZipFile('./tests/target/Dummy Tool.zip')
+        fileset = set(zipfile.namelist())
+        print(fileset)
+        self.assertTrue('run' in fileset)
+        self.assertTrue('manifest.json' in fileset)
+        self.assertTrue('examples.sh' in fileset)
+        os.remove('./tests/target/Dummy Tool.zip')
+        os.chdir(cur_dir)
