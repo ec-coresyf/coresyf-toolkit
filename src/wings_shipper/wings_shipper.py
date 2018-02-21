@@ -1,13 +1,16 @@
 """A command line utility to deploy a wings application"""
-from os.path import exists
+from os.path import exists, join
+from os import makedirs, getcwd
+from shutil import rmtree
 import click
 import json
+import zipfile
 from wings_api.components import ManageComponents
 from wings_api.data import ManageData
 
 
 @click.command()
-@click.option('--ipath', help='Path to the manifest file')
+@click.option('--ipath', help='Path to the tool')
 @click.option('--wurl', help='WINGS Instance URL')
 @click.option('--wdomain', help='Wings domain to use')
 @click.option('--wuser', help='Username for wings domain')
@@ -27,19 +30,19 @@ def deploy_application(ipath, wurl, wdomain, wuser, wpass):
         wuser = wings_parameters['user']
         wpass = wings_parameters['password']
     
-    try:
-        shipper = WingsShipper(wurl, wdomain, wuser, wpass, ipath)
-        click_log('{}: {}'.format(
-            shipper.manifest['name'], shipper.manifest['description']), 'INFO')
-        click_log('Type: {}'.format(shipper.manifest['type']), 'INFO')
-        click_log('{} inputs'.format(len(shipper.manifest['inputs'])), 'INFO')
-        click_log('{} parameters'.format(len(shipper.manifest['parameters'])), 'INFO')
-        click_log('{} outputs'.format(len(shipper.manifest['outputs'])), 'INFO')
-        click_log('RUNNING SHIPPER...', 'INFO')
+    # try:
+    shipper = WingsShipper(wurl, wdomain, wuser, wpass, ipath)
+    click_log('{}: {}'.format(
+        shipper.manifest['name'], shipper.manifest['description']), 'INFO')
+    click_log('Type: {}'.format(shipper.manifest['type']), 'INFO')
+    click_log('{} inputs'.format(len(shipper.manifest['inputs'])), 'INFO')
+    click_log('{} parameters'.format(len(shipper.manifest['parameters'])), 'INFO')
+    click_log('{} outputs'.format(len(shipper.manifest['outputs'])), 'INFO')
+    click_log('RUNNING SHIPPER...', 'INFO')
 
-    except Exception as e:
-        click_log(str(e), 'ERROR')
-        return
+    # except Exception as e:
+    #     click_log(str(e), 'ERROR')
+    #     return
     try:
         shipper.ship_wings_tool()
         click_log('Application shipped!', 'SUCCESS')
@@ -47,6 +50,8 @@ def deploy_application(ipath, wurl, wdomain, wuser, wpass):
     except Exception as e:
         click_log(str(e), 'ERROR')
         return
+    
+    shipper.cleanup_temp_dir()
 
 def validate_inputs(ipath, wurl, wdomain, wuser, wpass):
     if not exists(ipath):
@@ -77,7 +82,7 @@ class WingsShipper(object):
     """A class to read manifest files and create appropriate wings components"""
 
     def __init__(self, wings_url, wings_domain, wings_user,
-                 wings_pass, manifest_path):
+                 wings_pass, tool_zip_path):
         """Initiates shipper class and instantiates manage data and components.
 
         :param str wings_url: url for the wings instance to use
@@ -86,14 +91,34 @@ class WingsShipper(object):
         shall be added
         :param str wings_pass: password to login the user
         """
+        self.temp_dir = join(getcwd(), 'tmp')
         self.data_manager = ManageData(wings_url, wings_user, wings_domain)
         self.component_manager = ManageComponents(
             wings_url, wings_user, wings_domain)
         self.data_manager.login(wings_pass)
         self.component_manager.login(wings_pass)
-        self.manifest_path = manifest_path
+        self.tool_zip_path = tool_zip_path
+        self.manifest_path = None
         self.manifest = {}
+        self.unzip_tool()
         self.read_manifest()
+
+    def unzip_tool(self):
+        self.make_target_dir()
+        zip_reference = zipfile.ZipFile(self.tool_zip_path, 'r')
+        target_folder = zip_reference.namelist()[0]
+
+        zip_reference.extractall(self.temp_dir)
+        zip_reference.close()
+        self.manifest_path = join(self.temp_dir, target_folder, 'manifest.json')
+
+    def make_target_dir(self):
+        if not exists(self.temp_dir):
+            makedirs(self.temp_dir)
+
+    def read_manifest(self):
+        """Reads the manifest file and loads it into a dict"""
+        self.manifest = json.load(open(join(self.manifest_path)))
 
     def ship_wings_tool(self):
         """Ships the tool to wings, adding it as a new component"""
@@ -104,10 +129,6 @@ class WingsShipper(object):
             self.manifest['parameters'])
         outputs_list = self.parse_data_argument(self.manifest['outputs'])
         self.add_component_properties(inputs_list, params_list, outputs_list)
-
-    def read_manifest(self):
-        """Reads the manifest file and loads it into a dict"""
-        self.manifest = json.load(open(self.manifest_path))
 
     def create_component_type(self):
         """Attempts to retrieve a component type. If it doesn't exist in wings,
@@ -167,6 +188,9 @@ class WingsShipper(object):
     def add_component_properties(self, inputs, parameters, outputs):
         self.component_manager.add_component_parameters(
             self.get_component_id(), inputs, parameters, outputs, '')
+
+    def cleanup_temp_dir(self):
+        rmtree(self.temp_dir)
 
 
 if __name__ == '__main__':
