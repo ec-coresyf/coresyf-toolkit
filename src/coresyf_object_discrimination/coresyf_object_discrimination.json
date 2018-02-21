@@ -1,5 +1,5 @@
 {
-    "name": "Coresyf Object Discrimination",
+    "name": "Co-ReSyF Object Discrimination",
     "description": "Remove false alarms from the detected objects.",
     "graph": false,
     "inputs": [
