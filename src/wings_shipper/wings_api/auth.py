@@ -1,5 +1,6 @@
 """Manages basic authentication with wings client"""
 import requests
+from requests.exceptions import ConnectionError
 
 
 class Auth(object):
@@ -14,16 +15,16 @@ class Auth(object):
 
     def login(self, password):
         """Performs a request to wings to login a user"""
-        response = self.session.get(self.server + '/sparql')
+        response = self.session.get(self.server + '/sparql', verify=False)
         data = {
             'j_username': self.userid,
             'j_password': password
         }
-        response = self.session.post(self.server + '/j_security_check', data)
+        response = self.session.post(self.server + '/j_security_check', data, verify=False)
         if response.status_code != 200 and response.status_code != 403:
-            return False
+            raise ConnectionError('Unable to login to wings.')
         return True
 
     def logout(self):
         """Logs out form wings on the current session"""
-        self.session.get(self.server + '/jsp/logout.jsp')
+        self.session.get(self.server + '/jsp/logout.jsp', verify=False)
