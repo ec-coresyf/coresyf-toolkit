@@ -61,7 +61,7 @@ class ManageComponents(UserOperation):
     def get_component_class(self, component_id):
         """Returns a class for a given component.
 
-        The class corresponds simply to appending the 'Class' word to the 
+        The class corresponds simply to appending the 'Class' word to the
         component id.
 
         :param str component_id: the component id to fetch the class
@@ -190,3 +190,20 @@ class ManageComponents(UserOperation):
             ))
 
         return 'http://www.w3.org/2001/XMLSchema#{}'.format(parameter_type)
+
+    def upload_component(self, component_zip_path):
+        files = {'file': ('tool', open(component_zip_path, 'r'))}
+        print files
+        upload_result = self.session.post(
+            '{}upload'.format(self.get_request_url(), files=files))
+        print upload_result.status_code
+        print upload_result.text
+        print upload_result.json()
+
+    def set_component_location(self, component_id):
+        payload_params = {
+            'cid': self.get_component_id(component_id),
+            'location': '{}'.format(component_id)
+        }
+        self.session.post('{}components/setComponentLocation'.format(self.get_request_url(),
+                          payload_params))
