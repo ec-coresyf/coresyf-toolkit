@@ -1,0 +1,40 @@
+{
+    "name": "Coresyf Object Discrimination",
+    "description": "Remove false alarms from the detected objects.",
+    "graph": false,
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster",
+            "required": true,
+            "dimensionality": 0
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "PmaxTargetSizeInMeter",
+            "name": "Max Target Size in meters",
+            "description": "Maximum target size",
+            "type": "double",
+            "default": 600.0
+        },
+        {
+            "identifier": "PminTargetSizeInMeter",
+            "name": "Min Target Size in meters",
+            "description": "Minimum target size",
+            "type": "double",
+            "default": 50.0
+        }
+    ],
+    "outputs": [
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "Raster",
+            "dimensionality": 0
+        }
+    ]
+}
