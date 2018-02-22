@@ -1,5 +1,5 @@
 {
-    "name": "Coresyf Subset",
+    "name": "CoReSyF Subset",
     "type": "Subset",
     "description": "Create a spatial and/or spectral subset of a data product",
     "inputs": [
@@ -30,7 +30,7 @@
         {
             "identifier": "PgeoRegion",
             "name": "Geo Region",
-            "description": "The subset region in geographical coordinates using WKT-format, e.g. POLYGON((<lon1> <lat1>, <lon2> <lat2>, ..., <lon1> <lat1>))",
+            "description": "The subset region in geographical coordinates using WKT format, e.g. POLYGON((<lon1> <lat1>, <lon2> <lat2>, ..., <lon1> <lat1>))",
             "type": "geometry"
         },
         {
@@ -48,21 +48,21 @@
         {
             "identifier": "PsubSamplingX",
             "name": "Sub Sampling X",
-            "description": "The pixel sub-sampling step in X (horizontal image direction)",
+            "description": "The pixel subsampling step in X (horizontal image direction)",
             "type": "integer",
             "default": 1
         },
         {
             "identifier": "PsubSamplingY",
             "name": "Sub Sampling Y",
-            "description": "The pixel sub-sampling step in Y (vertical image direction)",
+            "description": "The pixel subsampling step in Y (vertical image direction)",
             "type": "integer",
             "default": 1
         },
         {
             "identifier": "PtiePointGridNames",
-            "name": "Tie-point Grid Names",
-            "description": "The comma-separated list of names of tie-point grids to be copied. If not given, all bands are copied.",
+            "name": "Tie point Grid Names",
+            "description": "The comma separated list of names of tie point grids to be copied. If not given, all bands are copied.",
             "type": "list"
         }
     ],

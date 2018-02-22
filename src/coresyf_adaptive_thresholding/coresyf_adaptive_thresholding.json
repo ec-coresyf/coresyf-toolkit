@@ -1,5 +1,5 @@
 {
-    "name": "Co-ReSyF Adaptive Thresholding",
+    "name": "CoReSyF Adaptive Thresholding",
     "type": "AdaptiveThresholding",
     "description": "Detect ships using Constant False Alarm Rate detector",
     "graph": false,
