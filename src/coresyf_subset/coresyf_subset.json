@@ -8,8 +8,7 @@
             "name": "source",
             "description": "Sets source to <filepath>",
             "type": "Raster",
-            "required": true,
-            "dimensionality": 0
+            "required": true
         }
     ],
     "parameters": [
@@ -31,19 +30,22 @@
             "identifier": "PgeoRegion",
             "name": "Geo Region",
             "description": "The subset region in geographical coordinates using WKT format, e.g. POLYGON((<lon1> <lat1>, <lon2> <lat2>, ..., <lon1> <lat1>))",
-            "type": "geometry"
+            "type": "string",
+            "default": ""
         },
         {
             "identifier": "PRegion",
             "name": "Region",
             "description": "The subset region in pixel coordinates. Use the following format: <x>,<y>,<width>,<height>",
-            "type": "rectangle"
+            "type": "string",
+            "default": ""
         },
         {
             "identifier": "PsourceBands",
             "name": "Source Bands",
             "description": "The list of source bands.",
-            "type": "list"
+            "type": "list",
+            "default": ""
         },
         {
             "identifier": "PsubSamplingX",
@@ -63,7 +65,8 @@
             "identifier": "PtiePointGridNames",
             "name": "Tie point Grid Names",
             "description": "The comma separated list of names of tie point grids to be copied. If not given, all bands are copied.",
-            "type": "list"
+            "type": "list",
+            "default": ""
         }
     ],
     "outputs": [
@@ -71,8 +74,7 @@
             "identifier": "Ttarget",
             "name": "target",
             "description": "Sets the target to <filepath>",
-            "type": "Raster",
-            "dimensionality": 0
+            "type": "Raster"
         }
     ]
 }

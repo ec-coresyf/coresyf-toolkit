@@ -9,8 +9,7 @@
             "name": "source",
             "description": "Sets source to <filepath>",
             "type": "Raster",
-            "required": true,
-            "dimensionality": 0
+            "required": true
         }
     ],
     "parameters": [
@@ -34,8 +33,7 @@
             "identifier": "Ttarget",
             "name": "target",
             "description": "Sets the target to <filepath>",
-            "type": "Raster",
-            "dimensionality": 0
+            "type": "Raster"
         }
     ]
 }
