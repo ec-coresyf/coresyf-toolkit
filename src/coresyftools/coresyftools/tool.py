@@ -19,13 +19,18 @@ TMP_DIR = os.path.abspath('tmp')
 class MissingCommandPlaceholderForOption(Exception):
 
     def __init__(self, option_identifier):
-        super(MissingCommandPlaceholderForOption, self).__init__()
+        super(MissingCommandPlaceholderForOption, self).__init__(
+            'Defined {} identifier, but not used it in the command template.'
+            .format(option_identifier)
+        )
         self.option_identifier = option_identifier
 
 class UnexpectedCommandPlaceholder(Exception):
 
     def __init__(self, placeholder):
-        super(UnexpectedCommandPlaceholder, self).__init__()
+        super(UnexpectedCommandPlaceholder, self).__init__(
+            '''Found {} in command template. However it is not a defined input,
+            output or parameter identifier.'''.format(placeholder))
         self.placeholder = placeholder
 
 
