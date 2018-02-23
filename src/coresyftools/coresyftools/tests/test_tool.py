@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 from zipfile import ZipFile
 
-from ..tool import CoReSyFTool, EmptyOutputFile, NoOutputFile
+from ..tool import CoReSyFTool, EmptyOutputFile, NoOutputFile, UnexpectedCommandPlaceholder, MissingCommandPlaceholderForOption
 
 import json
 
@@ -254,15 +254,28 @@ class TestCoReSyFTool(TestCase):
         (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("rm nofile")
         self.assertIn('rm: cannot remove', stderr.read())
 
-    def test_can_run_shell_command_of_manifest(self):
+    
+    def _extend_manifest(self, extra_fields):
         manifest = self.manifest.copy()
-        manifest['command'] = 'cp {input} {output}'
+        manifest.update(extra_fields)
         with open('manifest.json', 'w') as manifest_file:
             json.dump(manifest, manifest_file)
         self.runfile = os.path.join(os.getcwd(), 'run')
+
+    def test_can_run_shell_command_of_manifest(self):
+        self._extend_manifest({
+            'command': 'cp {input} {output}'
+        })
         with open('f1', 'w') as f1:
             f1.write('input')
         tool = CoReSyFTool(self.runfile)
         cmd = '--input f1 --output f2 --param astr'.split()
         tool.execute(cmd)
         self.assertTrue(os.path.exists('f2'))
+
+    def test_can_handle_unexpected_command_placeholders(self):
+        self._extend_manifest({
+            'command': 'cp {input} {unexpected_placeholder}'
+        })
+        with self.assertRaises(UnexpectedCommandPlaceholder):
+            CoReSyFTool(self.runfile)
