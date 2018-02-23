@@ -42,6 +42,7 @@ def deploy_application(ipath, wurl, wdomain, wuser, wpass):
 
     except Exception as e:
         click_log(str(e), 'ERROR')
+        shipper.cleanup_temp_dir()
         return
 
     try:
@@ -50,6 +51,7 @@ def deploy_application(ipath, wurl, wdomain, wuser, wpass):
 
     except Exception as e:
         click_log(str(e), 'ERROR')
+        shipper.cleanup_temp_dir()
         return
 
     shipper.cleanup_temp_dir()
@@ -202,10 +204,15 @@ class WingsShipper(object):
             data_list.append({
                 'role': _data['identifier'],
                 'type': _data['type'],
-                'prefix': '--{}'.format(_data['identifier']),
+                'prefix': '-{}'.format(_data['identifier']),
                 'dimensionality': self.get_dimensionality_value(_data)
             })
         return data_list
+
+    def create_data_type(self, data_type):
+        """Attempts to retrieve a data type. If it doesn't exist in wings,
+        it creates a new one"""
+        self.data_manager.new_data_type(data_type)
 
     @staticmethod
     def get_dimensionality_value(data_argument):
@@ -221,18 +228,27 @@ class WingsShipper(object):
         """Parses parameter arguments contained in the manifest"""
         parameter_list = []
         for _parameter in raw_parameters:
+            parameter_value = self.get_parameter_value(_parameter)
+            parameter_type = self.get_parameter_type(_parameter)
             parameter_list.append({
                 'role': _parameter['identifier'],
-                'type': _parameter['type'],
-                'prefix': '--{}'.format(_parameter['identifier']),
-                'paramDefaultValue': _parameter['default']
+                'type': parameter_type,
+                'prefix': '-{}'.format(_parameter['identifier']),
+                'paramDefaultValue': parameter_value
             })
         return parameter_list
 
-    def create_data_type(self, data_type):
-        """Attempts to retrieve a data type. If it doesn't exist in wings,
-        it creates a new one"""
-        self.data_manager.new_data_type(data_type)
+    def get_parameter_value(self, parameter):
+        parameter_value = parameter['default']
+        if parameter['type'] == 'list':
+            parameter_value = str(parameter['default'])
+        return parameter_value
+
+    def get_parameter_type(self, parameter):
+        parameter_type = parameter['type']
+        if parameter_type == 'list':
+            parameter_type = 'string'
+        return parameter_type
 
     def add_component_properties(self, inputs, parameters, outputs):
         """Adds the properties of the component to wings"""
