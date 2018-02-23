@@ -9,6 +9,11 @@ MANIFEST_SCHEMA = {
         'required': True,
         'empty': False
     },
+    'type': {
+        'type': 'string',
+        'required': True,
+        'empty': False
+    },
     'description': {
         'type': 'string'
     },

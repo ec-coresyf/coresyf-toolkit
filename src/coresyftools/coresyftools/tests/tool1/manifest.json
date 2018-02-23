@@ -1,6 +1,7 @@
 {
     "name": "Dummy Tool",
     "description": "Tool for testing proposes only",
+    "type": "Dummy",
     "inputs": [{
         "identifier": "input",
         "name": "input",
