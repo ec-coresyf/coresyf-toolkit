@@ -124,8 +124,12 @@ class CoReSyFTool(object):
         if os.path.isdir(TMP_DIR):
             shutil.rmtree(TMP_DIR)
 
+    def _run_command(self, command_template):
+        self.invoke_shell_command(command_template, **self.bindings)
+
     def run(self, bindings):
-        pass
+        if 'command' in self.manifest:
+            self._run_command(self.manifest['command'])
 
     def invoke_shell_command(self, fmt, **kwargs):
         cmd_str = shell_format(fmt, **kwargs)

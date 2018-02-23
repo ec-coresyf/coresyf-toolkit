@@ -106,6 +106,7 @@ MANIFEST_SCHEMA = {
             }
         }
     },
+    'command': {'type': 'string'},
     'operation': {
         'type': 'dict',
         'required': False

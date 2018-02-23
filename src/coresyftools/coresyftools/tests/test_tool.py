@@ -253,3 +253,16 @@ class TestCoReSyFTool(TestCase):
         self.assertEqual(stdout.read(), 'out')
         (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("rm nofile")
         self.assertIn('rm: cannot remove', stderr.read())
+
+    def test_can_run_shell_command_of_manifest(self):
+        manifest = self.manifest.copy()
+        manifest['command'] = 'cp {input} {output}'
+        with open('manifest.json', 'w') as manifest_file:
+            json.dump(manifest, manifest_file)
+        self.runfile = os.path.join(os.getcwd(), 'run')
+        with open('f1', 'w') as f1:
+            f1.write('input')
+        tool = CoReSyFTool(self.runfile)
+        cmd = '--input f1 --output f2 --param astr'.split()
+        tool.execute(cmd)
+        self.assertTrue(os.path.exists('f2'))
