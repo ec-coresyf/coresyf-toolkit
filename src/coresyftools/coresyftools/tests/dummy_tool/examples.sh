@@ -1,3 +1,5 @@
+input="https://scihub.copernicus.eu/dhus/odata/v1/Products('139d30eb-bc03-459c-8642-e794aad61707')/$value"
+
 #PASSING EXECUTION
 #Example of a passing execution
 ./dummy_tool --input input --output output
