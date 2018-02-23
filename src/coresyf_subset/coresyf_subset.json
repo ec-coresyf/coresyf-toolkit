@@ -1,0 +1,80 @@
+{
+    "name": "CoReSyF Subset",
+    "type": "Subset",
+    "description": "Create a spatial and/or spectral subset of a data product",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster",
+            "required": true
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "PcopyMetadata",
+            "name": "Copy Meta Data",
+            "description": "Whether to copy the metadata of the source product",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PfullSwath",
+            "name": "Full Swath",
+            "description": "Forces the operator to extend the subset region to the full swath.",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PgeoRegion",
+            "name": "Geo Region",
+            "description": "The subset region in geographical coordinates using WKT format, e.g. POLYGON((<lon1> <lat1>, <lon2> <lat2>, ..., <lon1> <lat1>))",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "identifier": "PRegion",
+            "name": "Region",
+            "description": "The subset region in pixel coordinates. Use the following format: <x>,<y>,<width>,<height>",
+            "type": "string",
+            "default": ""
+        },
+        {
+            "identifier": "PsourceBands",
+            "name": "Source Bands",
+            "description": "The list of source bands.",
+            "type": "list",
+            "default": []
+        },
+        {
+            "identifier": "PsubSamplingX",
+            "name": "Sub Sampling X",
+            "description": "The pixel subsampling step in X (horizontal image direction)",
+            "type": "int",
+            "default": 1
+        },
+        {
+            "identifier": "PsubSamplingY",
+            "name": "Sub Sampling Y",
+            "description": "The pixel subsampling step in Y (vertical image direction)",
+            "type": "int",
+            "default": 1
+        },
+        {
+            "identifier": "PtiePointGridNames",
+            "name": "Tie point Grid Names",
+            "description": "The comma separated list of names of tie point grids to be copied. If not given, all bands are copied.",
+            "type": "list",
+            "default": []
+        }
+    ],
+    "outputs": [
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "Raster"
+        }
+    ]
+}
