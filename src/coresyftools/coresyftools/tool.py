@@ -1,18 +1,13 @@
-import sys
+import logging
 import os
-
 import shutil
-
 import string
-
+import sys
 import zipfile
 
-import logging
-
-from manifest import get_manifest
 from argument_parser import CoReSyFArgumentParser
-
-from sarge import run, shell_format, Capture
+from manifest import get_manifest
+from sarge import Capture, run, shell_format
 
 TMP_DIR = os.path.abspath('tmp')
 
@@ -20,7 +15,7 @@ class MissingCommandPlaceholderForOption(Exception):
 
     def __init__(self, option_identifier):
         super(MissingCommandPlaceholderForOption, self).__init__(
-            'Defined {} identifier, but not used it in the command template.'
+            'Identifier {} was defined, but not used in the command template.'
             .format(option_identifier)
         )
         self.option_identifier = option_identifier
@@ -79,7 +74,13 @@ class CoReSyFTool(object):
                     literal_text, field_name, format_spec, conversion in
                     formatter.parse(command_template)])
 
-
+    # Manifests 'operation' field is intended for specifying behavior aspects
+    # for CoReSyFTool specializations (i.e. subclasses).
+    # For example, GPTCoReSyFTool use it for specifying the GPT operation or
+    # if a GPT graph is to be used.
+    # This method, which is called during __init__, is supposed to be
+    # overridden by subclasses, in order to extend manifest validation
+    # according to operation logics of specializations.
     def _validate_operation(self, operation_dict):
         return (True, [])
 

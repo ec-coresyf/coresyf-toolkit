@@ -1,10 +1,11 @@
-from unittest import TestCase
+import json
 import os
+from unittest import TestCase
 from zipfile import ZipFile
 
-from ..tool import CoReSyFTool, EmptyOutputFile, NoOutputFile, UnexpectedCommandPlaceholder, MissingCommandPlaceholderForOption
-
-import json
+from ..tool import (CoReSyFTool, EmptyOutputFile,
+                    MissingCommandPlaceholderForOption, NoOutputFile,
+                    UnexpectedCommandPlaceholder)
 
 
 class TestCoReSyFTool(TestCase):
@@ -65,7 +66,7 @@ class TestCoReSyFTool(TestCase):
                 self.run_bindings = bindings
                 with open('f2', 'w') as out:
                     out.write('output')
-        
+
         manifest = self.manifest.copy()
         manifest['inputs'] = [
             {
@@ -98,7 +99,7 @@ class TestCoReSyFTool(TestCase):
         os.remove('f2')
 
         self.setUp()
-    
+
     def test_collection_ouput(self):
         class MockCoReSyFTool(CoReSyFTool):
             def run(self, bindings):
@@ -109,7 +110,7 @@ class TestCoReSyFTool(TestCase):
                     out.write('output')
                 with open('f23', 'w') as out:
                     out.write('output')
-        
+
         manifest = self.manifest.copy()
         manifest['outputs'] = [
             {
@@ -242,19 +243,28 @@ class TestCoReSyFTool(TestCase):
         self.assertRaises(EmptyOutputFile, lambda: tool.execute(cmd))
         os.remove('f1')
 
-
-    def test_invoke_shell_command(self):
+    def test_can_successfully_run_command_from_interpolated_template(self):
         coresyf_tool = CoReSyFTool(self.runfile)
-        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("test {op}", op="1")
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command(
+            "test {op}", op="1")
         self.assertEqual(pipeline.returncode, 0)
-        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("test {op1} = {op2}", op1="1", op2="2")
+
+    def test_can_read_failed_return_code_after_running_shell_command(self):
+        coresyf_tool = CoReSyFTool(self.runfile)
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command(
+            "test {op1} = {op2}", op1="1", op2="2")
         self.assertEqual(pipeline.returncode, 1)
+
+    def test_can_read_stdout_after_running_shell_command(self):
+        coresyf_tool = CoReSyFTool(self.runfile)
         (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("echo -n out")
         self.assertEqual(stdout.read(), 'out')
+
+    def test_can_read_stderr_after_running_shell_command(self):
+        coresyf_tool = CoReSyFTool(self.runfile)
         (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("rm nofile")
         self.assertIn('rm: cannot remove', stderr.read())
 
-    
     def _extend_manifest(self, extra_fields):
         manifest = self.manifest.copy()
         manifest.update(extra_fields)
@@ -286,4 +296,3 @@ class TestCoReSyFTool(TestCase):
         })
         with self.assertRaises(MissingCommandPlaceholderForOption):
             CoReSyFTool(self.runfile)
-

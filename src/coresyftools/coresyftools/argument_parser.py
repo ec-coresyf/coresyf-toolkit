@@ -8,22 +8,16 @@ from manifest import validate_manifest, InvalidManifestException, MANIFEST_SCHEM
 class CoReSyFArgumentParser():
 
     def __init__(self, manifest, logger=None):
+        self.identifiers = set()
+        self.manifest = manifest
         self.logger = logger or logging.getLogger(__name__)
         self.bindings = {}
         self.inputs = []
         self.outputs = []
         self.options = []
         self.arg_parser = ArgumentParser()
-        self.manifest = manifest
         validate_manifest(self.manifest)
-        is_valid, errors = self._validate_manifest(self.manifest)
-        if not is_valid:
-            raise InvalidManifestException(errors)
-        self.identifiers = set()
         self._configure_arg_parser()
-
-    def _validate_manifest(self, manifest):
-        return (True, [])
 
     def _get_manifest_schema(self):
         return MANIFEST_SCHEMA
