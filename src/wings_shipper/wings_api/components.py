@@ -1,5 +1,6 @@
 """Contains a class to manage components in wings"""
 import re
+import os
 from .userop import UserOperation
 import json
 
@@ -61,7 +62,7 @@ class ManageComponents(UserOperation):
     def get_component_class(self, component_id):
         """Returns a class for a given component.
 
-        The class corresponds simply to appending the 'Class' word to the 
+        The class corresponds simply to appending the 'Class' word to the
         component id.
 
         :param str component_id: the component id to fetch the class
@@ -190,3 +191,40 @@ class ManageComponents(UserOperation):
             ))
 
         return 'http://www.w3.org/2001/XMLSchema#{}'.format(parameter_type)
+
+    def upload_component(self, component_id, component_zip_path):
+        """Uploads the component definition to wings.
+
+        :param str component_id: id of the component to upload
+        :param str component_zip_path: path to the zip file of the component
+        """
+        filename = os.path.basename(component_zip_path)
+        wings_component_id = self.get_component_id(component_id)
+        zip_file = {
+            'file': (filename, open(component_zip_path, 'rb'))
+        }
+        form_data = {
+            'name': filename,
+            'type': 'component',
+            'id': wings_component_id
+        }
+        upload_result = self.session.post(
+            '{}upload'.format(self.get_request_url()),
+            data=form_data,
+            files=zip_file)
+
+        if upload_result.status_code != 200:
+            raise Exception('Unable to upload component to Wings')
+
+        file_location = upload_result.json()['location']
+        self.set_component_location(file_location, component_id)
+
+    def set_component_location(self, location, component_id):
+        """Sets the file location of the component in Wings"""
+        payload_params = {
+            'cid': self.get_component_id(component_id),
+            'location': location
+        }
+        self.session.post(
+            '{}components/setComponentLocation'.format(self.get_request_url()),
+            payload_params)

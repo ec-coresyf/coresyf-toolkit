@@ -8,8 +8,7 @@
       "name": "input",
       "description": "Sets input file to <filepath>",
       "required": true,
-      "type": "Raster",
-      "dimensionality": 0
+      "type": "Raster"
     },
     {
       "identifier": "input2",
@@ -17,7 +16,7 @@
       "description": "Sets second input file to <filepath>",
       "required": true,
       "type": "Grid",
-      "dimensionality": 0
+      "collection": true
     }
   ],
   "parameters": [
@@ -55,8 +54,7 @@
       "identifier": "output",
       "name": "output",
       "description": "Sets the output file name to <filepath>",
-      "type": "Raster",
-      "dimensionality": 0
+      "type": "Raster"
     }
   ]
 }

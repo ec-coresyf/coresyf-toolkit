@@ -1,10 +1,12 @@
 {
     "name": "Dummy Tool",
     "description": "Tool for testing proposes only",
+    "type": "DummyType",
     "inputs": [{
         "identifier": "input",
         "name": "input",
-        "description": "Sets input file to <filepath>"
+        "description": "Sets input file to <filepath>",
+        "type": "Raster"
     }],
     "parameters": [{
             "identifier": "error",
@@ -17,7 +19,8 @@
             "identifier": "errmsg",
             "name": "error message option",
             "type": "string",
-            "description": "option to pass a error message for stderr"
+            "description": "option to pass a error message for stderr",
+            "default": "error"
         },
         {
             "identifier": "noutput",
@@ -37,6 +40,7 @@
     "outputs": [{
         "identifier": "output",
         "name": "output",
-        "description": "Sets the output file name to <filepath>"
+        "description": "Sets the output file name to <filepath>",
+        "type": "Raster"        
     }]
 }
