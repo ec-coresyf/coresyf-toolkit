@@ -1,12 +1,28 @@
 from unittest import TestCase
 
 from ..tool_tester import ToolTester, NonZeroReturnCode, NonEmptyStderr, NoOutputFile, EmptyOutputFile
+import os
 
 
 class TestTester(TestCase):
 
+    def test_download_input(self):
+        tester = ToolTester('coresyftools/tests/dummy_tool',
+                            ('rccc', 'ssdh2dme'))
+        tester._download_input('downloaded_file', "https://scihub.copernicus.eu/dhus/odata/v1/Products('139d30eb-bc03-459c-8642-e794aad61707')/$value", tester.scihub_credentials)
+        self.assertTrue(os.path.exists('downloaded_file'))
+        self.assertGreater(os.path.getsize('downloaded_file'), 0)
+        os.remove('downloaded_file')
+    
+    def test_inputs_mappings(self):
+        tester = ToolTester('coresyftools/tests/dummy_tool',
+                           ('rccc', 'ssdh2dme'))
+        self.assertDictEqual(tester.input_mappings,
+                            {'input': "https://scihub.copernicus.eu/dhus/odata/v1/Products('139d30eb-bc03-459c-8642-e794aad61707')/$value"})
+
     def test_tester(self):
-        tester = ToolTester('coresyftools/tests/dummy_tool')
+        tester = ToolTester('coresyftools/tests/dummy_tool',
+                            ('rccc','ssdh2dme'))
         tester.test()
         print(tester.errors)
         self.assertEqual(len(tester.errors), 4)
