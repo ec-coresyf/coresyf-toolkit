@@ -1,0 +1,38 @@
+{
+    "name": "CoReSyF Object Discrimination",
+    "type": "ObjectDiscrimination",
+    "description": "Remove false alarms from the detected objects.",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster",
+            "required": true
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "PmaxTargetSizeInMeter",
+            "name": "Max Target Size in meters",
+            "description": "Maximum target size",
+            "type": "float",
+            "default": 600.0
+        },
+        {
+            "identifier": "PminTargetSizeInMeter",
+            "name": "Min Target Size in meters",
+            "description": "Minimum target size",
+            "type": "float",
+            "default": 50.0
+        }
+    ],
+    "outputs": [
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "Raster"
+        }
+    ]
+}
