@@ -19,3 +19,9 @@ class UserOperation(Auth):
         """Builds an URL with exports for the user"""
         return 'http://localhost:8080/wings/export/users/{}/{}/'.format(
             self.userid, self.domain)
+
+    def get_location_uri(self):
+        """Builds a URI with location of code"""
+        return '/usr/share/tomcat8/.wings/storage/users/{}/{}/code/library/'.format(
+            self.userid, self.domain
+        )
