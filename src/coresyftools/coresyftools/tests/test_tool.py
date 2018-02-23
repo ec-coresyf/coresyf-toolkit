@@ -241,3 +241,15 @@ class TestCoReSyFTool(TestCase):
         cmd = '--input f1 --output f2 --param astr'.split()
         self.assertRaises(EmptyOutputFile, lambda: tool.execute(cmd))
         os.remove('f1')
+
+
+    def test_invoke_shell_command(self):
+        coresyf_tool = CoReSyFTool(self.runfile)
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("test {op}", op="1")
+        self.assertEqual(pipeline.returncode, 0)
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("test {op1} = {op2}", op1="1", op2="2")
+        self.assertEqual(pipeline.returncode, 1)
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("echo -n out")
+        self.assertEqual(stdout.read(), 'out')
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("rm nofile")
+        self.assertIn('rm: cannot remove', stderr.read())

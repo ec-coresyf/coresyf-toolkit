@@ -10,6 +10,8 @@ import logging
 from manifest import get_manifest
 from argument_parser import CoReSyFArgumentParser
 
+from sarge import run, shell_format, Capture
+
 TMP_DIR = os.path.abspath('tmp')
 
 
@@ -124,3 +126,10 @@ class CoReSyFTool(object):
 
     def run(self, bindings):
         pass
+
+    def invoke_shell_command(self, fmt, **kwargs):
+        cmd_str = shell_format(fmt, **kwargs)
+        stdout_capture = Capture()
+        stderr_capture = Capture()
+        pipeline = run(cmd_str, stdout=stdout_capture, stderr=stderr_capture)
+        return (pipeline, stdout_capture, stderr_capture)
