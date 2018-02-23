@@ -7,6 +7,7 @@ class TestValidateManifest(TestCase):
     def test_valid(self):
         base_manifest = {
             "name": "name",
+            "type": "Dummy",
             "description": "description",
             "inputs": [{
                 "identifier": "input",
@@ -40,6 +41,7 @@ class TestValidateManifest(TestCase):
     def test_invalid_key(self):
         manifest = {
             "name": "name",
+            "type": "Dummy",
             "description_______": "description",
             "inputs": [{
                 "identifier": "input",
@@ -58,6 +60,7 @@ class TestValidateManifest(TestCase):
     def test_no_input(self):
         manifest = {
             "name": "name",
+            "type": "Dummy",
             "description": "description",
             "outputs": [{
                 "identifier": "output",
@@ -71,6 +74,7 @@ class TestValidateManifest(TestCase):
     def test_no_output(self):
         manifest = {
             "name": "name",
+            "type": "Dummy",
             "description": "description",
             "inputs": [{
                 "identifier": "input",
