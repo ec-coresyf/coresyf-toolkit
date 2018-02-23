@@ -11,6 +11,7 @@ class TestGPTTool(TestCase):
     def setUp(self):
         self.manifest = {
             'name': 'dummy tool',
+            'type': 'Dummy',
             'inputs': [
                 {
                     'identifier': 'input',
