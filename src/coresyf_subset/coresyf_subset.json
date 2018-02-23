@@ -45,20 +45,20 @@
             "name": "Source Bands",
             "description": "The list of source bands.",
             "type": "list",
-            "default": ""
+            "default": []
         },
         {
             "identifier": "PsubSamplingX",
             "name": "Sub Sampling X",
             "description": "The pixel subsampling step in X (horizontal image direction)",
-            "type": "integer",
+            "type": "int",
             "default": 1
         },
         {
             "identifier": "PsubSamplingY",
             "name": "Sub Sampling Y",
             "description": "The pixel subsampling step in Y (vertical image direction)",
-            "type": "integer",
+            "type": "int",
             "default": 1
         },
         {
@@ -66,7 +66,7 @@
             "name": "Tie point Grid Names",
             "description": "The comma separated list of names of tie point grids to be copied. If not given, all bands are copied.",
             "type": "list",
-            "default": ""
+            "default": []
         }
     ],
     "outputs": [

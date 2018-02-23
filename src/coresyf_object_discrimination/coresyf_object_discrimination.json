@@ -17,14 +17,14 @@
             "identifier": "PmaxTargetSizeInMeter",
             "name": "Max Target Size in meters",
             "description": "Maximum target size",
-            "type": "double",
+            "type": "float",
             "default": 600.0
         },
         {
             "identifier": "PminTargetSizeInMeter",
             "name": "Min Target Size in meters",
             "description": "Minimum target size",
-            "type": "double",
+            "type": "float",
             "default": 50.0
         }
     ],

@@ -17,7 +17,7 @@
             "identifier": "PbackgroundWindowSizeInMeter",
             "name": "Background Window Size in Meters",
             "description": "Background window size",
-            "type": "double",
+            "type": "float",
             "default": 800.0
         },
         {
@@ -31,21 +31,21 @@
             "identifier": "PguardWindowSizeInMeter",
             "name": "Guard Window Size in Meters",
             "description": "Guard window size",
-            "type": "double",
+            "type": "float",
             "default": 500.0
         },
         {
             "identifier": "Ppfa",
             "name": "Probability of False Alarm",
             "description": "Probability of false alarm",
-            "type": "double",
+            "type": "float",
             "default": 6.5
         },
         {
             "identifier": "PguardWindowSizeInMeter",
             "name": "Guard Window Size In Meters",
             "description": "Target window size",
-            "type": "integer",
+            "type": "int",
             "default": 50
         }
     ],
