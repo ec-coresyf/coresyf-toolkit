@@ -264,7 +264,7 @@ class TestCoReSyFTool(TestCase):
 
     def test_can_run_shell_command_of_manifest(self):
         self._extend_manifest({
-            'command': 'cp {input} {output}'
+            'command': 'cp {input} {output}; echo {param}'
         })
         with open('f1', 'w') as f1:
             f1.write('input')
@@ -275,7 +275,15 @@ class TestCoReSyFTool(TestCase):
 
     def test_can_handle_unexpected_command_placeholders(self):
         self._extend_manifest({
-            'command': 'cp {input} {unexpected_placeholder}'
+            'command': 'cp {input} {unexpected_placeholder}; echo {param}'
         })
         with self.assertRaises(UnexpectedCommandPlaceholder):
             CoReSyFTool(self.runfile)
+
+    def test_can_handle_missing_command_placeholders(self):
+        self._extend_manifest({
+            'command': 'cp {input}'
+        })
+        with self.assertRaises(MissingCommandPlaceholderForOption):
+            CoReSyFTool(self.runfile)
+

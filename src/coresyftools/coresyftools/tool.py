@@ -69,12 +69,15 @@ class CoReSyFTool(object):
         for placeholder in placeholders:
             if placeholder not in self.arg_parser.identifiers:
                 raise UnexpectedCommandPlaceholder(placeholder)
+        for identifier in self.arg_parser.identifiers:
+            if identifier not in placeholders:
+                raise MissingCommandPlaceholderForOption(identifier)
 
     def _extract_command_placeholders(self, command_template):
         formatter = string.Formatter()
-        return [field_name for
-                literal_text, field_name, format_spec, conversion in
-                formatter.parse(command_template)]
+        return set([field_name for
+                    literal_text, field_name, format_spec, conversion in
+                    formatter.parse(command_template)])
 
 
     def _validate_operation(self, operation_dict):
