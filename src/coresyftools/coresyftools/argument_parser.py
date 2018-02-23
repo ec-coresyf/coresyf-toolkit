@@ -20,6 +20,7 @@ class CoReSyFArgumentParser():
         if not is_valid:
             raise InvalidManifestException(errors)
         self.identifiers = set()
+        self._configure_arg_parser()
 
     def _validate_manifest(self, manifest):
         return (True, [])
@@ -28,7 +29,6 @@ class CoReSyFArgumentParser():
         return MANIFEST_SCHEMA
 
     def parse_arguments(self, args=None):
-        self._configure_arg_parser()
         self.arguments = self.arg_parser.parse_args(args)
         self.bindings = vars(self.arguments)
         self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
