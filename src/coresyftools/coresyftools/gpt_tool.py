@@ -8,11 +8,11 @@ from manifest import InvalidManifestException
 class TooManyInputArgumentsException(Exception):
     pass
 
-class ToManyOutputArgumentsException(Exception):
+class TooManyOutputArgumentsException(Exception):
     pass
 
 class GPTExecutionException(Exception):
-    '''Error occurred during a SNAP gpt execution'''
+    """Error occurred during a SNAP gpt execution."""
 
     ERROR_REGEX = re.compile('Error:')
 
@@ -34,12 +34,14 @@ class GPTCoReSyFTool(CoReSyFTool):
     DEFAULT_EXT = 'tif'
     DEFAULT_GPT_GRAPH_FILE_NAME = 'gpt_graph.xml'
 
+    # this overrides the super-class method extending it's validation behaviour
+    # the method is invoked during super-class __init__
     def _validate_operation(self, operation):
         if 'operation' not in operation and ('graph' not in operation or not operation['graph']):
-            raise InvalidManifestException('A operation or graph flag should be present.')
+            raise InvalidManifestException('An operation or graph flag should be present.')
         if 'operation' in operation and 'graph' in operation and operation['graph']:
-            raise InvalidManifestException('Can not be operation and graph at same time.')
-        if 'graph' in self.operation and self.operation['graph']:
+            raise InvalidManifestException('Cannot be operation and graph at same time.')
+        if self.operation.get('graph') is not None:
             graph_file = os.path.join(self.context_directory, self.DEFAULT_GPT_GRAPH_FILE_NAME)
             if not os.path.exists(graph_file):
                 raise GPTGraphFileNotFound(graph_file)
@@ -48,20 +50,17 @@ class GPTCoReSyFTool(CoReSyFTool):
         if len(self.arg_parser.inputs) > 1:
             raise TooManyInputArgumentsException()
         if len(self.arg_parser.outputs) > 1:
-            raise TooManyInputArgumentsException()
+            raise TooManyOutputArgumentsException()
 
         bindings = bindings.copy()
-        operator = None
-        if 'operation' in self.operation:
-            operator = self.operation['operation']
-        elif 'graph' in self.operation and self.operation['graph']:
+        operator = self.operation.get('operation')
+        if 'graph' in self.operation and self.operation['graph']:
             graph_file = os.path.join(self.context_directory, self.DEFAULT_GPT_GRAPH_FILE_NAME)
             if not os.path.exists(graph_file):
                 raise GPTGraphFileNotFound(graph_file)
             operator = graph_file
         if 'parameters' in self.operation:
-            parameters = self.operation['parameters']
-            bindings.update(parameters)
+            bindings.update(self.operation['parameters'])
         source = bindings.pop(self.arg_parser.inputs[0])
         target = bindings.pop(self.arg_parser.outputs[0])
         self._call_gpt(operator, source, target, bindings)
@@ -69,8 +68,8 @@ class GPTCoReSyFTool(CoReSyFTool):
         # output files can not have a name different from the specified in
         # the command line.
         self._remove_snap_file_extension(target)
-
-    def _call_gpt(self, operator, source, target, options):
+    
+    def _build_gpt_shell_command(self, operator, source, target, options):
         source = os.path.abspath(source)
         target = os.path.abspath(target)
         args = ['gpt', operator, '-f', self.DEFAULT_FORMAT,
@@ -78,6 +77,10 @@ class GPTCoReSyFTool(CoReSyFTool):
         args.extend([self._option_str(arg, value)
                      for arg, value in options.items()])
         args.append(source)
+        return args
+
+    def _call_gpt(self, operator, source, target, options):
+        args = self._build_gpt_shell_command(operator, source, target, options)
         self._get_logger().info('calling GPT: %s', ' '.join(args))
         self._call_shell_command(args)
 
@@ -89,7 +92,6 @@ class GPTCoReSyFTool(CoReSyFTool):
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
-        # Reads the output and waits for the process to exit before returning
         stdout, stderr = process.communicate()
         self._get_logger().info(stderr)
         if process.returncode:

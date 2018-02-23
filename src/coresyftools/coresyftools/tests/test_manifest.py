@@ -2,41 +2,36 @@ from unittest import TestCase
 from ..manifest import MalformedManifestException, validate_manifest, MissingInputArgument , MissingOutputArgument
 
 
-
 class TestValidateManifest(TestCase):
 
     def test_valid(self):
         base_manifest = {
             "name": "name",
             "description": "description",
-            "arguments": [{
+            "inputs": [{
                 "identifier": "input",
                 "name": "input",
-                "description": "input description",
-                "type": "data",
-                "required": True
-            }, {
+                "description": "input description"
+            }],
+            "outputs": [{
                 "identifier": "output",
                 "name": "output",
-                "description": "Sets the output file name to <filepath>",
-                "type": "output"
+                "description": "Sets the output file name to <filepath>"
             }]
         }
         validate_manifest(base_manifest)
 
     def test_missing_key(self):
         manifest = {
-            "arguments": [{
+            "inputs": [{
                 "identifier": "input",
                 "name": "input",
-                "description": "input description",
-                "type": "data",
-                "required": True
-            }, {
+                "description": "input description"
+            }],
+            "outputs": [{
                 "identifier": "output",
                 "name": "output",
-                "description": "Sets the output file name to <filepath>",
-                "type": "output"
+                "description": "Sets the output file name to <filepath>"
             }]
         }
         self.assertRaises(MalformedManifestException,
@@ -46,17 +41,15 @@ class TestValidateManifest(TestCase):
         manifest = {
             "name": "name",
             "description_______": "description",
-            "arguments": [{
+            "inputs": [{
                 "identifier": "input",
                 "name": "input",
-                "description": "input description",
-                "type": "data",
-                "required": True
-            }, {
+                "description": "input description"
+            }],
+            "outputs": [{
                 "identifier": "output",
                 "name": "output",
-                "description": "Sets the output file name to <filepath>",
-                "type": "output"
+                "description": "Sets the output file name to <filepath>"
             }]
         }
         self.assertRaises(MalformedManifestException,
@@ -66,26 +59,24 @@ class TestValidateManifest(TestCase):
         manifest = {
             "name": "name",
             "description": "description",
-            "arguments": [{
+            "outputs": [{
                 "identifier": "output",
                 "name": "output",
-                "description": "Sets the output file name to <filepath>",
-                "type": "output"
+                "description": "Sets the output file name to <filepath>"
             }]
         }
-        self.assertRaises(MissingInputArgument,
+        self.assertRaises(MalformedManifestException,
                           lambda: validate_manifest(manifest))
 
     def test_no_output(self):
         manifest = {
             "name": "name",
             "description": "description",
-            "arguments": [{
+            "inputs": [{
                 "identifier": "input",
                 "name": "input",
-                "description": "Sets the output file name to <filepath>",
-                "type": "data"
+                "description": "Sets the output file name to <filepath>"
             }]
         }
-        self.assertRaises(MissingOutputArgument,
+        self.assertRaises(MalformedManifestException,
                           lambda: validate_manifest(manifest))

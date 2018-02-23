@@ -30,7 +30,8 @@ class ToolExampleCommand(object):
 
     def _parse_arguments(self):
         self.arg_parser = CoReSyFArgumentParser(self.manifest)
-        self.arg_parser.parse_arguments(self.command[1:])
+        args = self.command[1:]
+        self.arg_parser.parse_arguments(args)
         self.outputs = [self.arg_parser.bindings[arg] for arg in
                         self.arg_parser.outputs]
 
@@ -43,11 +44,6 @@ class ToolExampleCommand(object):
     def __str__(self):
         return ' '.join(self.command)
 
-
-def normalize_variable_name(name):
-    return name
-
-
 class ToolTester(object):
 
     def __init__(self, tool_dir):
@@ -59,45 +55,50 @@ class ToolTester(object):
         self.logger = logging.getLogger()
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
+        self.errors = []
+        self.log = {}
 
     def _load_examples_file(self, file_name):
-        cwd = os.getcwd()
-        os.chdir(self.tool_dir)
+        cwd = self.change_to_tool_dir()
         try:
             with open(file_name) as examples_file:
                 self.example_commands = []
                 title = None
                 description = ''
-                ln = 0
+                line_number = 0
                 for line in examples_file:
                     if not line.strip():
                         continue
                     if self._is_comment(line):
                         if not title:
-                            title = line[1:-1]
+                            title = self._extract_comment_content(line)
                         else:
-                            description += line[1:-1]
-                    elif self._is_valid_command(line):
-                        if not title:
-                            raise ExampleTitleMissingException(ln)
-                        if not description:
-                            raise ExampleDescriptionMissingException(ln)
-                        self.example_commands.append(
-                            ToolExampleCommand(self.manifest, title, description,
-                                            line.split()))
+                            description += self._extract_comment_content(line)
+                    else:
+                        self._load_example(line_number, title, description,
+                                           line)
                         title = None
                         description = ''
-                    else:
-                        raise InvalidCommandException(line)
-                    ln += 1
+                    line_number += 1
         finally:
             os.chdir(cwd)
 
+    def _extract_comment_content(self, comment_line):
+        # remember the comments start with a '#' character and end with a
+        # new line separator
+        return comment_line[1:-1]
+
+    def _load_example(self, line_number, title, description, line):
+        if not title:
+            raise ExampleTitleMissingException(line_number)
+        if not description:
+            raise ExampleDescriptionMissingException(line_number)
+        self.example_commands.append(
+            ToolExampleCommand(self.manifest, title, description,
+                               line.split()))
+
     def _is_comment(self, line):
         return line.startswith('#')
-
-    def _is_valid_command(self, command):
-        return True
 
     def _byte_to_str(self, _bytes):
         return _bytes.decode('utf-8')[1:-1]
@@ -110,26 +111,35 @@ class ToolTester(object):
             if not getsize(output) > 0:
                 return EmptyOutputFile(output)
 
-    def test(self):
+    def change_to_tool_dir(self):
         cwd = os.getcwd()
         os.chdir(self.tool_dir)
-        self.errors = []
-        self.log = {}
+        return cwd
+
+    def _test_case(self, command):
+        returncode, stdout, stderror = command.run()
+        self.log[command] = stdout
+        if returncode:
+            self.errors.append(NonZeroReturnCode(returncode,
+                                self._byte_to_str(stderror)))
+        elif stderror:
+            self.errors.append(NonEmptyStderr(stderror))
+        else:
+            output_error = self._output_errors(command)
+            if output_error:
+                self.errors.append(output_error)
+
+    def _log_command_details(self, command):
+        self.logger.info(command.title)
+        self.logger.info(command.description)
+        self.logger.info('Running %s', str(command))
+
+    def test(self):
+        """Test the tool with the provided invokation command examples."""
+        cwd = self.change_to_tool_dir()
         for command in self.example_commands:
-            self.logger.info(command.title)
-            self.logger.info(command.description)
-            self.logger.info('Running %s', str(command))
-            returncode, stdout, stderror = command.run()
-            self.log[command] = stdout
-            if returncode:
-                self.errors.append(NonZeroReturnCode(returncode,
-                                   self._byte_to_str(stderror)))
-            elif stderror:
-                self.errors.append(NonEmptyStderr(stderror))
-            else:
-                output_error = self._output_errors(command)
-                if output_error:
-                    self.errors.append(output_error)
+            self._log_command_details(command)
+            self._test_case(command)
         os.chdir(cwd)
 
 

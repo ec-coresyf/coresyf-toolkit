@@ -10,7 +10,7 @@ import logging
 from manifest import get_manifest
 from argument_parser import CoReSyFArgumentParser
 
-TMP_DIR = os.path.abspath("tmp")
+TMP_DIR = os.path.abspath('tmp')
 
 
 class NoOutputFile(Exception):
@@ -79,11 +79,14 @@ class CoReSyFTool(object):
 
     def _check_outputs(self):
         for out_arg in self.arg_parser.outputs:
-            output = self.bindings[out_arg]
-            if not os.path.exists(output):
-                raise NoOutputFile(output)
-            elif not os.path.getsize(output) > 0:
-                raise EmptyOutputFile(output)
+            outputs = self.bindings[out_arg]
+            if not hasattr(outputs, '__iter__'):
+                outputs = [outputs]
+            for output in outputs:
+                if not os.path.exists(output):
+                    raise NoOutputFile(output)
+                elif not os.path.getsize(output) > 0:
+                    raise EmptyOutputFile(output)
 
     def _unzip_file_(self, file_name):
         extracted_files = None
@@ -103,14 +106,17 @@ class CoReSyFTool(object):
     def _prepare_inputs_(self, arguments):
         for argname in self.arg_parser.inputs:
             if argname in arguments and arguments[argname]:
-                file_name = arguments[argname]
-                if not os.path.exists(file_name):
-                    self.arg_parser.arg_parser.error(
-                        "{} does not exists.".format(file_name))
-                else:
-                    extracted_files = self._unzip_file_(file_name)
-                    if extracted_files:
-                        self.bindings[argname] = extracted_files[0]
+                files = arguments[argname]
+                if not hasattr(files, '__iter__'):
+                    files = [files]
+                for file_name in files:
+                    if not os.path.exists(file_name):
+                        self.arg_parser.arg_parser.error(
+                            "{} does not exists.".format(file_name))
+                    else:
+                        extracted_files = self._unzip_file_(file_name)
+                        if extracted_files:
+                            self.bindings[argname] = extracted_files[0]
 
     def _clean_tmp_(self):
         if os.path.isdir(TMP_DIR):

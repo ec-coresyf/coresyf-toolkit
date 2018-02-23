@@ -8,24 +8,22 @@ class TestCoReSyFArgParser(TestCase):
         self.base_manifest = {
             "name": "name",
             "description": "description",
-            "arguments": [{
+            "inputs": [{
                 "identifier": "input",
                 "name": "input",
-                "description": "input description",
-                "type": "data",
-                "required": True
-            }, {
+                "description": "input description"
+            }],
+            "outputs": [{
                 "identifier": "output",
                 "name": "output",
-                "description": "Sets the output file name to <filepath>",
-                "type": "output"
+                "description": "Sets the output file name to <filepath>"
             }]
         }
 
     def parse_with_arg(self, arg_def=None, args=[]):
         manifest = self.base_manifest.copy()
         if arg_def:
-            manifest['arguments'].append(arg_def)
+            manifest['parameters'] = [arg_def]
         arg_parser = CoReSyFArgumentParser(manifest)
         arg_parser.parse_arguments(args)
         print(arg_parser.arg_parser.__class__.__module__)
@@ -46,8 +44,7 @@ class TestCoReSyFArgParser(TestCase):
         arg = {
             "identifier": "strparam",
             "name": "string parameter",
-            "type": "parameter",
-            "parameterType": "string",
+            "type": "string",
             "description": "string parameter description",
         }
         command = '--input f1 --output f2'
@@ -59,8 +56,7 @@ class TestCoReSyFArgParser(TestCase):
         arg = {
             "identifier": "strparam",
             "name": "string parameter",
-            "type": "parameter",
-            "parameterType": "string",
+            "type": "string",
             "description": "string parameter description",
         }
         command = '--input f1 --output f2 --strparam str'
@@ -71,8 +67,7 @@ class TestCoReSyFArgParser(TestCase):
         arg = {
             "identifier": "boolparam",
             "name": "boolean parameter",
-            "type": "parameter",
-            "parameterType": "boolean",
+            "type": "boolean",
             "description": "boolean parameter description"
         }
         command = '--input f1 --output f2 --boolparam true'
@@ -83,8 +78,7 @@ class TestCoReSyFArgParser(TestCase):
         arg = {
             "identifier": "boolparam",
             "name": "boolean parameter",
-            "type": "parameter",
-            "parameterType": "boolean",
+            "type": "boolean",
             "description": "boolean parameter description"
         }
         command = '--input f1 --output f2 --boolparam false'
@@ -95,8 +89,7 @@ class TestCoReSyFArgParser(TestCase):
         arg = {
             "identifier": "boolparam",
             "name": "boolean parameter",
-            "type": "parameter",
-            "parameterType": "boolean",
+            "type": "boolean",
             "description": "boolean parameter description"
         }
         command = '--input f1 --output f2 --boolparam invalid_value'
@@ -107,8 +100,7 @@ class TestCoReSyFArgParser(TestCase):
             "identifier": "intparam",
             "name": "int parameter",
             "description": "int parameter description",
-            "type": "parameter",
-            "parameterType": "int"
+            "type": "int"
         }
         command = '--input f1 --output f2 --intparam 3'
         arg_parser = self.parse_with_arg(arg, command.split())
@@ -119,8 +111,7 @@ class TestCoReSyFArgParser(TestCase):
             "identifier": "floatparam",
             "name": "float parameter",
             "description": "float parameter description",
-            "type": "parameter",
-            "parameterType": "float"
+            "type": "float"
         }
         command = '--input f1 --output f2 --floatparam 0.5'
         arg_parser = self.parse_with_arg(arg, command.split())
@@ -131,8 +122,7 @@ class TestCoReSyFArgParser(TestCase):
             "identifier": "defaultparam",
             "name": "default parameter",
             "description": "default parameter description",
-            "type": "parameter",
-            "parameterType": "int",
+            "type": "int",
             "default": "1"
         }
         command = '--input f1 --output f2'
@@ -144,8 +134,7 @@ class TestCoReSyFArgParser(TestCase):
             "identifier": "optparam",
             "name": "options parameter",
             "description": "options parameter description",
-            "type": "parameter",
-            "parameterType": "string",
+            "type": "string",
             "options": ["1", "2", "3"]
         }
         command = '--input f1 --output f2 --optparam 2'
@@ -157,8 +146,7 @@ class TestCoReSyFArgParser(TestCase):
             "identifier": "reqparam",
             "name": "required parameter",
             "description": "required parameter description",
-            "type": "parameter",
-            "parameterType": "int",
+            "type": "int",
             "required": True
         }
         command = '--input f1 --output f2 --reqparam 1'
@@ -170,8 +158,7 @@ class TestCoReSyFArgParser(TestCase):
             "identifier": "reqparam",
             "name": "required parameter",
             "description": "required parameter description",
-            "type": "parameter",
-            "parameterType": "int",
+            "type": "int",
             "required": True
         }
         command = '--input f1 --output f2'
@@ -179,3 +166,30 @@ class TestCoReSyFArgParser(TestCase):
         def parse():
             self.parse_with_arg(arg, command.split())
         self.assertRaises(SystemExit, parse)
+
+    def test_collection_input(self):
+        manifest = self.base_manifest.copy()
+        manifest['inputs'].append({
+            'identifier': 'colinput',
+            'name': 'collection input',
+            'description': 'collection input description',
+            'collection': True
+        })
+        command = '--input f1 --colinput fc1 fc2 fc3 --output f2'
+        arg_parser = CoReSyFArgumentParser(manifest)
+        arg_parser.parse_arguments(command.split())
+        self.assertEqual(arg_parser.bindings['colinput'], ['fc1', 'fc2', 'fc3'])
+    
+    def test_collection_output(self):
+        manifest = self.base_manifest.copy()
+        manifest['outputs'].append({
+            'identifier': 'coloutput',
+            'name': 'collection output',
+            'description': 'collection output description',
+            'collection': True
+        })
+        command = '--input f1 --output f2 --coloutput fc2 fc3 fc4'
+        arg_parser = CoReSyFArgumentParser(manifest)
+        arg_parser.parse_arguments(command.split())
+        self.assertEqual(arg_parser.bindings['coloutput'],
+                         ['fc2', 'fc3', 'fc4'])
