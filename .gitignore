@@ -7,3 +7,4 @@ src/coresyftools/CoReSyF_tools.egg-info/
 target/
 src/coresyftools/dist
 src/coresyftools/coresyftools/tests/tool4.zip
+tool_examples/
