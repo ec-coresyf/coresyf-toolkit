@@ -7,6 +7,7 @@ class TestCoReSyFArgParser(TestCase):
     def setUp(self):
         self.base_manifest = {
             "name": "name",
+            "type": "Dummy",
             "description": "description",
             "inputs": [{
                 "identifier": "input",
