@@ -1,4 +1,4 @@
-input="https://scihub.copernicus.eu/dhus/odata/v1/Products('139d30eb-bc03-459c-8642-e794aad61707')/$value"
+input="https://scihub.copernicus.eu/dhus/odata/v1/Products('8be67f04-2287-40d2-b6ba-5c1bf0ff8ee1')/$value"
 
 #PASSING EXECUTION
 #Example of a passing execution
