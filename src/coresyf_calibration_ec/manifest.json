@@ -1,0 +1,114 @@
+{
+    "name": "CoReSyF calibration",
+    "description": "CoReSyF calibration tool",
+    "operation": {"graph": true},
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "data",
+            "required": true
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "PauxFile",
+            "name": "auxiliary file",
+            "type": "parameter",
+            "parameterType": "string",
+            "description": "Value must be one of 'Latest Auxiliary File' Product Auxiliary File'",
+            "options": ["Latest Auxiliary File", "Product Auxiliary File", "External Auxiliary File"],
+            "default": "Product Auxiliary File"
+        },
+        {
+            "identifier": "PcreateBetaBand",
+            "name": "create beta band",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "description": "Create beta0 virtual band.",
+            "default": false
+        },
+        {
+            "identifier": "PcreateGammaBand",
+            "name": "create gamma band",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "description": "Create gamma0 virtual band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputBetaBand",
+            "name": "output beta band",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "description": "Output beta0 band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputGammaBand",
+            "name": "output gamma band",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "description": "Output gamma0 band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputImageInComplex",
+            "name": "output image in complex",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "description": "Output image in complex.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputImageScaleInDb",
+            "name": "output image scale in db",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "description": "Output image scale.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputSigmaBand",
+            "name": "output sigma band",
+            "type": "parameter",
+            "parameterType": "boolean",
+            "description": "Output sigma0 band.",
+            "default": true
+        },
+        {
+            "identifier": "PimgResamplingMethod",
+            "name": "imgResamplingMethod",
+            "description": "Image Resampling Method. Value must be one of NEAREST_NEIGHBOUR', 'BILINEAR_INTERPOLATION', 'CUBIC_CONVOLUTION'",
+            "type": "parameter",
+            "parameterType": "string",
+            "options": ["NEAREST_NEIGHBOUR", "BILINEAR_INTERPOLATION", "CUBIC_CONVOLUTION"],
+            "default": "BILINEAR_INTERPOLATION"
+        },
+        {
+            "identifier": "PpixelSpacingInDegree",
+            "name": "pixelSpacingInDegree",
+            "description": "The pixel spacing in degrees. Default value is '0'.",
+            "type": "parameter",
+            "parameterType": "string",
+            "default": "0"
+        },
+        {
+            "identifier": "PpixelSpacingInMeter",
+            "name": "pixelSpacingInMeter",
+            "description": "The pixel spacing in meters. Default value is '0'.",
+            "type": "parameter",
+            "parameterType": "string",
+            "default": "0"
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "output"
+        }
+    ]
+}
