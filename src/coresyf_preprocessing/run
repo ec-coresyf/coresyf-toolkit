@@ -2,4 +2,4 @@
 from coresyftools.gpt_tool import GPTCoReSyFTool
 
 if __name__ == '__main__':
-    GPTCoReSyFTool(__file__).execute()
+    GPTCoReSyFTool('preprocessing.manifest.json').execute()
