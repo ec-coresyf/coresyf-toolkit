@@ -76,10 +76,9 @@ class TestGPTTool(TestCase):
 
     def test_graph(self):
         manifest = self.manifest.copy()
-        graph_file_name = 'gpt_graph.xml'
+        graph_file_name = 'my_tool.gpt_graph.xml'
         manifest['operation'] = {
-            'graph': True,
-            'file_name': graph_file_name
+            'graph': graph_file_name
         }
         self.write_manifest(manifest)
 
