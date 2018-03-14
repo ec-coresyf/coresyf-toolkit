@@ -62,11 +62,13 @@ class GPTCoReSyFTool(CoReSyFTool):
         if 'parameters' in self.operation:
             bindings.update(self.operation['parameters'])
         source = bindings.pop(self.arg_parser.inputs[0])
+        self._add_snap_file_extension(source)
         target = bindings.pop(self.arg_parser.outputs[0])
         self._call_gpt(operator, source, target, bindings)
         # This is needed because SNAP automatically adds file extensions, but
         # output files can not have a name different from the specified in
         # the command line.
+        self._remove_snap_file_extension(source)
         self._remove_snap_file_extension(target)
     
     def _build_gpt_shell_command(self, operator, source, target, options):
@@ -101,3 +103,10 @@ class GPTCoReSyFTool(CoReSyFTool):
         gpt_file_name = target + '.' + self.DEFAULT_EXT
         if os.path.exists(gpt_file_name):
             os.rename(gpt_file_name, target)
+
+    def _add_snap_file_extension(self, source):
+        if os.path.exists(source) and not self._extension_exists(source, self.DEFAULT_EXT):
+            os.rename(source, source + self.DEFAULT_EXT)
+
+    def _extension_exists(self, file_name, extension):
+        return str(file_name).split('.')[-1] == extension
