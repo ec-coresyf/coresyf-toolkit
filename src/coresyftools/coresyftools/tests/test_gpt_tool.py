@@ -76,10 +76,14 @@ class TestGPTTool(TestCase):
 
     def test_graph(self):
         manifest = self.manifest.copy()
-        manifest['operation'] = {'graph': True}
+        graph_file_name = 'gpt_graph.xml'
+        manifest['operation'] = {
+            'graph': True,
+            'file_name': graph_file_name
+        }
         self.write_manifest(manifest)
 
-        with open('gpt_graph.xml', 'w'):
+        with open(graph_file_name, 'w'):
             pass
 
         tool = GPTCoReSyFTool(self.runfile)
@@ -99,11 +103,11 @@ class TestGPTTool(TestCase):
         tool.execute(cmd)
 
         gpt_cmd = 'gpt {} -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
-            os.path.join(os.getcwd(), 'gpt_graph.xml'),
+            os.path.join(os.getcwd(), graph_file_name),
             os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
         self.assertEqual(call_shell_command_mock.args, gpt_cmd)
         os.remove('input')
-        os.remove('gpt_graph.xml')
+        os.remove(graph_file_name)
 
     def test_missing_operation_and_graph(self):
         manifest = self.manifest.copy()
