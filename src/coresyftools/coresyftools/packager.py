@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 import os
+import glob
 from os import mkdir, rename, listdir
 from os.path import join, basename, splitext, exists
 from shutil import copy, make_archive, move
@@ -27,6 +28,8 @@ class MissingManifestFileException(Exception):
 class MissingExamplesFileException(Exception):
     pass
 
+class MultipleManifestFileException(Exception):
+    pass
 
 class ToolErrorsException(Exception):
 
@@ -49,8 +52,11 @@ class Packager():
             raise TargetDirectoryNotFoundException()
         if not exists(join(self.tool_dir, 'run')):
             raise MissingRunFileException()
-        if not exists(join(self.tool_dir, 'manifest.json')):
+        manifest_files = glob.glob(join(self.tool_dir, '*manifest.json'))
+        if not manifest_files:
             raise MissingManifestFileException()
+        if len(manifest_files) > 1:
+            raise MultipleManifestFileException()
         if not exists(join(self.tool_dir, 'examples.sh')):
             raise MissingExamplesFileException()
     
