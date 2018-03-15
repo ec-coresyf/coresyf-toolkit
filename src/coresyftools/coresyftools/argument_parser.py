@@ -8,26 +8,21 @@ from manifest import validate_manifest, InvalidManifestException, MANIFEST_SCHEM
 class CoReSyFArgumentParser():
 
     def __init__(self, manifest, logger=None):
+        self.identifiers = set()
+        self.manifest = manifest
         self.logger = logger or logging.getLogger(__name__)
         self.bindings = {}
         self.inputs = []
         self.outputs = []
         self.options = []
         self.arg_parser = ArgumentParser()
-        self.manifest = manifest
         validate_manifest(self.manifest)
-        is_valid, errors = self._validate_manifest(self.manifest)
-        if not is_valid:
-            raise InvalidManifestException(errors)
-
-    def _validate_manifest(self, manifest):
-        return (True, [])
+        self._configure_arg_parser()
 
     def _get_manifest_schema(self):
         return MANIFEST_SCHEMA
 
     def parse_arguments(self, args=None):
-        self._configure_arg_parser()
         self.arguments = self.arg_parser.parse_args(args)
         self.bindings = vars(self.arguments)
         self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
@@ -65,6 +60,7 @@ class CoReSyFArgumentParser():
         # defined as False.
         if arg['type'] == 'boolean':
             self.options.append(name)
+        self.identifiers.add(name)
 
     def _parse_data_arg(self, arg):
         name = arg['identifier']
@@ -76,6 +72,8 @@ class CoReSyFArgumentParser():
                                      **kwargs)
         self.inputs.append(name)
         self.logger.debug('Parsed %s data argument.', name)
+        self.identifiers.add(name)
+
 
     def _parse_output_arg(self, arg):
         name = arg['identifier']
@@ -87,6 +85,8 @@ class CoReSyFArgumentParser():
             '--' + name, help=_help, required=True, **kwargs)
         self.outputs.append(name)
         self.logger.debug('Parsed %s output argument.', name)
+        self.identifiers.add(name)
+
 
     @staticmethod
     def parse_boolean(value):

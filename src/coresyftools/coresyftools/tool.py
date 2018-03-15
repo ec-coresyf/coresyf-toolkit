@@ -1,16 +1,32 @@
-import sys
+import logging
 import os
-
 import shutil
-
+import string
+import sys
 import zipfile
 
-import logging
-
-from manifest import get_manifest
 from argument_parser import CoReSyFArgumentParser
+from manifest import get_manifest
+from sarge import Capture, run, shell_format
 
 TMP_DIR = os.path.abspath('tmp')
+
+class MissingCommandPlaceholderForOption(Exception):
+
+    def __init__(self, option_identifier):
+        super(MissingCommandPlaceholderForOption, self).__init__(
+            'Identifier {} was defined, but not used in the command template.'
+            .format(option_identifier)
+        )
+        self.option_identifier = option_identifier
+
+class UnexpectedCommandPlaceholder(Exception):
+
+    def __init__(self, placeholder):
+        super(UnexpectedCommandPlaceholder, self).__init__(
+            '''Found {} in command template. However it is not a defined input,
+            output or parameter identifier.'''.format(placeholder))
+        self.placeholder = placeholder
 
 
 class NoOutputFile(Exception):
@@ -38,9 +54,33 @@ class CoReSyFTool(object):
             self.context_directory, self.MANIFEST_FILE_NAME)
         self.manifest = get_manifest(self.manifest_file_name)
         self.arg_parser = CoReSyFArgumentParser(self.manifest)
+        if 'command' in self.manifest:
+            self._validate_command(self.manifest['command'])
         self.operation = self.manifest.get('operation', {})
         self._validate_operation(self.operation)
 
+    def _validate_command(self, command):
+        placeholders = self._extract_command_placeholders(command)
+        for placeholder in placeholders:
+            if placeholder not in self.arg_parser.identifiers:
+                raise UnexpectedCommandPlaceholder(placeholder)
+        for identifier in self.arg_parser.identifiers:
+            if identifier not in placeholders:
+                raise MissingCommandPlaceholderForOption(identifier)
+
+    def _extract_command_placeholders(self, command_template):
+        formatter = string.Formatter()
+        return set([field_name for
+                    literal_text, field_name, format_spec, conversion in
+                    formatter.parse(command_template)])
+
+    # Manifests 'operation' field is intended for specifying behavior aspects
+    # for CoReSyFTool specializations (i.e. subclasses).
+    # For example, GPTCoReSyFTool use it for specifying the GPT operation or
+    # if a GPT graph is to be used.
+    # This method, which is called during __init__, is supposed to be
+    # overridden by subclasses, in order to extend manifest validation
+    # according to operation logics of specializations.
     def _validate_operation(self, operation_dict):
         return (True, [])
 
@@ -122,5 +162,16 @@ class CoReSyFTool(object):
         if os.path.isdir(TMP_DIR):
             shutil.rmtree(TMP_DIR)
 
+    def _run_command(self, command_template):
+        self.invoke_shell_command(command_template, **self.bindings)
+
     def run(self, bindings):
-        pass
+        if 'command' in self.manifest:
+            self._run_command(self.manifest['command'])
+
+    def invoke_shell_command(self, fmt, **kwargs):
+        cmd_str = shell_format(fmt, **kwargs)
+        stdout_capture = Capture()
+        stderr_capture = Capture()
+        pipeline = run(cmd_str, stdout=stdout_capture, stderr=stderr_capture)
+        return (pipeline, stdout_capture, stderr_capture)

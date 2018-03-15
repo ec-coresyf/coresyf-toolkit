@@ -2,10 +2,20 @@ import sys
 import os
 import logging
 import subprocess
+import requests
+import json
+from urlparse import urlparse
 from os.path import exists, getsize
 from argument_parser import CoReSyFArgumentParser
 from manifest import get_manifest
 
+DOWNLOAD_TIMEOUT = 30
+SCHIHUB_DOMAIN = 'https://scihub.copernicus.eu'
+
+class InvalidInputSource(Exception):
+    
+    def __init__(self, source_url):
+        self.source_url = source_url
 
 class InvalidCommandException(Exception):
     pass
@@ -46,27 +56,32 @@ class ToolExampleCommand(object):
 
 class ToolTester(object):
 
-    def __init__(self, tool_dir):
+    def __init__(self, tool_dir, scihub_credentials):
+        self.logger = logging.getLogger()
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger.setLevel(logging.DEBUG)
         self.tool_dir = tool_dir
+        self.scihub_credentials = scihub_credentials
+        self.cwd = os.getcwd()
         examples_file = 'examples.sh'
         self.manifest_file_name = os.path.join(tool_dir, 'manifest.json')
         self.manifest = get_manifest(self.manifest_file_name)
         self._load_examples_file(examples_file)
-        self.logger = logging.getLogger()
-        self.logger.addHandler(logging.StreamHandler(sys.stdout))
-        self.logger.setLevel(logging.DEBUG)
         self.errors = []
         self.log = {}
+        self.configurations = {}
 
     def _load_examples_file(self, file_name):
         cwd = self.change_to_tool_dir()
         try:
             with open(file_name) as examples_file:
+                self.input_mappings = {}
                 self.example_commands = []
                 title = None
                 description = ''
                 line_number = 0
                 for line in examples_file:
+                    self.logger.debug('Read line %s.', line)
                     if not line.strip():
                         continue
                     if self._is_comment(line):
@@ -74,6 +89,11 @@ class ToolTester(object):
                             title = self._extract_comment_content(line)
                         else:
                             description += self._extract_comment_content(line)
+                    elif self._is_input_mapping(line):
+                        file_name, url = self._extract_input_mapping(line)
+                        self.logger.debug('Read input mapping %s to %s.',
+                                          file_name, url)
+                        self.input_mappings[file_name] = url
                     else:
                         self._load_example(line_number, title, description,
                                            line)
@@ -82,6 +102,25 @@ class ToolTester(object):
                     line_number += 1
         finally:
             os.chdir(cwd)
+
+    def _extract_input_mapping(self, line):
+        file_name, url_str = self._without_newline_separator(line).split('=')
+        self._ensures_is_from_schihub(url_str)
+        url = self._unquote_str(url_str)
+        return (file_name, url)
+
+    def _is_input_mapping(self, line):
+        return '=' in line
+
+    def _ensures_is_from_schihub(self, url):
+        if url.startswith(SCHIHUB_DOMAIN):
+            raise InvalidInputSource(url)
+
+    def _unquote_str(self, _str):
+        return _str[1:-1]
+
+    def _without_newline_separator(self, line):
+        return line[:-1]
 
     def _extract_comment_content(self, comment_line):
         # remember the comments start with a '#' character and end with a
@@ -112,9 +151,9 @@ class ToolTester(object):
                 return EmptyOutputFile(output)
 
     def change_to_tool_dir(self):
-        cwd = os.getcwd()
+        self.cwd = os.getcwd()
         os.chdir(self.tool_dir)
-        return cwd
+        return self.cwd
 
     def _test_case(self, command):
         returncode, stdout, stderror = command.run()
@@ -135,6 +174,7 @@ class ToolTester(object):
         self.logger.info('Running %s', str(command))
 
     def test(self):
+        self._download_inputs()
         """Test the tool with the provided invokation command examples."""
         cwd = self.change_to_tool_dir()
         for command in self.example_commands:
@@ -142,6 +182,19 @@ class ToolTester(object):
             self._test_case(command)
         os.chdir(cwd)
 
+    def _download_inputs(self):
+        for file_name, url in self.input_mappings.items():
+            if not os.path.exists(file_name):
+                self.logger.info('Downloading "%s" from "%s".', file_name, url)
+                self._download_input(os.path.join(self.cwd, file_name), url,
+                                     self.scihub_credentials)
+
+    def _download_input(self, file_name, url, credentials):
+        response = requests.get(url, auth=credentials, stream=True,
+                                timeout=DOWNLOAD_TIMEOUT)
+        with open(file_name, "a+") as input_file:
+            for chunk in response.iter_content(chunk_size=1024):
+                input_file.write(chunk)
 
 class TestFailure(Exception):
     pass

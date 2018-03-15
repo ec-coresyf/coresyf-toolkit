@@ -36,9 +36,10 @@ class ToolErrorsException(Exception):
 
 class Packager():
 
-    def __init__(self, tool_dir, target_dir):
+    def __init__(self, tool_dir, target_dir, scihub_credentials):
         self.tool_dir = tool_dir
         self.target_dir = target_dir
+        self.scihub_credentials = scihub_credentials
         self.manifest = None
 
     def _check_tool_directory_structure(self):
@@ -57,7 +58,7 @@ class Packager():
         self.manifest = get_manifest(join(self.tool_dir, 'manifest.json'))
 
     def _test(self):
-        tester = ToolTester(self.tool_dir)
+        tester = ToolTester(self.tool_dir, self.scihub_credentials)
         tester.test()
         if tester.errors:
             raise ToolErrorsException(tester.errors)
@@ -76,9 +77,11 @@ class Packager():
 @click.command()
 @click.option('--tool_dir', type=click.Path(), default='.')
 @click.option('--target_dir', type=click.Path(), default='..')
-def pack_tool(tool_dir, target_dir):
+@click.option('--scihub_user')
+@click.option('--scihub_pass')
+def pack_tool(tool_dir, target_dir, scihub_user, scihub_pass):
     click.echo('Packaging {} to {}..'.format(tool_dir, target_dir))
-    packager = Packager(tool_dir, target_dir)
+    packager = Packager(tool_dir, target_dir, (scihub_user, scihub_pass))
     packager.pack_tool()
     click.echo('Packaging finished.')
 
