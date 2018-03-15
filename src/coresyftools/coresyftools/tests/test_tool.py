@@ -1,10 +1,12 @@
-from unittest import TestCase
-import os
-from zipfile import ZipFile
-
-from ..tool import CoReSyFTool, EmptyOutputFile, NoOutputFile
-
 import json
+import os
+from unittest import TestCase
+from zipfile import ZipFile
+from pathlib import Path
+
+from ..tool import (CoReSyFTool, EmptyOutputFile,
+                    MissingCommandPlaceholderForOption, NoOutputFile,
+                    UnexpectedCommandPlaceholder)
 
 
 class TestCoReSyFTool(TestCase):
@@ -66,7 +68,7 @@ class TestCoReSyFTool(TestCase):
                 self.run_bindings = bindings
                 with open('f2', 'w') as out:
                     out.write('output')
-        
+
         manifest = self.manifest.copy()
         manifest['inputs'] = [
             {
@@ -99,7 +101,7 @@ class TestCoReSyFTool(TestCase):
         os.remove('f2')
 
         self.setUp()
-    
+
     def test_collection_ouput(self):
         class MockCoReSyFTool(CoReSyFTool):
             def run(self, bindings):
@@ -110,7 +112,7 @@ class TestCoReSyFTool(TestCase):
                     out.write('output')
                 with open('f23', 'w') as out:
                     out.write('output')
-        
+
         manifest = self.manifest.copy()
         manifest['outputs'] = [
             {
@@ -242,3 +244,71 @@ class TestCoReSyFTool(TestCase):
         cmd = '--input f1 --output f2 --param astr'.split()
         self.assertRaises(EmptyOutputFile, lambda: tool.execute(cmd))
         os.remove('f1')
+
+    def test_can_successfully_run_command_from_interpolated_template(self):
+        coresyf_tool = CoReSyFTool(self.runfile)
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command(
+            "test {op}", op="1")
+        self.assertEqual(pipeline.returncode, 0)
+
+    def test_can_read_failed_return_code_after_running_shell_command(self):
+        coresyf_tool = CoReSyFTool(self.runfile)
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command(
+            "test {op1} = {op2}", op1="1", op2="2")
+        self.assertEqual(pipeline.returncode, 1)
+
+    def test_can_read_stdout_after_running_shell_command(self):
+        coresyf_tool = CoReSyFTool(self.runfile)
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("echo -n out")
+        self.assertEqual(stdout.read(), 'out')
+
+    def test_can_read_stderr_after_running_shell_command(self):
+        coresyf_tool = CoReSyFTool(self.runfile)
+        (pipeline, stdout, stderr) = coresyf_tool.invoke_shell_command("rm nofile")
+        self.assertIn('rm: cannot remove', stderr.read())
+
+    def _extend_manifest(self, extra_fields):
+        manifest = self.manifest.copy()
+        manifest.update(extra_fields)
+        with open('manifest.json', 'w') as manifest_file:
+            json.dump(manifest, manifest_file)
+        self.runfile = os.path.join(os.getcwd(), 'run')
+
+    def test_can_run_shell_command_of_manifest(self):
+        self._extend_manifest({
+            'command': 'cp {input} {output}; echo {param}'
+        })
+        with open('f1', 'w') as f1:
+            f1.write('input')
+        tool = CoReSyFTool(self.runfile)
+        cmd = '--input f1 --output f2 --param astr'.split()
+        tool.execute(cmd)
+        self.assertTrue(os.path.exists('f2'))
+
+    def test_can_handle_unexpected_command_placeholders(self):
+        self._extend_manifest({
+            'command': 'cp {input} {unexpected_placeholder}; echo {param}'
+        })
+        with self.assertRaises(UnexpectedCommandPlaceholder):
+            CoReSyFTool(self.runfile)
+
+    def test_can_handle_missing_command_placeholders(self):
+        self._extend_manifest({
+            'command': 'cp {input}'
+        })
+        with self.assertRaises(MissingCommandPlaceholderForOption):
+            CoReSyFTool(self.runfile)
+
+    def test_can_use_custom_manifest_name(self):
+        """Test we can pass the manifest file name to CoReSyTFTool."""
+        manifest = self.manifest.copy()
+        manifest['name'] = 'MyFairTool'
+        manifest_file_name = 'my_tool.manifest.json'
+        with open(manifest_file_name, 'w') as manifest_file:
+            manifest_file.write(json.dumps(manifest))
+        tool = CoReSyFTool(self.runfile, manifest_file_name)
+        self.assertEqual(tool.manifest_file_name,
+                         str(Path(self.runfile).parent / manifest_file_name))
+        self.assertEqual(tool.manifest['name'], 'MyFairTool')
+        os.remove(manifest_file_name)
+
