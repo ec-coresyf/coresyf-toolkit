@@ -298,8 +298,9 @@ class TestCoReSyFTool(TestCase):
         })
         with self.assertRaises(MissingCommandPlaceholderForOption):
             CoReSyFTool(self.runfile)
-        
+
     def test_can_use_custom_manifest_name(self):
+        """Test we can pass the manifest file name to CoReSyTFTool."""
         manifest = self.manifest.copy()
         manifest['name'] = 'MyFairTool'
         manifest_file_name = 'my_tool.manifest.json'
@@ -310,4 +311,4 @@ class TestCoReSyFTool(TestCase):
                          str(Path(self.runfile).parent / manifest_file_name))
         self.assertEqual(tool.manifest['name'], 'MyFairTool')
         os.remove(manifest_file_name)
-        
+
