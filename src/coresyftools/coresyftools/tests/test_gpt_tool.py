@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 import json
 import os
 
@@ -6,7 +6,7 @@ from ..gpt_tool import GPTCoReSyFTool, GPTGraphFileNotFound
 from ..manifest import InvalidManifestException
 
 
-class TestGPTTool(TestCase):
+class TestGPTTool(unittest.TestCase):
 
     def setUp(self):
         self.manifest = {
@@ -148,3 +148,20 @@ class TestGPTTool(TestCase):
             os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
         self.assertEqual(call_shell_command_mock.args, gpt_cmd)
         os.remove('input')
+
+    def test_add_and_remove_file_extensions(self):
+        with open('input.tif', 'wb') as input_image:
+            input_image.write(101010101101010101010100001)
+        manifest = self.manifest.copy()
+        manifest['operation'] = {'operation': 'Land-Sea-Mask'}
+        self.write_manifest(manifest)
+        tool = GPTCoReSyFTool(self.runfile)
+        tool._remove_snap_file_extension(input_image)
+
+        self.assertEqual(input_image, 'input')
+
+        tool._add_snap_file_extension(input_image)
+
+        self.assertEqual(input_image, 'input.tif')
+
+        os.remove('input.tif')
