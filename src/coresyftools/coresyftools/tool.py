@@ -43,15 +43,15 @@ class EmptyOutputFile(Exception):
         self.file = file
 
 
+MANIFEST_FILE_NAME = 'manifest.json'
+
 class CoReSyFTool(object):
 
-    MANIFEST_FILE_NAME = 'manifest.json'
-
-    def __init__(self, run_script_file_name):
+    def __init__(self, run_script_file_name, manifest_file_name=MANIFEST_FILE_NAME):
         self.context_directory = self._get_context_directory(
             run_script_file_name)
         self.manifest_file_name = os.path.join(
-            self.context_directory, self.MANIFEST_FILE_NAME)
+            self.context_directory, manifest_file_name)
         self.manifest = get_manifest(self.manifest_file_name)
         self.arg_parser = CoReSyFArgumentParser(self.manifest)
         if 'command' in self.manifest:
