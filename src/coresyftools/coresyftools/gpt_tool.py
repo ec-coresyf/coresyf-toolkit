@@ -34,6 +34,12 @@ class GPTCoReSyFTool(CoReSyFTool):
     DEFAULT_EXT = 'tif'
     DEFAULT_GPT_GRAPH_FILE_NAME = 'gpt_graph.xml'
 
+    def _graph_file_path(self, operation_dict):
+        graph_file_name = self.DEFAULT_GPT_GRAPH_FILE_NAME
+        if isinstance(operation_dict['graph'], basestring):
+            graph_file_name = operation_dict['graph']
+        return os.path.join(self.context_directory, graph_file_name)
+
     # this overrides the super-class method extending it's validation behaviour
     # the method is invoked during super-class __init__
     def _validate_operation(self, operation):
@@ -42,7 +48,7 @@ class GPTCoReSyFTool(CoReSyFTool):
         if 'operation' in operation and 'graph' in operation and operation['graph']:
             raise InvalidManifestException('Cannot be operation and graph at same time.')
         if self.operation.get('graph') is not None:
-            graph_file = os.path.join(self.context_directory, self.DEFAULT_GPT_GRAPH_FILE_NAME)
+            graph_file = self._graph_file_path(operation)
             if not os.path.exists(graph_file):
                 raise GPTGraphFileNotFound(graph_file)
 
@@ -55,7 +61,7 @@ class GPTCoReSyFTool(CoReSyFTool):
         bindings = bindings.copy()
         operator = self.operation.get('operation')
         if 'graph' in self.operation and self.operation['graph']:
-            graph_file = os.path.join(self.context_directory, self.DEFAULT_GPT_GRAPH_FILE_NAME)
+            graph_file = self._graph_file_path(self.operation)
             if not os.path.exists(graph_file):
                 raise GPTGraphFileNotFound(graph_file)
             operator = graph_file
