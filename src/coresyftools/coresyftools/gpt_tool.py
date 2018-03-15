@@ -61,8 +61,7 @@ class GPTCoReSyFTool(CoReSyFTool):
         bindings = bindings.copy()
         operator = self.operation.get('operation')
         if 'graph' in self.operation and self.operation['graph']:
-            graph_file_name = self._graph_file_path(self.operation)
-            graph_file = os.path.join(self.context_directory, graph_file_name)
+            graph_file = self._graph_file_path(self.operation)
             if not os.path.exists(graph_file):
                 raise GPTGraphFileNotFound(graph_file)
             operator = graph_file
