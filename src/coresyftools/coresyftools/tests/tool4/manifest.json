@@ -21,7 +21,7 @@
             "name": "error message option",
             "type": "string",
             "description": "option to pass a error message for stderr",
-            "default": "error"
+            "default": false
         },
         {
             "identifier": "noutput",
@@ -42,6 +42,6 @@
         "identifier": "output",
         "name": "output",
         "description": "Sets the output file name to <filepath>",
-        "type": "Raster"        
+        "type": "Raster"
     }]
 }
