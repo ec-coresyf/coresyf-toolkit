@@ -52,7 +52,7 @@ class Packager():
             raise TargetDirectoryNotFoundException()
         if not exists(join(self.tool_dir, 'run')):
             raise MissingRunFileException()
-        manifest_files = glob.glob(join(self.tool_dir, '*manifest.json'))
+        manifest_files = self._find_manifest_files()
         if not manifest_files:
             raise MissingManifestFileException()
         if len(manifest_files) > 1:
@@ -61,8 +61,11 @@ class Packager():
             raise MissingExamplesFileException()
     
     def _read_manifest(self):
-        manifest_file_name = glob.glob(join(self.tool_dir, '*manifest.json'))
-        self.manifest = get_manifest(manifest_file_name[0])
+        manifest_file_name = self._find_manifest_files()[0]
+        self.manifest = get_manifest(manifest_file_name)
+    
+    def _find_manifest_files(self):
+        return glob.glob(join(self.tool_dir, '*manifest.json'))
 
     def _test(self):
         tester = ToolTester(self.tool_dir, self.scihub_credentials)
