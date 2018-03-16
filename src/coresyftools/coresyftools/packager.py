@@ -61,7 +61,8 @@ class Packager():
             raise MissingExamplesFileException()
     
     def _read_manifest(self):
-        self.manifest = get_manifest(join(self.tool_dir, 'manifest.json'))
+        manifest_file_name = glob.glob(join(self.tool_dir, '*manifest.json'))
+        self.manifest = get_manifest(manifest_file_name[0])
 
     def _test(self):
         tester = ToolTester(self.tool_dir, self.scihub_credentials)
