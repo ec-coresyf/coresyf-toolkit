@@ -4,10 +4,11 @@ import logging
 import subprocess
 import requests
 import json
+import glob
 from urlparse import urlparse
 from os.path import exists, getsize
 from argument_parser import CoReSyFArgumentParser
-from manifest import get_manifest
+from manifest import get_manifest, find_manifest_files
 
 DOWNLOAD_TIMEOUT = 30
 SCHIHUB_DOMAIN = 'https://scihub.copernicus.eu'
@@ -64,7 +65,7 @@ class ToolTester(object):
         self.scihub_credentials = scihub_credentials
         self.cwd = os.getcwd()
         examples_file = 'examples.sh'
-        self.manifest_file_name = os.path.join(tool_dir, 'manifest.json')
+        self.manifest_file_name = find_manifest_files(tool_dir)[0]
         self.manifest = get_manifest(self.manifest_file_name)
         self._load_examples_file(examples_file)
         self.errors = []
