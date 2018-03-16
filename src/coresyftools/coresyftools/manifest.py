@@ -1,7 +1,7 @@
 from cerberus import Validator
-
+from os.path import abspath, join
 import json
-
+import glob
 
 MANIFEST_SCHEMA = {
     'name': {
@@ -158,3 +158,7 @@ def get_manifest(manifest_file_name):
         raise ManifestFileNotFound(manifest_file_name)
     except ValueError:
         raise ManifestSyntaxError()
+
+
+def find_manifest_files(tool_dir):
+    return glob.glob(join(abspath(tool_dir), '*manifest.json'))
