@@ -5,7 +5,7 @@ from os import mkdir, rename, listdir
 from os.path import join, basename, splitext, exists
 from shutil import copy, make_archive, move
 from tool_tester import ToolTester
-from manifest import get_manifest
+from manifest import get_manifest, find_manifest_files
 import click
 
 
@@ -52,7 +52,7 @@ class Packager():
             raise TargetDirectoryNotFoundException()
         if not exists(join(self.tool_dir, 'run')):
             raise MissingRunFileException()
-        manifest_files = self._find_manifest_files()
+        manifest_files = find_manifest_files(self.tool_dir)
         if not manifest_files:
             raise MissingManifestFileException()
         if len(manifest_files) > 1:
@@ -61,11 +61,8 @@ class Packager():
             raise MissingExamplesFileException()
     
     def _read_manifest(self):
-        manifest_file_name = self._find_manifest_files()[0]
+        manifest_file_name = find_manifest_files(self.tool_dir)[0]
         self.manifest = get_manifest(manifest_file_name)
-    
-    def _find_manifest_files(self):
-        return glob.glob(join(self.tool_dir, '*manifest.json'))
 
     def _test(self):
         tester = ToolTester(self.tool_dir, self.scihub_credentials)
