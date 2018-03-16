@@ -50,7 +50,7 @@
             "name": "useSRTM",
             "description": "Set useSRTM to <boolean>",
             "type": "boolean",
-            "default": true
+            "default": false
         }
         ],
         "outputs": [
