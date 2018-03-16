@@ -2,7 +2,7 @@
     "name": "calibration_ec",
     "type": "Calibration",
     "description": "CoReSyF calibration tool",
-    "operation": {"graph": true},
+    "operation": {"graph": "calibration_ec.graph.xml"},
     "inputs": [
         {
             "identifier": "Ssource",
