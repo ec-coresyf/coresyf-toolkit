@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from unittest import TestCase
 from ..packager import Packager, ToolDirectoryNotFoundException, TargetDirectoryNotFoundException, MissingRunFileException, MissingManifestFileException, MissingExamplesFileException, ToolErrorsException
 from zipfile import ZipFile
@@ -68,16 +69,32 @@ class TestPackager(TestCase):
         os.chdir(cur_dir)
 
     def test_package_command_with_opts(self):
-        cur_dir = os.getcwd()
-        os.chdir('./coresyftools')
-        run('./packager.py --tool_dir=./tests/tool4 --target_dir=./tests/target --scihub_user rccc --scihub_pass ssdh2dme')
+        packager_script_file = Path(__file__).parent / '..' / 'packager.py'
+        tool_dir = Path(__file__).parent / 'tool4'
+        target_dir = Path(__file__).parent / 'target'
+        tool_zipfile = target_dir / 'Dummy Tool.zip'
+        print(tool_dir)
+        run('{} --tool_dir={} --target_dir={} --scihub_user rccc --scihub_pass ssdh2dme'
+            .format(str(packager_script_file), str(tool_dir), str(target_dir)))
         self.assertTrue(
-            os.path.exists('./tests/target/Dummy Tool.zip'))
-        zipfile = ZipFile('./tests/target/Dummy Tool.zip')
+            os.path.exists(str(tool_zipfile)))
+        zipfile = ZipFile(str(tool_zipfile))
         fileset = set(zipfile.namelist())
         print(fileset)
         self.assertTrue('run' in fileset)
         self.assertTrue('manifest.json' in fileset)
         self.assertTrue('examples.sh' in fileset)
-        os.remove('./tests/target/Dummy Tool.zip')
-        os.chdir(cur_dir)
+        os.remove(str(tool_zipfile))
+
+    def test_custom_manifest_name(self):
+        packager = Packager('./coresyftools/tests/tool5/',
+                            './coresyftools/tests/target', self.scihub_credentials)
+        packager.pack_tool()
+        self.assertTrue(
+            os.path.exists('./coresyftools/tests/target/Dummy Tool.zip'))
+        zipfile = ZipFile('./coresyftools/tests/target/Dummy Tool.zip')
+        fileset = set(zipfile.namelist())
+        print(fileset)
+        self.assertTrue('run' in fileset)
+        self.assertTrue('custommanifest.json' in fileset)
+        self.assertTrue('examples.sh' in fileset)
