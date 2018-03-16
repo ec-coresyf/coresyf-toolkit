@@ -70,7 +70,7 @@ class TestGPTTool(TestCase):
         tool.execute(cmd)
 
         gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
-            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input.tif')).split()
         self.assertEqual(call_shell_command_mock.args, gpt_cmd)
         os.remove('input')
 
@@ -100,7 +100,7 @@ class TestGPTTool(TestCase):
 
         gpt_cmd = 'gpt {} -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
             os.path.join(os.getcwd(), 'gpt_graph.xml'),
-            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input.tif')).split()
         self.assertEqual(call_shell_command_mock.args, gpt_cmd)
         os.remove('input')
         os.remove('gpt_graph.xml')
@@ -145,6 +145,6 @@ class TestGPTTool(TestCase):
         tool.execute(cmd)
 
         gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -opt=a -const=1 -param=val {}'.format(
-            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input.tif')).split()
         self.assertEqual(call_shell_command_mock.args, gpt_cmd)
         os.remove('input')
