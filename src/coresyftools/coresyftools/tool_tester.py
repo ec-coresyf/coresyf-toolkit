@@ -4,6 +4,7 @@ import logging
 import subprocess
 import requests
 import json
+import glob
 from urlparse import urlparse
 from os.path import exists, getsize
 from argument_parser import CoReSyFArgumentParser
@@ -64,7 +65,7 @@ class ToolTester(object):
         self.scihub_credentials = scihub_credentials
         self.cwd = os.getcwd()
         examples_file = 'examples.sh'
-        self.manifest_file_name = os.path.join(tool_dir, 'manifest.json')
+        self.manifest_file_name = glob.glob(os.path.join(tool_dir, '*manifest.json'))[0]
         self.manifest = get_manifest(self.manifest_file_name)
         self._load_examples_file(examples_file)
         self.errors = []
