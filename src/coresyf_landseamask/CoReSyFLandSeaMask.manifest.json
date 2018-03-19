@@ -13,12 +13,6 @@
      ],
      "parameters": [
         {
-            "identifier": "Pgeometry",
-            "name": "geometry",
-            "description": "Sets geometry to <string>",
-            "type": "string"
-        },
-        {
             "identifier": "PinvertGeometry",
             "name": "invertGeometry",
             "description": "Sets invertGeometry to <boolean>",
@@ -43,7 +37,8 @@
             "identifier": "PsourceBands",
             "name": "sourceBands",
             "description": "The list of source bands",
-            "type": "string" 
+            "type": "string",
+            "default": ""
         },
         {
             "identifier": "PuseSRTM",
