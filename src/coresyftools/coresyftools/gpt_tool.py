@@ -128,12 +128,12 @@ class GPTCoReSyFTool(CoReSyFTool):
             os.rename(gpt_file_name, target)
 
     def _add_tif_file_extension(self, source):
-        if os.path.exists(source) and self._has_no_extension(source):
+        if os.path.exists(source) and self._has_no_tif_extension(source):
             source_with_ext = source + '.' + self.TIF_EXT
             os.rename(source, source_with_ext)
             return source_with_ext
         else:
             return source
 
-    def _has_no_extension(self, file_name):
-        return os.path.splitext(str(file_name))[-1] == ''
+    def _has_no_tif_extension(self, file_name):
+        return os.path.splitext(str(file_name))[-1] != '.tif'
