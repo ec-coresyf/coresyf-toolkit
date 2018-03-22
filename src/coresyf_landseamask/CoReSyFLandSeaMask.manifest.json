@@ -34,13 +34,6 @@
             "default": 0
         },
         {
-            "identifier": "PsourceBands",
-            "name": "sourceBands",
-            "description": "The list of source bands",
-            "type": "string",
-            "default": ""
-        },
-        {
             "identifier": "PuseSRTM",
             "name": "useSRTM",
             "description": "Set useSRTM to <boolean>",
