@@ -168,7 +168,7 @@ class TestGPTTool(TestCase):
 
         tool._call_shell_command = call_shell_command_mock
 
-        tool._remove_snap_file_extension = lambda x: None
+        tool._remove_tif_file_extension = lambda x: None
 
         with open('input', 'w') as infile:
             infile.write('input')
@@ -196,7 +196,7 @@ class TestGPTTool(TestCase):
 
         tool._call_shell_command = call_shell_command_mock
 
-        tool._remove_snap_file_extension = lambda x: None
+        tool._remove_tif_file_extension = lambda x: None
 
         with open('input.tif', 'w') as infile:
             infile.write('input')
@@ -231,7 +231,7 @@ class TestGPTTool(TestCase):
 
         tool._call_shell_command = call_shell_command_mock
 
-        tool._remove_snap_file_extension = lambda x: None
+        tool._remove_tif_file_extension = lambda x: None
 
         with open('input', 'w') as infile:
             infile.write('input')
