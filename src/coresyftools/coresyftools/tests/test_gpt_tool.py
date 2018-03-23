@@ -5,7 +5,6 @@ import os
 from ..gpt_tool import GPTCoReSyFTool, GPTGraphFileNotFound
 from ..manifest import InvalidManifestException
 
-
 class TestGPTTool(TestCase):
 
     def setUp(self):
@@ -17,6 +16,7 @@ class TestGPTTool(TestCase):
                     'identifier': 'input',
                     'name': 'input',
                     'description': 'description',
+                    'type': 'GeoTIFF'
                 }],
             'outputs': [
                 {
@@ -150,4 +150,154 @@ class TestGPTTool(TestCase):
         gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -opt=a -const=1 -param=val {}'.format(
             os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input.tif')).split()
         self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        os.remove('input')
+
+    def test_can_add_extension_to_geotiff(self):
+        """Test that the .tif extension is added to a GeoTIFF source file without extension."""
+        manifest = self.manifest.copy()
+        manifest['operation'] = {'operation': 'Land-Sea-Mask'}
+        self.write_manifest(manifest)
+        tool = GPTCoReSyFTool(self.runfile)
+
+        class CallShellCommandMock():
+            def __call__(self, args):
+                self.args = args
+
+        call_shell_command_mock = CallShellCommandMock()
+
+        tool._call_shell_command = call_shell_command_mock
+
+        tool._remove_tif_file_extension = lambda x: None
+
+        with open('input', 'w') as infile:
+            infile.write('input')
+
+        cmd = '--input input --output output --param val'.split()
+        tool.execute(cmd)
+
+        gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input.tif')).split()
+        self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        self.assertTrue(os.path.exists('input.tif'))
+        os.remove('input.tif')
+
+    def test_can_add_extension_to_geotiff_when_has_different_extension(self):
+        """Test that a .tif extensions is added to a GeoTIFF source file with a extension other than '.tif'"""
+        manifest = self.manifest.copy()
+        manifest['operation'] = {'operation': 'Land-Sea-Mask'}
+        self.write_manifest(manifest)
+        tool = GPTCoReSyFTool(self.runfile)
+
+        class CallShellCommandMock():
+            def __call__(self, args):
+                self.args = args
+
+        call_shell_command_mock = CallShellCommandMock()
+
+        tool._call_shell_command = call_shell_command_mock
+
+        tool._remove_tif_file_extension = lambda x: None
+
+        with open('input.txt', 'w') as infile:
+            infile.write('input')
+
+        cmd = '--input input.txt --output output --param val'.split()
+        tool.execute(cmd)
+
+        gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input.txt.tif')).split()
+        self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        self.assertTrue(os.path.exists('input.txt.tif'))
+        os.remove('input.txt.tif')
+
+    def test_do_not_add_extension_to_geotiff_when_has_geotiff_extension(self):
+        """Test that a GeoTIFF source file is not renamed if it already has an .tif extension."""
+        manifest = self.manifest.copy()
+        manifest['operation'] = {'operation': 'Land-Sea-Mask'}
+        self.write_manifest(manifest)
+        tool = GPTCoReSyFTool(self.runfile)
+
+        class CallShellCommandMock():
+            def __call__(self, args):
+                self.args = args
+
+        call_shell_command_mock = CallShellCommandMock()
+
+        tool._call_shell_command = call_shell_command_mock
+
+        tool._remove_tif_file_extension = lambda x: None
+
+        with open('input.tif', 'w') as infile:
+            infile.write('input')
+
+        cmd = '--input input.tif --output output --param val'.split()
+        tool.execute(cmd)
+
+        gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input.tif')).split()
+        self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        self.assertTrue(os.path.exists('input.tif'))
+        os.remove('input.tif')
+
+    def test_do_not_add_extension_to_non_geotiff(self):
+        """Test that a source file which is not GeoTIFF is not renamed."""
+        manifest = self.manifest.copy()
+        manifest['operation'] = {'operation': 'Land-Sea-Mask'}
+        manifest['inputs'] = [{
+                    'identifier': 'input',
+                    'name': 'input',
+                    'description': 'description',
+                    'type': 'Raster'
+                }]
+        self.write_manifest(manifest)
+        tool = GPTCoReSyFTool(self.runfile)
+
+        class CallShellCommandMock():
+            def __call__(self, args):
+                self.args = args
+
+        call_shell_command_mock = CallShellCommandMock()
+
+        tool._call_shell_command = call_shell_command_mock
+
+        tool._remove_tif_file_extension = lambda x: None
+
+        with open('input', 'w') as infile:
+            infile.write('input')
+
+        cmd = '--input input --output output --param val'.split()
+        tool.execute(cmd)
+
+        gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input')).split()
+        self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        self.assertTrue(os.path.exists('input'))
+        os.remove('input')
+
+    def test_geotiff_source_file_ends_with_original_name(self):
+        """Test that a GeoTIFF source file gets the original name after the processing finish."""
+        manifest = self.manifest.copy()
+        manifest['operation'] = {'operation': 'Land-Sea-Mask'}
+        self.write_manifest(manifest)
+        tool = GPTCoReSyFTool(self.runfile)
+
+        class CallShellCommandMock():
+            def __call__(self, args):
+                self.args = args
+
+        call_shell_command_mock = CallShellCommandMock()
+
+        tool._call_shell_command = call_shell_command_mock
+
+        with open('input', 'w') as infile:
+            infile.write('input')
+
+        cmd = '--input input --output output --param val'.split()
+        tool.execute(cmd)
+
+        gpt_cmd = 'gpt Land-Sea-Mask -f GeoTIFF-BigTIFF -t {} -param=val {}'.format(
+            os.path.join(os.getcwd(), 'output'), os.path.join(os.getcwd(), 'input.tif')).split()
+        self.assertEqual(call_shell_command_mock.args, gpt_cmd)
+        self.assertFalse(os.path.exists('input.tif'))
+        self.assertTrue(os.path.exists('input'))
         os.remove('input')
