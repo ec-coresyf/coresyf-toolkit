@@ -59,7 +59,7 @@ class GPTCoReSyFTool(CoReSyFTool):
             graph_file = self._graph_file_path(operation)
             if not os.path.exists(graph_file):
                 raise GPTGraphFileNotFound(graph_file)
-    
+
     def run(self, bindings):
         if len(self.arg_parser.inputs) > 1:
             raise TooManyInputArgumentsException()
@@ -76,7 +76,10 @@ class GPTCoReSyFTool(CoReSyFTool):
         if 'parameters' in self.operation:
             bindings.update(self.operation['parameters'])
         source = bindings.pop(self.arg_parser.inputs[0])
-        source_with_ext = self._add_tif_file_extension(source) if self._has_geotiff_source() else source
+        if self._has_geotiff_source(): 
+            source_with_ext = self._add_tif_file_extension(source) 
+        else:
+            source_with_ext = source
         target = bindings.pop(self.arg_parser.outputs[0])
         self._call_gpt(operator, source_with_ext, target, bindings)
         # Remove source file extension (case it was added)
@@ -88,10 +91,10 @@ class GPTCoReSyFTool(CoReSyFTool):
         self._remove_tif_file_extension(target)
 
     def _has_geotiff_source(self):
-        return self._get_source_type() == self.GEOTIFF_TYPE 
-    
+        return self._get_source_type() == self.GEOTIFF_TYPE
+
     def _get_source_type(self):
-         return self.manifest['inputs'][0]['type']
+        return self.manifest['inputs'][0]['type']
 
     def _build_gpt_shell_command(self, operator, source, target, options):
         source = os.path.abspath(source)
@@ -136,4 +139,4 @@ class GPTCoReSyFTool(CoReSyFTool):
             return source
 
     def _has_no_tif_extension(self, file_name):
-        return os.path.splitext(str(file_name))[-1] != '.tif'
+        return os.path.splitext(str(file_name))[-1] !=  '.' + self.TIF_EXT
