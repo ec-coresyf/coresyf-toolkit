@@ -1,0 +1,52 @@
+{
+    "name": "CoReSyF Land-Sea-Mask",
+    "type": "LandSeaMask", 
+    "operation": {"operation": "Land-Sea-Mask"},
+    "description": "CoReSyF Land Sea Mask tool",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        }
+     ],
+     "parameters": [
+        {
+            "identifier": "PinvertGeometry",
+            "name": "invertGeometry",
+            "description": "Sets invertGeometry to <boolean>",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PlandMask",
+            "name": "landMask",
+            "description": "sets landMaks to <boolean>",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "identifier": "PshorelineExtension",
+            "name": "shorelineExtension",
+            "description": "Sets shorelineExtension to <integer>",
+            "type": "int",
+            "default": 0
+        },
+        {
+            "identifier": "PuseSRTM",
+            "name": "useSRTM",
+            "description": "Set useSRTM to <boolean>",
+            "type": "boolean",
+            "default": false
+        }
+        ],
+        "outputs": [
+          {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "Raster"
+          }
+       ]
+}

@@ -5,7 +5,9 @@ setup(name='CoReSyF tools',
       description='base classes for CoReSyF tool',
       packages=['coresyftools'],
       install_requires=[
-            'cerberus'
+            'cerberus',
+            'click',
+            'sarge'
       ],
       test_suite='nose.collector',
       tests_require=['nose'])

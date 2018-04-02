@@ -1,14 +1,14 @@
 {
     "name": "CoReSyF Adaptive Thresholding",
     "type": "AdaptiveThresholding",
+    "operation": {"operation": "AdaptiveThresholding"},
     "description": "Detect ships using Constant False Alarm Rate detector",
     "inputs": [
         {
             "identifier": "Ssource",
             "name": "source",
             "description": "sets source to <filepath>",
-            "type": "Raster",
-            "required": true
+            "type": "Raster"
         }
     ],
     "parameters": [
@@ -41,8 +41,8 @@
             "default": 6.5
         },
         {
-            "identifier": "PguardWindowSizeInMeter",
-            "name": "Guard Window Size In Meters",
+            "identifier": "PtargetWindowSizeInMeter",
+            "name": "Target Window Size In Meters",
             "description": "Target window size",
             "type": "int",
             "default": 50

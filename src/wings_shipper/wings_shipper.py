@@ -1,6 +1,7 @@
 """A command line utility to deploy a wings application"""
 import json
 import zipfile
+import glob
 from os import getcwd, makedirs
 from os.path import exists, join
 from shutil import rmtree
@@ -140,21 +141,19 @@ class WingsShipper(object):
         """Unzips the tool to ship to wings to the temporary directory"""
         self.make_temporary_dir()
         zip_reference = zipfile.ZipFile(self.tool_zip_path, 'r')
-        target_folder = zip_reference.namelist()[0]
 
         zip_reference.extractall(self.temp_dir)
         zip_reference.close()
-        self.set_manifest_path(target_folder)
+        self.set_manifest_path()
 
     def make_temporary_dir(self):
         """Creates a temporary directory to unzip file contents"""
         if not exists(self.temp_dir):
             makedirs(self.temp_dir)
 
-    def set_manifest_path(self, target):
+    def set_manifest_path(self):
         """Sets the path to the manifest file"""
-        self.manifest_path = join(
-            self.temp_dir, target, 'manifest.json')
+        self.manifest_path = glob.glob(join(self.temp_dir, '*manifest.json'))[0]
 
     def read_manifest(self):
         """Reads the manifest file and loads it into a dict"""
@@ -204,7 +203,7 @@ class WingsShipper(object):
             data_list.append({
                 'role': _data['identifier'],
                 'type': _data['type'],
-                'prefix': '-{}'.format(_data['identifier']),
+                'prefix': '--{}'.format(_data['identifier']),
                 'dimensionality': self.get_dimensionality_value(_data)
             })
         return data_list
@@ -233,7 +232,7 @@ class WingsShipper(object):
             parameter_list.append({
                 'role': _parameter['identifier'],
                 'type': parameter_type,
-                'prefix': '-{}'.format(_parameter['identifier']),
+                'prefix': '--{}'.format(_parameter['identifier']),
                 'paramDefaultValue': parameter_value
             })
         return parameter_list

@@ -1,0 +1,24 @@
+{
+    "name": "preprocessing",
+    "type": "Calibration",
+    "description": "CoReSyF calibration tool",
+    "operation": {"graph": true},
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        }
+    ],
+    "parameters": [
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "Raster"
+        }
+    ]
+}
