@@ -34,8 +34,9 @@ class GPTCoReSyFTool(CoReSyFTool):
     '''CoReSyF Tool consisting of a single SNAP gpt operation.'''
 
     DEFAULT_FORMAT = 'GeoTIFF-BigTIFF'
-    DEFAULT_EXT = 'tif'
+    TIF_EXT = 'tif'
     DEFAULT_GPT_GRAPH_FILE_NAME = 'gpt_graph.xml'
+    GEOTIFF_TYPE = 'GeoTIFF'
 
     def _graph_file_path(self, operation_dict):
         graph_file_name = self.DEFAULT_GPT_GRAPH_FILE_NAME
@@ -75,15 +76,25 @@ class GPTCoReSyFTool(CoReSyFTool):
         if 'parameters' in self.operation:
             bindings.update(self.operation['parameters'])
         source = bindings.pop(self.arg_parser.inputs[0])
-        source_with_ext = self._add_snap_file_extension(source)
+        if self._has_geotiff_source(): 
+            source_with_ext = self._add_tif_file_extension(source) 
+        else:
+            source_with_ext = source
         target = bindings.pop(self.arg_parser.outputs[0])
         self._call_gpt(operator, source_with_ext, target, bindings)
         # Remove source file extension (case it was added)
-        self._remove_snap_file_extension(source)
+        if self._has_geotiff_source():
+            self._remove_tif_file_extension(source)
         # This is needed because SNAP automatically adds file extensions, but
         # output files can not have a name different from the specified in
         # the command line.
-        self._remove_snap_file_extension(target)
+        self._remove_tif_file_extension(target)
+
+    def _has_geotiff_source(self):
+        return self._get_source_type() == self.GEOTIFF_TYPE
+
+    def _get_source_type(self):
+        return self.manifest['inputs'][0]['type']
 
     def _build_gpt_shell_command(self, operator, source, target, options):
         source = os.path.abspath(source)
@@ -114,18 +125,18 @@ class GPTCoReSyFTool(CoReSyFTool):
         if process.returncode:
             raise GPTExecutionException(process.returncode, stderr)
 
-    def _remove_snap_file_extension(self, target):
-        gpt_file_name = target + '.' + self.DEFAULT_EXT
+    def _remove_tif_file_extension(self, target):
+        gpt_file_name = target + '.' + self.TIF_EXT
         if os.path.exists(gpt_file_name):
             os.rename(gpt_file_name, target)
 
-    def _add_snap_file_extension(self, source):
-        if os.path.exists(source) and self._has_no_extension(source):
-            source_with_ext = source + '.' + self.DEFAULT_EXT
+    def _add_tif_file_extension(self, source):
+        if os.path.exists(source) and self._has_no_tif_extension(source):
+            source_with_ext = source + '.' + self.TIF_EXT
             os.rename(source, source_with_ext)
             return source_with_ext
         else:
             return source
 
-    def _has_no_extension(self, file_name):
-        return os.path.splitext(str(file_name))[-1] == ''
+    def _has_no_tif_extension(self, file_name):
+        return os.path.splitext(str(file_name))[-1] !=  '.' + self.TIF_EXT
