@@ -1,14 +1,14 @@
 {
     "name": "CoReSyF Object Discrimination",
     "type": "ObjectDiscrimination",
+    "operation": {"operation": "Object-Discrimination"},
     "description": "Remove false alarms from the detected objects.",
     "inputs": [
         {
             "identifier": "Ssource",
             "name": "source",
             "description": "Sets source to <filepath>",
-            "type": "Raster",
-            "required": true
+            "type": "Raster"
         }
     ],
     "parameters": [
