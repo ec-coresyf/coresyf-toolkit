@@ -1,5 +1,5 @@
 {
-    "name": "CoReSyF Subset",
+    "name": "CoReSyFSubset",
     "type": "Subset",
     "operation": {"operation": "Subset"},
     "description": "Create a spatial and/or spectral subset of a data product",
