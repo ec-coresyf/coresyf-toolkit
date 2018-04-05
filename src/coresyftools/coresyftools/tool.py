@@ -163,14 +163,17 @@ class CoReSyFTool(object):
             shutil.rmtree(TMP_DIR)
 
     def _run_command(self, command_template):
+        self.logger.debug('Command: %s', str(command_template))
         self.invoke_shell_command(command_template, **self.bindings)
 
     def run(self, bindings):
+        self.logger.info('Running command...')
         if 'command' in self.manifest:
             self._run_command(self.manifest['command'])
 
     def invoke_shell_command(self, fmt, **kwargs):
         cmd_str = shell_format(fmt, **kwargs)
+        self.logger.debug('Final Command: %s', str(cmd_str))
         stdout_capture = Capture()
         stderr_capture = Capture()
         pipeline = run(cmd_str, stdout=stdout_capture, stderr=stderr_capture)
