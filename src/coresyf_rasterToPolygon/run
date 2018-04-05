@@ -2,4 +2,4 @@
 from coresyftools.tool import CoReSyFTool
 
 if __name__ == '__main__':
-    CoReSyFTool(__file__, 'rasterToPolygon.manifest.json').execute()
+    CoReSyFTool(__file__, 'CoReSyFRasterToPolygon.manifest.json').execute()

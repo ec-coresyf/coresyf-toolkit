@@ -1,0 +1,38 @@
+{
+    "name": "CoReSyFRasterToPolygon",
+    "type": "RasterToPolygon",
+    "description": "CoReSyF tool to convert a Raster to a Shapefile",
+    "command": "gdal_polygonize.py {Ssource} -b {band} -f 'ESRI Shapefile' {Ttarget} {Ttarget} {fieldname}",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "band",
+            "name": "band",
+            "description": "Indicate the source band to process",
+            "type": "int",
+            "default": "1"
+        },
+        {
+            "identifier": "fieldname",
+            "name": "Field Name",
+            "description": "Name of the field to create",
+            "type": "string",
+            "default": "DN"
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "Shapefile"
+        }
+    ]
+}
