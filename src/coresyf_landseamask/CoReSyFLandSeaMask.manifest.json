@@ -1,5 +1,5 @@
 {
-    "name": "CoReSyF Land-Sea-Mask",
+    "name": "CoReSyFLand-Sea-Mask",
     "type": "LandSeaMask", 
     "operation": {"operation": "Land-Sea-Mask"},
     "description": "CoReSyF Land Sea Mask tool",
