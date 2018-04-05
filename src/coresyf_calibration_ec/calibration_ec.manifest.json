@@ -97,7 +97,7 @@
             "identifier": "Ttarget",
             "name": "target",
             "description": "Sets the target to <filepath>",
-            "type": "Raster"
+            "type": "GeoTIFF"
         }
     ]
 }
