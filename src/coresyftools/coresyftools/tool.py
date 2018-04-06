@@ -173,7 +173,6 @@ class CoReSyFTool(object):
 
     def invoke_shell_command(self, fmt, **kwargs):
         cmd_str = shell_format(fmt, **kwargs)
-        self.logger.debug('Final Command: %s', str(cmd_str))
         stdout_capture = Capture()
         stderr_capture = Capture()
         pipeline = run(cmd_str, stdout=stdout_capture, stderr=stderr_capture)
