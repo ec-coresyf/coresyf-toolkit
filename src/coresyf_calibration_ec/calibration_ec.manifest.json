@@ -17,8 +17,8 @@
             "name": "auxiliary file",
             "type": "string",
             "description": "Value must be one of 'Latest Auxiliary File' Product Auxiliary File'",
-            "options": ["Latest Auxiliary File", "Product Auxiliary File", "External Auxiliary File"],
-            "default": "Product Auxiliary File"
+            "options": ["'Latest Auxiliary File'", "'Product Auxiliary File'", "'External Auxiliary File'"],
+            "default": "'Product Auxiliary File'"
         },
         {
             "identifier": "PcreateBetaBand",
