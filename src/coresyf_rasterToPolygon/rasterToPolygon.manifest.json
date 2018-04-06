@@ -15,7 +15,7 @@
         {
             "identifier": "band",
             "name": "band",
-            "description": "Indicate the source band to process",
+            "description": "Indicate the band on the raster file to build the polygons features from.",
             "type": "int",
             "default": "1"
         },
