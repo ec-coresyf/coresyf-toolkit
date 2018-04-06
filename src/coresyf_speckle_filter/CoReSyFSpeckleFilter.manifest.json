@@ -2,7 +2,7 @@
     "name": "CoReSyFSpeckleFilter",
     "type": "SpeckleFilter",
     "operation":  {"operation": "Speckle-Filter"},
-    "description": "Speckle Reduction",
+    "description": "Speckle Reduction from SNAP GPT command line tool",
     "inputs": [
         {
             "identifier": "Ssource",
@@ -16,9 +16,10 @@
         {
             "identifier": "Pfilter",
             "name": "Filter",
-            "description": "Value must be one of 'None', 'Boxcar', 'Median', 'Frost', 'Gamma Map', 'Lee', 'Refined Lee', 'Lee Sigma', 'IDAN'",
+            "description": "Sets parameter 'filter' to <string>",
+            "options": ["'None'", "'Boxcar'", "'Median'", "'Frost'", "'Gamma Map'", "'Lee'", "'Refined Lee'", "'Lee Sigma'", "'IDAN'"],
             "type": "string",
-            "default": "Lee Sigma"
+            "default": "'Lee Sigma'"
         },
         {
             "identifier": "PfilterSizeX",
