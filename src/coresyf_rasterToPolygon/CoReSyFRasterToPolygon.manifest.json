@@ -1,7 +1,7 @@
 {
     "name": "CoReSyFRasterToPolygon",
     "type": "RasterToPolygon",
-    "description": "CoReSyF tool to convert a Raster to a Shapefile",
+    "description": "CoReSyF tool that creates a shapefile with a layer containing polygon features for all connected regions of pixels in the raster sharing a common pixel value. Each polygon is created with an attribute indicating the pixel value of that polygon. The shapefile contains a layer with its own name, but the user can specify the fieldname for the pixel values.",
     "command": "gdal_polygonize.py {Ssource} -b {band} -f 'ESRI Shapefile' {Ttarget} {Ttarget} {fieldname}",
     "inputs": [
         {
