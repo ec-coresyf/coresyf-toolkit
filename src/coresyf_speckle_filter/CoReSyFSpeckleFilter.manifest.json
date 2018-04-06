@@ -1,0 +1,47 @@
+{
+    "name": "CoReSyFSpeckleFilter",
+    "type": "SpeckleFilter",
+    "operation":  {"operation": "Speckle-Filter"},
+    "description": "Speckle Reduction from SNAP GPT command line tool",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source 'source' to <filepath>",
+            "type": "Raster"
+        }
+
+    ],
+    "parameters": [
+        {
+            "identifier": "Pfilter",
+            "name": "Filter",
+            "description": "Sets parameter 'filter' to <string>",
+            "options": ["'None'", "'Boxcar'", "'Median'", "'Frost'", "'Gamma Map'", "'Lee'", "'Refined Lee'", "'Lee Sigma'", "'IDAN'"],
+            "type": "string",
+            "default": "'Lee Sigma'"
+        },
+        {
+            "identifier": "PfilterSizeX",
+            "name": "FilterSizeX",
+            "description": "The Kernel x dimension",
+            "type": "int",
+            "default": 3
+        },
+        {
+            "identifier": "PfilterSizeY",
+            "name": "FilterSizeY",
+            "description": "The Kernel y dimension",
+            "type": "int",
+            "default": 3
+        }
+    ],
+    "outputs": [
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "GeoTIFF"
+        }
+    ]
+}

@@ -163,9 +163,11 @@ class CoReSyFTool(object):
             shutil.rmtree(TMP_DIR)
 
     def _run_command(self, command_template):
+        self.logger.debug('Command: %s', str(command_template))
         self.invoke_shell_command(command_template, **self.bindings)
 
     def run(self, bindings):
+        self.logger.info('Running command...')
         if 'command' in self.manifest:
             self._run_command(self.manifest['command'])
 
