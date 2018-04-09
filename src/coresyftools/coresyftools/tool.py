@@ -197,9 +197,14 @@ class CoReSyFTool(object):
         Creates a ZipFile with the files in 'directory'.
         """
         path = os.path.abspath(directory)
-        files_list = os.listdir(path)
-        with zipfile.ZipFile(path + '.zip', 'w') as archive:
+        # we need to change the name of the output directory to avoid conflicts
+        # with the zip archive name without the '.zip' extension
+        output_path = path + '_'
+        os.rename(path, output_path)
+        files_list = os.listdir(output_path)
+        with zipfile.ZipFile(path, 'w') as archive:
             for file_ in files_list:
-                archive.write(os.path.join(path, file_), file_)
+                archive.write(os.path.join(output_path, file_), file_)
             archive.close()
+
 
