@@ -114,6 +114,7 @@ class CoReSyFTool(object):
         self.logger.info('Running.')
         self.run(self.bindings)
         self._check_outputs()
+        self.prepare_outputs()
         self.logger.info('Cleaning temporary data.')
         self._clean_tmp_()
 
@@ -177,3 +178,28 @@ class CoReSyFTool(object):
         stderr_capture = Capture()
         pipeline = run(cmd_str, stdout=stdout_capture, stderr=stderr_capture)
         return (pipeline, stdout_capture, stderr_capture)
+
+    def prepare_outputs(self):
+        """
+        Method that checks if the tools' outputs are in a directory.
+        If yes, it calls another method to compress. If not, it does nothing.
+        """
+        for out_arg in self.arg_parser.outputs:
+            outputs = self.bindings[out_arg]
+            if not hasattr(outputs, '__iter__'):
+                outputs = [outputs]
+            for output in outputs:
+                if os.path.isdir(output):
+                    self.write_to_zipfile(output)
+
+    def write_to_zipfile(self, directory):
+        """
+        Creates a ZipFile with the files in 'directory'.
+        """
+        path = os.path.abspath(directory)
+        files_list = os.listdir(path)
+        with zipfile.ZipFile(path + '.zip', 'w') as archive:
+            for file_ in files_list:
+                archive.write(os.path.join(path, file_), file_)
+            archive.close()
+
