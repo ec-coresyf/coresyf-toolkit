@@ -206,5 +206,6 @@ class CoReSyFTool(object):
             for file_ in files_list:
                 archive.write(os.path.join(output_path, file_), file_)
             archive.close()
+            shutil.rmtree(output_path)
 
 
