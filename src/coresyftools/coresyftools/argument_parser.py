@@ -25,7 +25,9 @@ class CoReSyFArgumentParser():
     def parse_arguments(self, args=None):
         self.arguments = self.arg_parser.parse_args(args)
         self.bindings = vars(self.arguments)
-        self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
+
+        self.bindings = dict([(k, v) for k, v in self.bindings.items()
+                               if v is not None])
         for opt in self.options:
             self.bindings[opt] = self.bindings[opt] if opt in self.bindings else False
 
