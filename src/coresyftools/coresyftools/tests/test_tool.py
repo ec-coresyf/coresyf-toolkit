@@ -316,7 +316,7 @@ class TestCoReSyFTool(TestCase):
         """Test the method to compress an output folder"""
         tool = CoReSyFTool(self.runfile, 'manifest.json')
         if not os.path.exists('coresyftools/tests/tool6/myoutput/'):
-            os.mkdir('coresyftools/tests/tool6/myoutput/')
+            os.makedirs('coresyftools/tests/tool6/myoutput/')
             with open('coresyftools/tests/tool6/myoutput/output', 'w') as output:
                 output.write('output')
         tool.write_to_zipfile('coresyftools/tests/tool6/myoutput/')
