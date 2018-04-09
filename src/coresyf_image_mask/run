@@ -1,0 +1,5 @@
+#!/usr/bin/python2
+from coresyftools.tool import CoReSyFTool
+
+if __name__ == '__main__':
+    CoReSyFTool(__file__, 'CoReSyFImageMask.manifest.json').execute()
