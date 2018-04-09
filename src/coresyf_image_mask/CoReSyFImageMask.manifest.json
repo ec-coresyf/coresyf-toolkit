@@ -1,0 +1,31 @@
+{
+    "name": "CoReSyFImageMask",
+    "type": "ImageMask",
+    "description": "CoReSyF tool to create an image mask. The mask is a raster in which each pixel contains no-data or a single valid value (=1). The tool can take any raster file as input and uses the GDAL raster utility 'gdal_calc.py' to generate the image mask with no-data values for all pixels values =0 and 1 for all the pixel values >0",
+    "command": "gdal_calc.py -A {Ssource} --outfile={Ttarget} --calc='A>0' --NoDataValue={NoDataValue}",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "NoDataValue",
+            "name": "no_data_value",
+            "description": "Indicate the output nodata value.",
+            "type": "int",
+            "default": 0
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "Shapefile"
+        }
+    ]
+}
