@@ -2,7 +2,7 @@ from datetime import date
 import logging
 
 from argparse import ArgumentParser
-from manifest import validate_manifest, InvalidManifestException, MANIFEST_SCHEMA
+from manifest import validate_manifest, MANIFEST_SCHEMA
 
 
 class CoReSyFArgumentParser():
@@ -25,9 +25,12 @@ class CoReSyFArgumentParser():
     def parse_arguments(self, args=None):
         self.arguments = self.arg_parser.parse_args(args)
         self.bindings = vars(self.arguments)
-        self.bindings = dict([(k, v) for k, v in self.bindings.items() if v])
+
+        self.bindings = dict([(k, v) for k, v in self.bindings.items()
+                        if v is not None and v is not False])
         for opt in self.options:
-            self.bindings[opt] = self.bindings[opt] if opt in self.bindings else False
+            self.bindings[opt] = self.bindings[opt] if opt in self.bindings \
+                                                    else False
 
     def _configure_arg_parser(self):
         tool_definition = self.manifest
@@ -54,7 +57,7 @@ class CoReSyFArgumentParser():
                                      **add_arguments_kwargs)
         self.logger.debug('Parsed %s parameter argument.', name)
         # The boolean options need to be mantained.
-        # ArgumentParser do not define them if they are not passed in the shell.
+        # ArgumentParser do not define them if they are not passed in the shell
         # However Wings always need a value for every parameter.
         # If a booelan argument is not passed in the shell it should end up
         # defined as False.
@@ -74,7 +77,6 @@ class CoReSyFArgumentParser():
         self.logger.debug('Parsed %s data argument.', name)
         self.identifiers.add(name)
 
-
     def _parse_output_arg(self, arg):
         name = arg['identifier']
         _help = arg['description']
@@ -86,7 +88,6 @@ class CoReSyFArgumentParser():
         self.outputs.append(name)
         self.logger.debug('Parsed %s output argument.', name)
         self.identifiers.add(name)
-
 
     @staticmethod
     def parse_boolean(value):
