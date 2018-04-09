@@ -106,6 +106,17 @@ class TestCoReSyFArgParser(TestCase):
         command = '--input f1 --output f2 --intparam 3'
         arg_parser = self.parse_with_arg(arg, command.split())
         self.assertEqual(arg_parser.bindings['intparam'], 3)
+    
+    def test_parse_int_param_equal_to_zero(self):
+        arg = {
+            "identifier": "intparam",
+            "name": "int parameter",
+            "description": "int parameter description",
+            "type": "int"
+        }
+        command = '--input f1 --output f2 --intparam 0'
+        arg_parser = self.parse_with_arg(arg, command.split())
+        self.assertEqual(arg_parser.bindings['intparam'], 0)
 
     def test_parse_float_param(self):
         arg = {
