@@ -11,6 +11,7 @@ from sarge import Capture, run, shell_format
 
 TMP_DIR = os.path.abspath('tmp')
 
+
 class MissingCommandPlaceholderForOption(Exception):
 
     def __init__(self, option_identifier):
@@ -19,6 +20,7 @@ class MissingCommandPlaceholderForOption(Exception):
             .format(option_identifier)
         )
         self.option_identifier = option_identifier
+
 
 class UnexpectedCommandPlaceholder(Exception):
 
@@ -45,9 +47,11 @@ class EmptyOutputFile(Exception):
 
 MANIFEST_FILE_NAME = 'manifest.json'
 
+
 class CoReSyFTool(object):
 
-    def __init__(self, run_script_file_name, manifest_file_name=MANIFEST_FILE_NAME):
+    def __init__(self, run_script_file_name,
+                 manifest_file_name=MANIFEST_FILE_NAME):
         self.context_directory = self._get_context_directory(
             run_script_file_name)
         self.manifest_file_name = os.path.join(
@@ -72,7 +76,7 @@ class CoReSyFTool(object):
         formatter = string.Formatter()
         return set([field_name for
                     literal_text, field_name, format_spec, conversion in
-                    formatter.parse(command_template)])
+                    formatter.parse(command_template) if field_name])
 
     # Manifests 'operation' field is intended for specifying behavior aspects
     # for CoReSyFTool specializations (i.e. subclasses).
@@ -100,7 +104,7 @@ class CoReSyFTool(object):
     def _get_context_directory(self, run_script_file_name):
         return os.path.dirname(
             os.path.abspath(run_script_file_name))
-        
+
     def get_temporary_directory(self):
         os.mkdir(TMP_DIR)
         return TMP_DIR
