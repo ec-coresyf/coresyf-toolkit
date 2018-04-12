@@ -73,12 +73,12 @@ def InputSubsetParameters():
 	#image
 	parser.add_argument('-a', '--param', help='Parameters file for Wings (.ini file)', default='Config_Image.ini',required=False)
 	parser.add_argument('-i', '--input', help='Input image (to be processed)', required=True)
-	parser.add_argument('-b','--bathymetry', help='Bathymetric grid in a txt or npz file',required=True)
+	parser.add_argument('-b','--bathymetry', help='Bathymetric grid in a txt or npz file or ESRI shapefile',required=True)
 	parser.add_argument('-p', '--processing', nargs='+', help='Image Processing Filters (Slant Range Correction, ContrastStretch)', default=[True, True], required=False)
-	parser.add_argument('-ri', '--reference_system_in', help='Spatial Reference system EPSG code (Selected Image and Projection, cf. gdalinfo for image information and \
-				http://spatialreference.org/ref/epsg/)', required=True)
-	parser.add_argument('-ro', '--reference_system_out', help='Spatial Reference system EPSG code (Selected Image and Projection, cf. gdalinfo for image information and \
-				http://spatialreference.org/ref/epsg/)', required=True)
+	#parser.add_argument('-ri', '--reference_system_in', help='Spatial Reference system EPSG code (Selected Image and Projection, cf. gdalinfo for image information and \
+	#			http://spatialreference.org/ref/epsg/)', required=True)
+	#parser.add_argument('-ro', '--reference_system_out', help='Spatial Reference system EPSG code (Selected Image and Projection, cf. gdalinfo for image information and \
+	#			http://spatialreference.org/ref/epsg/)', required=True)
 
 	#subscene
 	parser.add_argument('-o', '--output', nargs='+', help='List with output file names (subsets#.out) for FFT determination (to be used by Wings)', required=False)
@@ -96,11 +96,17 @@ def InputSubsetParameters():
 	args = parser.parse_args()
 	RunId = datetime.now().strftime('%Y%m%dT%H%M%S')
 
+
+	# Get EPSG_in and ESPG_out from input image and grid, respectively (STeam):
+	EPSG_In = GetDataProjectionSystem(args.input)
+	EPSG_Out = UT.GetSpatialReferenceSystemFromGridShapefile(args.bathymetry)
+
 	#create config.ini file
 	parOut = open(args.param, "w"); Config = ConfigParser.ConfigParser(); Config.add_section("Arguments")
 	#image
 	Config.set("Arguments", "Input_image", args.input); Config.set("Arguments", "Bathymetry_file", args.bathymetry)
-	Config.set("Arguments", "Image_processing_filters", args.processing); Config.set("Arguments", "Reference_systems", [args.reference_system_in, args.reference_system_out])
+	Config.set("Arguments", "Image_processing_filters", args.processing)
+	Config.set("Arguments", "Reference_systems", [EPSG_In, EPSG_Out])
 	#subscene	
 	Config.set("Arguments", "Subscene_list", args.output); Config.set("Arguments", "Box_dimension", args.dimension)
 	Config.set("Arguments", "Number_of_boxes", args.window); Config.set("Arguments", "Box_shift", args.shift)	
@@ -118,7 +124,7 @@ def InputSubsetParameters():
 	Point = np.zeros(2) + 1000; Point = Point.astype(int)
 	LandMask_Parameters = CL.LandMaskParameters()	
 	ProcessingParameters = CL.Processing_Parameters('uint16', Slant_Correction, 1., Contrast_Stretch, LandMask_Parameters)
-	SpatialReferenceSystem = CL.Spatial_Reference_System(args.reference_system_in, args.reference_system_out)
+	SpatialReferenceSystem = CL.Spatial_Reference_System(EPSG_In, EPSG_Out)
 	Subsetparameters = CL.SubsetParameters(Point, float(args.dimension), True, float(args.shift), int(float(args.window)))
 	Image_Parameters = CL.ImageParameters(file_path_name, ProcessingParameters, SpatialReferenceSystem)
 	
@@ -153,13 +159,14 @@ def ReadSARImg(parameters):
 
 	ImgType, ImgSize, ImgRes = GetImgType(flin), GetImgSize(flin), GetImRes(flin)
 	
-	f, RasterBand, img = ReadGtiffRaster(flin,parameters.ProcessingParameters.DataType)
+	# STeam commented this because these variables are never used
+	#f, RasterBand, img = ReadGtiffRaster(flin,parameters.ProcessingParameters.DataType)
 	
 	# slant range correction
 	if parameters.ProcessingParameters.SlantRangeCorrection_Flag:
 		if (ImgType["ENVISAT"] or ImgType["ERS1/2"] or ImgType["GeoTIFF"]):
 			fileout_slant  = fname_input[:-4]+"_Slant.tif"; fout = path_input + fileout_slant
-			SlantRangeGTiFF(flin,fout, EPSG_in)
+			SlantRangeGTiFF(flin,fout)
 			filein = fileout_slant
 
 	# Scale image
@@ -529,7 +536,7 @@ def ImageContrastStretch(coordinates, img, filein, EPSG, Band=1):
 
 	return img
 
-def SlantRangeGTiFF(filein,fileout,EPSG):
+def SlantRangeGTiFF(filein,fileout):
 	#------------------------------------------------------------
 	# Perform slant range correction and create corrected image 
 	#------------------------------------------------------------
@@ -539,7 +546,7 @@ def SlantRangeGTiFF(filein,fileout,EPSG):
 	
 	# image processing
 	img1 = ContrastStretch(img)		# stretch contrast
-	img2 = SlantRangeCorrection(img1,EPSG)	# Slant Range correction
+	img2 = SlantRangeCorrection(img1)	# Slant Range correction
 	imgr = ScaleImage(img2,8)		# image scaling according to type
 	
 	# create Gtiff output image
@@ -547,7 +554,7 @@ def SlantRangeGTiFF(filein,fileout,EPSG):
 
 	return None
 
-def SlantRangeCorrection(img,EPSG):
+def SlantRangeCorrection(img):
 
 	#---------------------------------------------
 	# perform slant range correction
@@ -978,7 +985,10 @@ def GetDataProjectionSystem(filename):
 			LineRec = n
 	
 	EPSG = re.findall('\d+', data[LineRec])[0]
-
+	try:
+		ESPG = int(EPSG)
+	except:
+		sys.exit("Error. Unable to get EPSG code from '%s'!" % filename)
 	return EPSG
 
 
