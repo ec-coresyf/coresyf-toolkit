@@ -15,7 +15,7 @@ echo ""
 #***********************
 # 1) Tiling
 #***********************
-python SAR_Tiling.py -a Config_Image.ini -i /home/inputs/Aveiro_20170401T064230_20170401T064255_015947_01A4B8_B003_Sigma0_VV_processed.tif -b /home/inputs/bathymetry_test.txt -p contrast slant -ri 4326 -ro 32629 -d 2000 -w 9 -s 0.5 -T 16.6 -v
+python SAR_Tiling.py -a Config_Image.ini -i Aveiro_20170131T183449_20170131T183514_004096_007148_CDB9_Sigma0_VV_processed.tif -b grid_shape_3763.zip -p contrast slant -d 2000 -w 9 -s 0.5 -T 16.6 -v
 
 ##*****************************************
 ## 2) Spectra estimate (parallel)
