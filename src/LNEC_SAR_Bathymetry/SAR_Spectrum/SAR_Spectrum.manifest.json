@@ -1,60 +1,44 @@
 {
-    "inputs": [
-        {
-            "identifier": "input", 
-            "name": "input", 
-            "collection": false, 
-            "description": "Input subset files (subsets#.out) for Spectrum and wavelength estimation"
-        }
-    ], 
-    "parameters": [
-        {
-            "identifier": "verbose", 
-            "name": "verbose", 
-            "description": "comments and screen outputs"
-        }, 
-        {
-            "default": "Config_Spectrum.ini", 
-            "identifier": "param", 
-            "name": "param", 
-            "description": "Parameters file for Wings (.ini file)"
-        }, 
-        {
-            "default": 50, 
-            "identifier": "offset_profiles", 
-            "name": "offset_profiles", 
+    "inputs": [{
+        "identifier": "input",
+        "name": "input",
+        "description": "Input subset files (subsets#.out) for Spectrum and wavelength estimation"
+    }],
+    "parameters": [{
+            "default": 50,
+            "identifier": "offset_profiles",
+            "name": "offset_profiles",
             "description": "offset (m) in between wave profiles"
-        }, 
+        },
         {
-            "default": true, 
-            "identifier": "filter", 
-            "name": "filter", 
-            "description": "Flag whether to filter subscenes. Filter type: ellipsoidd Butterworth Filter"
-        }, 
-        {
-            "default": 5, 
-            "identifier": "number_of_profiles", 
-            "name": "number_of_profiles", 
+            "default": 5,
+            "identifier": "number_of_profiles",
+            "name": "number_of_profiles",
             "description": "number of wave profiles derived required to estimate spectrum"
-        }, 
+        },
         {
-            "default": 270, 
-            "identifier": "coast_orientation", 
-            "name": "coast_orientation", 
+            "default": 270,
+            "identifier": "coast_orientation",
+            "name": "coast_orientation",
             "description": "Coast normal orientation (nautical convention ex: 270-> West facing)"
-        }, 
+        },
         {
-            "identifier": "method", 
-            "name": "method", 
-            "description": "method for spectrum estimate: derived from wave series (subscene) or from radial projection of the subscene spectrum"
+            "identifier": "method",
+            "name": "method",
+            "description": "method for spectrum estimate: derived from wave series (subscene) or from radial projection of the subscene spectrum",
+            "default": "Radial"
         }
-    ], 
-    "outputs": [
-        {
-            "identifier": "output", 
-            "name": "output", 
-            "collection": false, 
+    ],
+    "outputs": [{
+            "identifier": "output",
+            "name": "output",
+            "collection": false,
             "description": "Output transfer file (spectrum#.out)"
+        },
+        {
+            "identifier": "param",
+            "name": "param",
+            "description": "Parameters file for Wings (.ini file)"
         }
     ]
 }
