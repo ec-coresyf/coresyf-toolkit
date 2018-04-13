@@ -27,13 +27,6 @@
             "default": true
         },
         {
-            "identifier": "PshorelineExtension",
-            "name": "shorelineExtension",
-            "description": "Sets shorelineExtension to <integer>",
-            "type": "int",
-            "default": 0
-        },
-        {
             "identifier": "PuseSRTM",
             "name": "useSRTM",
             "description": "Set useSRTM to <boolean>",
