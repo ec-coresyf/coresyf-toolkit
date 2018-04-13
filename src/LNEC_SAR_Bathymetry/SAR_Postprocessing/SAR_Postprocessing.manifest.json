@@ -1,25 +1,14 @@
 {
-    "inputs": [
-        {
-            "identifier": "input", 
-            "name": "input", 
-            "collection": true, 
-            "description": "Input files for grid points with inverted depth (Inversion.out) for bathymetry mapping"
-        }
-    ], 
-    "parameters": [
-        {
-            "identifier": "verbose", 
-            "name": "verbose", 
-            "description": "Screen comments"
-        }
-    ], 
-    "outputs": [
-        {
-            "identifier": "output", 
-            "name": "output", 
-            "collection": true, 
-            "description": "Output file names"
-        }
-    ]
+    "inputs": [{
+        "identifier": "input",
+        "name": "input",
+        "collection": true,
+        "description": "Input files for grid points with inverted depth (Inversion.out) for bathymetry mapping"
+    }],
+    "outputs": [{
+        "identifier": "output",
+        "name": "output",
+        "collection": true,
+        "description": "Output file names"
+    }]
 }
