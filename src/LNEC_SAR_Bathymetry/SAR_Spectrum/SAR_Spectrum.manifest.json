@@ -1,4 +1,6 @@
 {
+    "name": "sarSpectrum",
+    "type": "FFT",
     "inputs": [{
         "identifier": "input",
         "name": "input",
