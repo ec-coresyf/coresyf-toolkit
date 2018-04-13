@@ -1,25 +1,14 @@
 {
-    "inputs": [
-        {
-            "identifier": "input", 
-            "name": "input", 
-            "collection": false, 
-            "description": "Input computation points files (\"Computation#.out\" pickle files) for depth inversion"
-        }
-    ], 
-    "parameters": [
-        {
-            "identifier": "verbose", 
-            "name": "verbose", 
-            "description": "Screen comments"
-        }
-    ], 
-    "outputs": [
-        {
-            "identifier": "output", 
-            "name": "output", 
-            "collection": false, 
-            "description": "Output transfer file (\"Inversion#.out\" pickle files) with inversion points data"
-        }
-    ]
+    "inputs": [{
+        "identifier": "input",
+        "name": "input",
+        "collection": false,
+        "description": "Input computation points files (\"Computation#.out\" pickle files) for depth inversion"
+    }],
+    "outputs": [{
+        "identifier": "output",
+        "name": "output",
+        "collection": false,
+        "description": "Output transfer file (\"Inversion#.out\" pickle files) with inversion points data"
+    }]
 }
