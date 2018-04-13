@@ -1,4 +1,6 @@
 {
+    "name": "sarPostprocessing",
+    "type": "Postprocessing",
     "inputs": [{
         "identifier": "input",
         "name": "input",

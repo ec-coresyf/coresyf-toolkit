@@ -1,4 +1,6 @@
 {
+    "name": "sarInversion",
+    "type": "Inversion",
     "inputs": [{
         "identifier": "input",
         "name": "input",

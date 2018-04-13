@@ -1,4 +1,6 @@
 {
+    "name": "sarPointsSubdivision",
+    "type": "GridPointsSubdivision",
     "inputs": [{
         "identifier": "input",
         "name": "input",
