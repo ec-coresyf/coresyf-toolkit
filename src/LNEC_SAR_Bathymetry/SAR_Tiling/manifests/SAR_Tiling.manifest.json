@@ -1,0 +1,69 @@
+{
+    "inputs": [
+        {
+            "identifier": "input", 
+            "name": "input", 
+            "collection": false, 
+            "description": "Input image (to be processed)"
+        }
+    ], 
+    "parameters": [
+        {
+            "identifier": "bathymetry", 
+            "name": "bathymetry", 
+            "description": "Bathymetric grid in a txt or npz file or ESRI shapefile"
+        }, 
+        {
+            "identifier": "verbose", 
+            "name": "verbose", 
+            "description": "comments and screen outputs"
+        }, 
+        {
+            "default": 0.5, 
+            "identifier": "shift", 
+            "name": "shift", 
+            "description": "Overlapping boxes offset parameters for FFT computation. Values between (0.1-0.75). Default=0.5."
+        }, 
+        {
+            "default": [
+                true, 
+                true
+            ], 
+            "identifier": "processing", 
+            "name": "processing", 
+            "description": "Image Processing Filters (Slant Range Correction, ContrastStretch)"
+        }, 
+        {
+            "default": "Config_Image.ini", 
+            "identifier": "param", 
+            "name": "param", 
+            "description": "Parameters file for Wings (.ini file)"
+        }, 
+        {
+            "default": 9, 
+            "identifier": "window", 
+            "name": "window", 
+            "description": "number of overlapping boxes for FFT computation"
+        }, 
+        {
+            "default": 0, 
+            "identifier": "Tp", 
+            "name": "Tp", 
+            "description": "mean peak wave period Tp"
+        }, 
+        {
+            "default": 2000.0, 
+            "identifier": "dimension", 
+            "name": "dimension", 
+            "description": "Dimension of the subscenes (meters, ideally 1000-2000m)"
+        }
+    ], 
+    "outputs": [
+        {
+            "identifier": "output", 
+            "name": "output", 
+            "collection": true, 
+            "description": "List with output file names (subsets#.out) for FFT determination (to be used by Wings)"
+        }
+    ]
+}

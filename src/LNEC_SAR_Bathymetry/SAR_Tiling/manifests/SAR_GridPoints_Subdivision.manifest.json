@@ -1,0 +1,55 @@
+{
+    "inputs": [
+        {
+            "identifier": "input", 
+            "name": "input", 
+            "collection": true, 
+            "description": "Input grid point files (spectrum.out) for point subdivision"
+        }
+    ], 
+    "parameters": [
+        {
+            "identifier": "verbose", 
+            "name": "verbose", 
+            "description": "comments and screen outputs"
+        }, 
+        {
+            "default": 12, 
+            "identifier": "Tp", 
+            "name": "Tp", 
+            "description": "Peak Wave Period (buoys or model data)"
+        }, 
+        {
+            "default": 0, 
+            "identifier": "tide", 
+            "name": "tide", 
+            "description": "Tide level for depth correction"
+        }, 
+        {
+            "default": "linear", 
+            "identifier": "wave_theory", 
+            "name": "wave_theory", 
+            "description": "Wave Theory in use (linear/nonlinear)"
+        }, 
+        {
+            "default": "Config_Inversion.ini", 
+            "identifier": "param", 
+            "name": "param", 
+            "description": "Parameters file for Wings (.ini file)"
+        }, 
+        {
+            "default": "direct", 
+            "identifier": "method", 
+            "name": "method", 
+            "description": "method used for depth Inversion (inversion of relation dispersion or minimization algorithm)"
+        }
+    ], 
+    "outputs": [
+        {
+            "identifier": "output", 
+            "name": "output", 
+            "collection": false, 
+            "description": "Output transfer file (exception.out & Computation#.out)"
+        }
+    ]
+}
