@@ -10,7 +10,7 @@
             "type": "GeoTIFF"
         },
         {
-            "identifier": "grid",
+            "identifier": "bathymetry",
             "name": "bathymetry",
             "description": "Bathymetric grid in a txt or npz file or ESRI shapefile",
             "type": "Grid"
