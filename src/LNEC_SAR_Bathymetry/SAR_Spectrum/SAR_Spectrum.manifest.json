@@ -1,0 +1,54 @@
+{
+    "name": "sarSpectrum",
+    "type": "FFT",
+    "description": "Spectrum",
+    "inputs": [{
+        "identifier": "input",
+        "name": "input",
+        "description": "Input subset files (subsets#.out) for Spectrum and wavelength estimation",
+        "type": "LnecTile"
+    }],
+    "parameters": [{
+            "default": 50,
+            "identifier": "offset_profiles",
+            "name": "offset_profiles",
+            "description": "offset (m) in between wave profiles",
+            "type": "float"
+        },
+        {
+            "default": 5,
+            "identifier": "number_of_profiles",
+            "name": "number_of_profiles",
+            "description": "number of wave profiles derived required to estimate spectrum",
+            "type": "float"
+        },
+        {
+            "default": 270,
+            "identifier": "coast_orientation",
+            "name": "coast_orientation",
+            "description": "Coast normal orientation (nautical convention ex: 270-> West facing)",
+            "type": "float"
+        },
+        {
+            "identifier": "method",
+            "name": "method",
+            "description": "method for spectrum estimate: derived from wave series (subscene) or from radial projection of the subscene spectrum",
+            "default": "Radial",
+            "type": "string"
+        }
+    ],
+    "outputs": [{
+            "identifier": "output",
+            "name": "output",
+            "collection": false,
+            "description": "Output transfer file (spectrum#.out)",
+            "type": "LnecTile"
+        },
+        {
+            "identifier": "param",
+            "name": "param",
+            "description": "Parameters file for Wings (.ini file)",
+            "type": "ConfigFile"
+        }
+    ]
+}

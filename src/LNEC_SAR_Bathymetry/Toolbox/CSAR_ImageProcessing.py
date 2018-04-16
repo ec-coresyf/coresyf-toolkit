@@ -74,7 +74,7 @@ def InputSubsetParameters():
 	parser.add_argument('-a', '--param', help='Parameters file for Wings (.ini file)', default='Config_Image.ini',required=False)
 	parser.add_argument('-i', '--input', help='Input image (to be processed)', required=True)
 	parser.add_argument('-b','--bathymetry', help='Bathymetric grid in a txt or npz file or ESRI shapefile',required=True)
-	parser.add_argument('-p', '--processing', nargs='+', help='Image Processing Filters (Slant Range Correction, ContrastStretch)', default=[True, True], required=False)
+	parser.add_argument('-p', '--processing', nargs='+', help='Image Processing Filters (Slant Range Correction, ContrastStretch)', default="contrast slant")
 	#parser.add_argument('-ri', '--reference_system_in', help='Spatial Reference system EPSG code (Selected Image and Projection, cf. gdalinfo for image information and \
 	#			http://spatialreference.org/ref/epsg/)', required=True)
 	#parser.add_argument('-ro', '--reference_system_out', help='Spatial Reference system EPSG code (Selected Image and Projection, cf. gdalinfo for image information and \
