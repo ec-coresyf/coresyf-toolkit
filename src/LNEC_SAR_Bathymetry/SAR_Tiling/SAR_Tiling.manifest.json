@@ -24,11 +24,11 @@
             "type": "float"
         },
         {
-            "default": true,
+            "default": "contrast slant",
             "identifier": "processing",
             "name": "processing",
             "description": "Image Processing Filters (Slant Range Correction, ContrastStretch)",
-            "type": "boolean"
+            "type": "string"
         },
 
         {
