@@ -1,47 +1,55 @@
 {
     "name": "sarPointsSubdivision",
     "type": "GridPointsSubdivision",
+    "description": "Grid points subdivision.",
     "inputs": [{
         "identifier": "input",
         "name": "input",
         "collection": true,
-        "description": "Input grid point files (spectrum.out) for point subdivision"
+        "description": "Input grid point files (spectrum.out) for point subdivision",
+        "type": "LnecTile"
     }],
     "parameters": [{
             "default": 12,
             "identifier": "Tp",
             "name": "Tp",
-            "description": "Peak Wave Period (buoys or model data)"
+            "description": "Peak Wave Period (buoys or model data)",
+            "type": "float"
         },
         {
             "default": 0,
             "identifier": "tide",
             "name": "tide",
-            "description": "Tide level for depth correction"
+            "description": "Tide level for depth correction",
+            "type": "float"
         },
         {
             "default": "linear",
             "identifier": "wave_theory",
             "name": "wave_theory",
-            "description": "Wave Theory in use (linear/nonlinear)"
+            "description": "Wave Theory in use (linear/nonlinear)",
+            "type": "string"
         },
         {
             "default": "direct",
             "identifier": "method",
             "name": "method",
-            "description": "method used for depth Inversion (inversion of relation dispersion or minimization algorithm)"
+            "description": "method used for depth Inversion (inversion of relation dispersion or minimization algorithm)",
+            "type": "string"
         }
     ],
     "outputs": [{
             "identifier": "output",
             "name": "output",
-            "description": "Output transfer file (exception.out & Computation#.out)"
+            "description": "Output transfer file (exception.out & Computation#.out)",
+            "type": "LnecTile"
         },
         {
             "default": "Config_Inversion.ini",
             "identifier": "param",
             "name": "param",
-            "description": "Parameters file for Wings (.ini file)"
+            "description": "Parameters file for Wings (.ini file)",
+            "type": "ConfigFile"
         }
     ]
 }
