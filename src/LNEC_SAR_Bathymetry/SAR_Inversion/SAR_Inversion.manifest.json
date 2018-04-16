@@ -1,0 +1,20 @@
+{
+    "name": "sarInversion",
+    "type": "Inversion",
+    "description": "Inversion",
+    "inputs": [{
+        "identifier": "input",
+        "name": "input",
+        "collection": false,
+        "description": "Input computation points files (\"Computation#.out\" pickle files) for depth inversion",
+        "type": "LnecTile"
+    }],
+    "parameters": [],
+    "outputs": [{
+        "identifier": "output",
+        "name": "output",
+        "collection": false,
+        "description": "Output transfer file (\"Inversion#.out\" pickle files) with inversion points data",
+        "type": "LnecTile"
+    }]
+}
