@@ -1,16 +1,20 @@
 {
     "name": "sarPostprocessing",
     "type": "Postprocessing",
+    "description": "Postprocessing",
     "inputs": [{
         "identifier": "input",
         "name": "input",
         "collection": true,
-        "description": "Input files for grid points with inverted depth (Inversion.out) for bathymetry mapping"
+        "description": "Input files for grid points with inverted depth (Inversion.out) for bathymetry mapping",
+        "type": "LnecTile"
     }],
+    "parameters": [],
     "outputs": [{
         "identifier": "output",
         "name": "output",
         "collection": true,
-        "description": "Output file names"
+        "description": "Output file names",
+        "type": "CSV_file"
     }]
 }
