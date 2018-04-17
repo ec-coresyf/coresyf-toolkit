@@ -77,7 +77,6 @@ class Packager():
             for file_ in listdir(self.tool_dir):
                 if 'manifest.json' in file_ or 'run' in file_ or 'examples.sh' in file_:
                     tool_archive.write(join(self.tool_dir, file_), file_)
-            
             tool_archive.close()
 
     def pack_tool(self):
