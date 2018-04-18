@@ -5,12 +5,11 @@
     "inputs": [{
         "identifier": "input",
         "name": "input",
-        "collection": true,
         "description": "Input grid point files (spectrum.out) for point subdivision",
         "type": "LnecTile"
     }],
     "parameters": [{
-            "default": 12,
+            "default": 16.6,
             "identifier": "Tp",
             "name": "Tp",
             "description": "Peak Wave Period (buoys or model data)",
@@ -32,8 +31,8 @@
         },
         {
             "default": "direct",
-            "identifier": "method",
-            "name": "method",
+            "identifier": "method_inversion",
+            "name": "method_inversion",
             "description": "method used for depth Inversion (inversion of relation dispersion or minimization algorithm)",
             "type": "string"
         }
