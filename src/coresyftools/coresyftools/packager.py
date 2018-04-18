@@ -1,11 +1,11 @@
 #!/usr/bin/python2
-import os
-import glob
-from os import mkdir, rename, listdir
-from os.path import join, basename, splitext, exists
-from shutil import copy, make_archive, move
+from os import listdir
+from os.path import join, exists
+from zipfile import ZipFile
 from tool_tester import ToolTester
+from argument_parser import CoReSyFArgumentParser
 from manifest import get_manifest, find_manifest_files
+
 import click
 
 
@@ -71,8 +71,30 @@ class Packager():
             raise ToolErrorsException(tester.errors)
 
     def _archive(self):
-        make_archive(join(self.target_dir, self.manifest['name']),
-                     'zip', self.tool_dir)
+        files_to_exclude = self._get_input_output_names()
+        with ZipFile(join(self.target_dir, self.manifest['name']) + '.zip',
+                     'w') as tool_archive:
+            for file_ in listdir(self.tool_dir):
+                if file_ not in files_to_exclude:
+                    tool_archive.write(join(self.tool_dir, file_), file_)
+            tool_archive.close()
+
+    def _get_input_output_names(self):
+        arg_parser = CoReSyFArgumentParser(self.manifest)
+        args = self._get_command()[1:]
+        arg_parser.parse_arguments(args)
+        inputs = [arg_parser.bindings[argin] for argin in arg_parser.inputs]
+        outputs = [arg_parser.bindings[argout] for argout in
+                   arg_parser.outputs]
+        return inputs + outputs
+
+    def _get_command(self):
+        with open(join(self.tool_dir, 'examples.sh')) as examples_file:
+            for line in examples_file:
+                if line.startswith('./'):
+                    command = line.split()
+            examples_file.close()
+        return command
 
     def pack_tool(self):
         self._check_tool_directory_structure()
