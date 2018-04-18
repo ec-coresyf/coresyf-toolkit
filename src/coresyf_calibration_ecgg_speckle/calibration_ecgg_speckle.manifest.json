@@ -16,8 +16,8 @@
             "identifier": "PauxFile",
             "name": "auxiliary file",
             "type": "string",
-            "description": "Value must be one of 'Latest Auxiliary File' Product Auxiliary File'",
-            "options": ["'Latest Auxiliary File'", "'Product Auxiliary File'", "'External Auxiliary File'"],
+            "description": "Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File' or 'External Auxiliary File'",
+            "options": ["Latest Auxiliary File", "Product Auxiliary File", "External Auxiliary File"],
             "default": "'Product Auxiliary File'"
         },
         {
@@ -81,7 +81,7 @@
             "identifier": "Pfilter",
             "name": "Filter",
             "description": "Sets parameter 'filter' to <string>",
-            "options": ["'None'", "'Boxcar'", "'Median'", "'Frost'", "'Gamma Map'", "'Lee'", "'Refined Lee'", "'Lee Sigma'", "'IDAN'"],
+            "options": ["None", "Boxcar", "Median", "Frost", "Gamma Map", "Lee", "Refined Lee", "Lee Sigma", "IDAN"],
             "type": "string",
             "default": "'Lee Sigma'"
         },
