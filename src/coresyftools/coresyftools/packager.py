@@ -70,7 +70,6 @@ class Packager():
         tester = ToolTester(self.tool_dir, self.scihub_credentials)
         tester.test()
         if tester.errors:
-            print(tester.errors)
             raise ToolErrorsException(tester.errors)
 
     def _archive(self):
