@@ -91,10 +91,20 @@ class TestPackager(TestCase):
                             './coresyftools/tests/target', self.scihub_credentials)
         packager.pack_tool()
         self.assertTrue(
-            os.path.exists('./coresyftools/tests/target/Dummy Tool.zip'))
-        zipfile = ZipFile('./coresyftools/tests/target/Dummy Tool.zip')
+            os.path.exists('./coresyftools/tests/target/tool5.zip'))
+        zipfile = ZipFile('./coresyftools/tests/target/tool5.zip')
         fileset = set(zipfile.namelist())
         print(fileset)
         self.assertTrue('run' in fileset)
         self.assertTrue('custommanifest.json' in fileset)
         self.assertTrue('examples.sh' in fileset)
+
+    def test_clean_tool_directory(self):
+        packager = Packager('./coresyftools/tests/tool7/',
+                            './coresyftools/tests/target', self.scihub_credentials)
+        packager.pack_tool()
+
+        zipfile = ZipFile('./coresyftools/tests/target/tool7.zip')
+        fileset = set(zipfile.namelist())
+        self.assertFalse('output' in fileset)
+        self.assertFalse('input' in fileset)
