@@ -9,7 +9,7 @@
         "type": "LnecTile"
     }],
     "parameters": [{
-            "default": 50,
+            "default": 100,
             "identifier": "offset_profiles",
             "name": "offset_profiles",
             "description": "offset (m) in between wave profiles",
@@ -23,15 +23,15 @@
             "type": "float"
         },
         {
-            "default": 270,
+            "default": 290,
             "identifier": "coast_orientation",
             "name": "coast_orientation",
             "description": "Coast normal orientation (nautical convention ex: 270-> West facing)",
             "type": "float"
         },
         {
-            "identifier": "method",
-            "name": "method",
+            "identifier": "method_spectrum_estimate",
+            "name": "method_spectrum_estimate",
             "description": "method for spectrum estimate: derived from wave series (subscene) or from radial projection of the subscene spectrum",
             "default": "Radial",
             "type": "string"

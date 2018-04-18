@@ -13,7 +13,6 @@
     "outputs": [{
         "identifier": "output",
         "name": "output",
-        "collection": true,
         "description": "Output file names",
         "type": "CSV_file"
     }]
