@@ -87,7 +87,8 @@ class Packager():
         args = self._get_command()[1:]
         arg_parser.parse_arguments(args)
         inputs = [arg_parser.bindings[argin] for argin in arg_parser.inputs]
-        outputs = [arg_parser.bindings[argout] for argout in arg_parser.outputs]
+        outputs = [arg_parser.bindings[argout] for argout in
+                   arg_parser.outputs]
         return inputs + outputs
 
     def _get_command(self):
@@ -97,7 +98,7 @@ class Packager():
                     command = line.split()
             examples_file.close()
         return command
-        
+
     def pack_tool(self):
         self._check_tool_directory_structure()
         self._read_manifest()
