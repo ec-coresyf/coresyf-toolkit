@@ -1,13 +1,11 @@
 #!/usr/bin/python2
-import os
-import glob
-from os import mkdir, rename, listdir
-from os.path import join, basename, splitext, exists
-from shutil import copy, make_archive, move
+from os import listdir
+from os.path import join, exists
+from zipfile import ZipFile
 from tool_tester import ToolTester
 from argument_parser import CoReSyFArgumentParser
 from manifest import get_manifest, find_manifest_files
-from zipfile import ZipFile
+
 import click
 
 
