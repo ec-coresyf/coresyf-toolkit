@@ -5,6 +5,7 @@ from os import mkdir, rename, listdir
 from os.path import join, basename, splitext, exists
 from shutil import copy, make_archive, move
 from tool_tester import ToolTester
+from argument_parser import CoReSyFArgumentParser
 from manifest import get_manifest, find_manifest_files
 from zipfile import ZipFile
 import click
@@ -69,16 +70,34 @@ class Packager():
         tester = ToolTester(self.tool_dir, self.scihub_credentials)
         tester.test()
         if tester.errors:
+            print(tester.errors)
             raise ToolErrorsException(tester.errors)
 
     def _archive(self):
+        files_to_exclude = self._get_input_output_names()
         with ZipFile(join(self.target_dir, self.manifest['name']) + '.zip',
                      'w') as tool_archive:
             for file_ in listdir(self.tool_dir):
-                if 'manifest.json' in file_ or 'run' in file_ or 'examples.sh' in file_:
+                if file_ not in files_to_exclude:
                     tool_archive.write(join(self.tool_dir, file_), file_)
             tool_archive.close()
 
+    def _get_input_output_names(self):
+        arg_parser = CoReSyFArgumentParser(self.manifest)
+        args = self._get_command()[1:]
+        arg_parser.parse_arguments(args)
+        inputs = [arg_parser.bindings[argin] for argin in arg_parser.inputs]
+        outputs = [arg_parser.bindings[argout] for argout in arg_parser.outputs]
+        return inputs + outputs
+
+    def _get_command(self):
+        with open(join(self.tool_dir, 'examples.sh')) as examples_file:
+            for line in examples_file:
+                if line.startswith('./'):
+                    command = line.split()
+            examples_file.close()
+        return command
+        
     def pack_tool(self):
         self._check_tool_directory_structure()
         self._read_manifest()
