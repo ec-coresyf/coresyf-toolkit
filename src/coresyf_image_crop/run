@@ -1,0 +1,15 @@
+#!/usr/bin/python2
+from coresyftools.tool import CoReSyFTool
+from sridentify import Sridentify
+
+class CoresyfImageCrop(CoReSyFTool):
+    
+    def run(self, bindings):
+        pass
+        # get_shapefile_crs(shapefile_path) - retrieves the ESPG code of the shapefile CRS.
+        # get_shapefile_polygon_extent(shapefile_path) - retrieves the extent of the grid represented as OGR:Polygon.
+        # crop_raster(raster_path, output_path, extent_polygon, output_crs) - applies the crop to the input image by executing gdal_warp in command line.
+
+
+if __name__ == '__main__':
+    CoresyfImageCrop(__file__, 'CoReSyFImageCrop.manifest.json').execute()
