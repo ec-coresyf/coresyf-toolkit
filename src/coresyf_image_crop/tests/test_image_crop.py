@@ -1,5 +1,5 @@
 from unittest import TestCase
-from ..coresyf_image_crop import get_shapefile_polygon_extent
+from ..coresyf_image_crop import get_shapefile_polygon_extent, read_zip_shapefile
 
 
 class TestImageCrop(TestCase):
@@ -11,6 +11,7 @@ class TestImageCrop(TestCase):
         pass
 
     def test_get_shapefile_polygon_extent(self):
-        get_shapefile_polygon_extent('/home/rccc/Downloads/Crop_Tool_DESIGN/grid_EPSG_3763.shp')
+        data_source = read_zip_shapefile('/home/rccc/Downloads/Crop_Tool_DESIGN/grid_EPSG_3763.zip')
+        get_shapefile_polygon_extent(data_source)
         print ("Ok")
         pass
