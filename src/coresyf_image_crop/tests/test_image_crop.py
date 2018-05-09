@@ -28,4 +28,3 @@ class TestImageCrop(TestCase):
 
         self.assertTrue(extent_polygon.IsValid())
         self.assertEqual(extent_polygon.ExportToWkt(), self.extent_polygon_wkt)
-        self.assertTrue(False)
