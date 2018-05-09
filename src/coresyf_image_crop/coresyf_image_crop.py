@@ -57,10 +57,11 @@ def get_shapefile_polygon_extent(data_source):
     ogr_polygon.AddGeometry(ring)
     return ogr_polygon
 
+
 def get_shapefile_crs(data_source):
     '''
     Retrieves the ESPG Code of the shapefile CRS (Coordinate Reference System).
-    
+
     data_source: must be the result of GDAL Open applied to the respective OGR
     driver.
     '''
@@ -73,6 +74,7 @@ def get_shapefile_crs(data_source):
         print(epsg_exception)
         sys.exit("Error. Unable to get ESPG code of grid shapefile.")
     return epsg_code
+
 
 class CoresyfImageCrop(CoReSyFTool):
 
