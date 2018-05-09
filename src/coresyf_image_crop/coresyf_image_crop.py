@@ -55,7 +55,7 @@ def get_shapefile_polygon_extent(data_source):
 
 def get_shapefile_crs(data_source):
     '''
-    Retrieves the ESPG Code of the grid shapefile.
+    Retrieves the ESPG Code of the shapefile CRS (Coordinate Reference System).
     
     data_source: must be the result of GDAL Open applied to the respective OGR
     driver.
