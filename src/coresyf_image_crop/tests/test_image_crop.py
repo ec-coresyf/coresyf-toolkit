@@ -1,17 +1,31 @@
 from unittest import TestCase
-from ..coresyf_image_crop import get_shapefile_polygon_extent, read_zip_shapefile
+import os
+import shutil
+from ..coresyf_image_crop import get_shapefile_polygon_extent, \
+                                 read_zip_shapefile
+
+TEMP_PATH = "temp_path"
 
 
 class TestImageCrop(TestCase):
 
     def setUp(self):
-        pass
+        self.data_source = read_zip_shapefile('test_data/grid_EPSG_3763.zip',
+                                              TEMP_PATH)
+        self.extent_polygon_wkt = "POLYGON ((" + \
+            "-61575.57812574980926 103754.81329901740537 0," \
+            "-54172.937265817548905 103754.81329901740537 0," \
+            "-54172.937265817548905 107225.478697661776096 0," \
+            "-61575.57812574980926 107225.478697661776096 0,"\
+            "-61575.57812574980926 103754.81329901740537 0))"
 
     def tearDown(self):
-        pass
+        if os.path.isdir(TEMP_PATH):
+            shutil.rmtree(TEMP_PATH)
 
     def test_get_shapefile_polygon_extent(self):
-        data_source = read_zip_shapefile('/home/rccc/Downloads/Crop_Tool_DESIGN/grid_EPSG_3763.zip')
-        get_shapefile_polygon_extent(data_source)
-        print ("Ok")
-        pass
+        extent_polygon = get_shapefile_polygon_extent(self.data_source)
+
+        self.assertTrue(extent_polygon.IsValid())
+        self.assertEqual(extent_polygon.ExportToWkt(), self.extent_polygon_wkt)
+        self.assertTrue(False)
