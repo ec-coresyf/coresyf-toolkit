@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 import shutil
 from ..coresyf_image_crop import get_shapefile_polygon_extent, \
-                                 read_zip_shapefile
+    get_shapefile_crs, read_zip_shapefile
 
 TEMP_PATH = "temp_path"
 
@@ -25,6 +25,9 @@ class TestImageCrop(TestCase):
 
     def test_get_shapefile_polygon_extent(self):
         extent_polygon = get_shapefile_polygon_extent(self.data_source)
-
         self.assertTrue(extent_polygon.IsValid())
         self.assertEqual(extent_polygon.ExportToWkt(), self.extent_polygon_wkt)
+
+    def test_get_shapefile_crs(self):
+        espg_code = get_shapefile_crs(self.data_source)
+        self.assertEqual(espg_code, 3763)
