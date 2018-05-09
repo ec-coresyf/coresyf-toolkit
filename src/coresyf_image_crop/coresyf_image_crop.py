@@ -38,7 +38,11 @@ def read_zip_shapefile(filepath, temp_path="temp_input"):
 
 
 def get_shapefile_polygon_extent(data_source):
-    '''Retrieves the extent of the grid represented as OGR:Polygon.'''
+    """
+    Retrieves the extent of the grid represented as OGR:Polygon.
+
+    :param obj data_source: a shapefile represented as a OGR:DataSource object.
+    """
     layer = data_source.GetLayer()
     extent = layer.GetExtent()
 
