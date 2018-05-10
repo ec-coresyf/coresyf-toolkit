@@ -36,7 +36,7 @@ class TestImageCrop(TestCase):
         self.assertEqual(epsg_code, self.epsg_code)
 
     def test_crop_raster(self):
-        test_image = 'test_data/Aveiro_20170131T183449_20170131T183514_004096_007148_CDB9_Sigma0_VV_processed.tif'
+        test_image = 'test_data/Aveiro_resampled.tif'
         output_image = os.path.join(TEMP_PATH, 'output')
         polygon_ext = ogr.CreateGeometryFromWkt(self.extent_polygon_wkt)
         polygon_ext = polygon_ext.Buffer(2000, 0)
