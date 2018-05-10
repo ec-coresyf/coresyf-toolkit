@@ -76,6 +76,7 @@ def get_shapefile_crs(data_source):
         sys.exit("Error. Unable to get ESPG code of grid shapefile.")
     return epsg_code
 
+
 def crop_raster(input_raster, output_raster_file, polygon_extent, dest_crs):
     '''
     Crops the image specified by input_raster using the limits defined in
@@ -108,7 +109,7 @@ def crop_raster(input_raster, output_raster_file, polygon_extent, dest_crs):
     except Exception as crop_exception:
         print("ERROR: " + str(crop_exception))
         sys.exit(process.returncode)
-    
+
 
 class CoresyfImageCrop(CoReSyFTool):
 
