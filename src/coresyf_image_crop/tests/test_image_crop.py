@@ -18,6 +18,8 @@ class TestImageCrop(TestCase):
             "-54172.937265817548905 107225.478697661776096 0," \
             "-61575.57812574980926 107225.478697661776096 0,"\
             "-61575.57812574980926 103754.81329901740537 0))"
+        
+        self.epsg_code = 3763
 
     def tearDown(self):
         if os.path.isdir(TEMP_PATH):
@@ -29,5 +31,5 @@ class TestImageCrop(TestCase):
         self.assertEqual(extent_polygon.ExportToWkt(), self.extent_polygon_wkt)
 
     def test_get_shapefile_crs(self):
-        espg_code = get_shapefile_crs(self.data_source)
-        self.assertEqual(espg_code, 3763)
+        epsg_code = get_shapefile_crs(self.data_source)
+        self.assertEqual(epsg_code, self.epsg_code)
