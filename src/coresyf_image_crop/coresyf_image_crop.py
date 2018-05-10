@@ -3,6 +3,7 @@ from osgeo import ogr
 import zipfile
 import sys
 import os
+import subprocess
 
 from coresyftools.tool import CoReSyFTool
 from sridentify import Sridentify
@@ -75,6 +76,39 @@ def get_shapefile_crs(data_source):
         sys.exit("Error. Unable to get ESPG code of grid shapefile.")
     return epsg_code
 
+def crop_raster(input_raster, output_raster_file, polygon_extent, dest_crs):
+    '''
+    Crops the image specified by input_raster using the limits defined in
+    polygon_extent (buffer already applied).
+
+    input_raster: path to the image to be cropped.
+    output_raster_file: the output file path.
+    polygon_extent: POLYGON object to be used for the crop limits.
+    dest_crs: the CRS of the output raster.
+    '''
+    bounds = polygon_extent.GetEnvelope()
+    command_opts = str(bounds[0]) + ' ' + str(bounds[2]) + ' ' \
+        + str(bounds[1]) + ' ' + str(bounds[3])
+    gdal_command = 'gdalwarp' + ' -t_srs EPSG:' + str(dest_crs) + ' -te ' \
+                   + str(command_opts) + ' ' + input_raster \
+                   + ' ' + output_raster_file
+    try:
+        process = subprocess.Popen(gdal_command,
+                                   shell=True,
+                                   stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+
+        stdout, stderr = process.communicate()
+        if process.returncode:
+            raise Exception (stderr.decode())
+        else:
+            print(stdout.decode())
+            print(stderr.decode())
+    except Exception as crop_exception:
+        print("ERROR: " + str(crop_exception))
+        sys.exit(process.returncode)
+    
 
 class CoresyfImageCrop(CoReSyFTool):
 
