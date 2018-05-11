@@ -77,22 +77,21 @@ def get_shapefile_crs(data_source):
     return epsg_code
 
 
-def crop_raster(input_raster, output_raster_file, polygon_extent, dest_crs):
+def crop_raster(input_path, output_path, polygon_extent, output_crs):
     '''
     Crops the image specified by input_raster using the limits defined in
-    polygon_extent (buffer already applied).
+    polygon_extent.
 
-    input_raster: path to the image to be cropped.
+    input_path: path to the image to be cropped.
     output_raster_file: the output file path.
     polygon_extent: POLYGON object to be used for the crop limits.
     dest_crs: the CRS of the output raster.
     '''
     bounds = polygon_extent.GetEnvelope()
-    command_opts = str(bounds[0]) + ' ' + str(bounds[2]) + ' ' \
-        + str(bounds[1]) + ' ' + str(bounds[3])
-    gdal_command = 'gdalwarp' + ' -t_srs EPSG:' + str(dest_crs) + ' -te ' \
-                   + str(command_opts) + ' ' + input_raster \
-                   + ' ' + output_raster_file
+    command_opts = '{} {} {} {}'.format(str(bounds[0]), str(bounds[2]),
+                                        str(bounds[1]), str(bounds[3]))
+    gdal_command = 'gdalwarp -t_srs EPSG:{} -te {} {} {}'.format(
+                    str(output_crs), command_opts, input_path, output_path)
     try:
         process = subprocess.Popen(gdal_command,
                                    shell=True,
