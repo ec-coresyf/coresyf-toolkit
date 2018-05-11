@@ -21,6 +21,8 @@ class TestImageCrop(TestCase):
             "-61575.57812574980926 103754.81329901740537 0))"
         
         self.epsg_code = 3763
+        self.test_image = 'test_data/Aveiro_resampled.tif'
+        self.output_path = os.path.join(TEMP_PATH, 'output')
 
     def tearDown(self):
         if os.path.isdir(TEMP_PATH):
@@ -36,11 +38,10 @@ class TestImageCrop(TestCase):
         self.assertEqual(epsg_code, self.epsg_code)
 
     def test_crop_raster(self):
-        test_image = 'test_data/Aveiro_resampled.tif'
-        output_image = os.path.join(TEMP_PATH, 'output')
         polygon_ext = ogr.CreateGeometryFromWkt(self.extent_polygon_wkt)
         polygon_ext = polygon_ext.Buffer(2000, 0)
-        crop_raster(test_image, output_image, polygon_ext, self.epsg_code)
-        self.assertNotEqual(os.path.getsize(output_image), 0)
-        self.assertLess(os.path.getsize(output_image),
-                        os.path.getsize(test_image))
+        crop_raster(self.test_image, self.output_path,
+                    polygon_ext, self.epsg_code)
+        self.assertNotEqual(os.path.getsize(self.output_path), 0)
+        self.assertLess(os.path.getsize(self.output_path),
+                        os.path.getsize(self.test_image))
