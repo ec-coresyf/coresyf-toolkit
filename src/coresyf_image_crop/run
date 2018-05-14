@@ -3,4 +3,4 @@ from coresyf_image_crop import CoresyfImageCrop
 
 
 if __name__ == '__main__':
-    CoresyfImageCrop(__file__, 'CoReSyFImageCrop.manifest.json').execute()
+    CoresyfImageCrop(__file__, 'CoresyfImageCrop.manifest.json').execute()
