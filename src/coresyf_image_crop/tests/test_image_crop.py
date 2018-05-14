@@ -3,7 +3,7 @@ import os
 import shutil
 from osgeo import ogr
 from ..coresyf_image_crop import get_shapefile_polygon_extent, \
-    get_shapefile_crs, read_zip_shapefile, crop_raster
+    get_shapefile_crs, read_zip_shapefile
 
 TEMP_PATH = "temp_path"
 
@@ -37,11 +37,3 @@ class TestImageCrop(TestCase):
         epsg_code = get_shapefile_crs(self.data_source)
         self.assertEqual(epsg_code, self.epsg_code)
 
-    def test_crop_raster(self):
-        polygon_ext = ogr.CreateGeometryFromWkt(self.extent_polygon_wkt)
-        polygon_ext = polygon_ext.Buffer(2000, 0)
-        crop_raster(self.test_image, self.output_path,
-                    polygon_ext, self.epsg_code)
-        self.assertNotEqual(os.path.getsize(self.output_path), 0)
-        self.assertLess(os.path.getsize(self.output_path),
-                        os.path.getsize(self.test_image))
