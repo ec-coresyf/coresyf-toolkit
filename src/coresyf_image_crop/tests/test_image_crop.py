@@ -19,7 +19,7 @@ class TestImageCrop(TestCase):
             "-54172.937265817548905 107225.478697661776096 0," \
             "-61575.57812574980926 107225.478697661776096 0,"\
             "-61575.57812574980926 103754.81329901740537 0))"
-        
+
         self.epsg_code = 3763
         self.test_image = 'test_data/Aveiro_resampled.tif'
         self.output_path = os.path.join(TEMP_PATH, 'output')
