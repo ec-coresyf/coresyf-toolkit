@@ -70,51 +70,71 @@ def get_shapefile_crs(data_source):
         in_layer = data_source.GetLayer()
         spatial_ref = in_layer.GetSpatialRef()
         ident = Sridentify(prj=spatial_ref.ExportToWkt())
-        epsg_code = int(ident.get_epsg())
+        epsg_code = ident.get_epsg()
     except Exception as epsg_exception:
         print(epsg_exception)
         sys.exit("Error. Unable to get ESPG code of grid shapefile.")
     return epsg_code
 
 
-def crop_raster(input_path, output_path, polygon_extent, output_crs):
-    '''
-    Crops the image specified by input_raster using the limits defined in
-    polygon_extent.
+# def crop_raster(input_path, output_path, polygon_extent, output_crs):
+#     '''
+#     Crops the image specified by input_raster using the limits defined in
+#     polygon_extent.
 
-    input_path: path to the image to be cropped.
-    output_raster_file: the output file path.
-    polygon_extent: POLYGON object to be used for the crop limits.
-    dest_crs: the CRS of the output raster.
-    '''
-    bounds = polygon_extent.GetEnvelope()
-    command_opts = '{} {} {} {}'.format(str(bounds[0]), str(bounds[2]),
-                                        str(bounds[1]), str(bounds[3]))
-    gdal_command = 'gdalwarp -t_srs EPSG:{} -te {} {} {}'.format(
-                    str(output_crs), command_opts, input_path, output_path)
-    try:
-        process = subprocess.Popen(gdal_command,
-                                   shell=True,
-                                   stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+#     input_path: path to the image to be cropped.
+#     output_raster_file: the output file path.
+#     polygon_extent: POLYGON object to be used for the crop limits.
+#     dest_crs: the CRS of the output raster.
+#     '''
+#     bounds = polygon_extent.GetEnvelope()
+#     command_opts = '{} {} {} {}'.format(str(bounds[0]), str(bounds[2]),
+#                                         str(bounds[1]), str(bounds[3]))
+#     gdal_command = 'gdalwarp -t_srs EPSG:{} -te {} {} {}'.format(
+#                     str(output_crs), command_opts, input_path, output_path)
+#     try:
+#         process = subprocess.Popen(gdal_command,
+#                                    shell=True,
+#                                    stdin=subprocess.PIPE,
+#                                    stdout=subprocess.PIPE,
+#                                    stderr=subprocess.PIPE)
 
-        stdout, stderr = process.communicate()
-        if process.returncode:
-            raise Exception (stderr.decode())
-        else:
-            print(stdout.decode())
-            print(stderr.decode())
-    except Exception as crop_exception:
-        print("ERROR: " + str(crop_exception))
-        sys.exit(process.returncode)
+#         stdout, stderr = process.communicate()
+#         if process.returncode:
+#             raise Exception (stderr.decode())
+#         else:
+#             print(stdout.decode())
+#             print(stderr.decode())
+#     except Exception as crop_exception:
+#         print("ERROR: " + str(crop_exception))
+#         sys.exit(process.returncode)
 
 
 class CoresyfImageCrop(CoReSyFTool):
 
+    def crop_raster(self, input_path, output_path, polygon_extent, output_crs):
+        '''
+        Crops the image specified by input_raster using the limits defined in
+        polygon_extent.
+
+        input_path: path to the image to be cropped.
+        output_raster_file: the output file path.
+        polygon_extent: POLYGON object to be used for the crop limits.
+        dest_crs: the CRS of the output raster.
+        '''
+        envelope = polygon_extent.GetEnvelope()
+        bounds = "{} {} {} {}".format(str(envelope[0]), str(envelope[2]), 
+                                      str(envelope[1]), str(envelope[3]))
+        
+        command_template = "gdalwarp -t_srs EPSG:{} -te {}".format(
+                             str(output_crs), bounds)
+        command_template += ' {Ssource} {Ttarget}'
+        self.invoke_shell_command(command_template, **self.bindings)
+
     def run(self, bindings):
-        pass
-        # read_zip_shapefile(shapefile_zip_path)
-        # get_shapefile_crs(ogr_datasource) - retrieves the ESPG code of the shapefile CRS.
-        # get_shapefile_polygon_extent(ogr_datasource) - retrieves the extent of the grid represented as OGR:Polygon.
-        # crop_raster(raster_path, output_path, extent_polygon, output_crs) - applies the crop to the input image by executing gdal_warp in command line.
+        data_source = read_zip_shapefile(bindings['Sgrid'])
+        output_crs = get_shapefile_crs(data_source)
+        polygon_extent = get_shapefile_polygon_extent(data_source)
+        self.crop_raster(bindings['Ssource'], bindings['Ttarget'],
+                         polygon_extent, output_crs)
+
