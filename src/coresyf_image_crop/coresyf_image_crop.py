@@ -7,19 +7,13 @@ from coresyftools.tool import CoReSyFTool
 from sridentify import Sridentify
 
 
-def read_zip_shapefile(filepath, temp_path="temp_input"):
+def read_zip_shapefile(filepath):
     '''
     It opens a zip file containing a shapefile and returns an handle to the
     OGRDataSource (a GDAL OGR object with the shapefile data).
     '''
-    zip_file = zipfile.ZipFile(filepath, 'r')
-    if not zip_file.infolist():
-        sys.exit("Input Zip file with shapefile '%s' is empty!" % filepath)
-    # Extract zip contents
-    zip_file.extractall(temp_path)
-    zip_file.close()
     # Get main file of the shapefile
-    input_list = [os.path.join(temp_path, x) for x in os.listdir(temp_path)
+    input_list = [os.path.join(filepath, x) for x in os.listdir(filepath)
                   if x.endswith(".shp")]
     if not input_list:
         sys.exit("Shapefile not found in '%s'!" % filepath)
