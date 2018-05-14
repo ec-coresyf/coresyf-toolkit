@@ -112,7 +112,7 @@ def get_shapefile_crs(data_source):
 
 class CoresyfImageCrop(CoReSyFTool):
 
-    def crop_raster(self, input_path, output_path, polygon_extent, output_crs):
+    def crop_raster(self, polygon_extent, output_crs):
         '''
         Crops the image specified by input_raster using the limits defined in
         polygon_extent.
@@ -135,6 +135,5 @@ class CoresyfImageCrop(CoReSyFTool):
         data_source = read_zip_shapefile(bindings['Sgrid'])
         output_crs = get_shapefile_crs(data_source)
         polygon_extent = get_shapefile_polygon_extent(data_source)
-        self.crop_raster(bindings['Ssource'], bindings['Ttarget'],
-                         polygon_extent, output_crs)
+        self.crop_raster(polygon_extent, output_crs)
 
