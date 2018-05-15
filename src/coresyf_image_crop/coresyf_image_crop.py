@@ -1,22 +1,21 @@
 #!/usr/bin/python2
-import zipfile
 import sys
 import os
-from osgeo import ogr
+from osgeo import ogr, osr
 from coresyftools.tool import CoReSyFTool
 from sridentify import Sridentify
 
 
-def read_zip_shapefile(filepath):
+def read_shapefile(folder_path):
     '''
-    It opens a zip file containing a shapefile and returns an handle to the
+    It opens folder with a shapefile and returns an handle to the
     OGRDataSource (a GDAL OGR object with the shapefile data).
     '''
     # Get main file of the shapefile
-    input_list = [os.path.join(filepath, x) for x in os.listdir(filepath)
+    input_list = [os.path.join(folder_path, x) for x in os.listdir(folder_path)
                   if x.endswith(".shp")]
     if not input_list:
-        sys.exit("Shapefile not found in '%s'!" % filepath)
+        sys.exit("Shapefile not found in '%s'!" % folder_path)
     shapefile_shp = input_list[0]
     try:
         driver = ogr.GetDriverByName('ESRI Shapefile')
@@ -24,9 +23,9 @@ def read_zip_shapefile(filepath):
         if not data_source:
             raise IOError()
     except IOError:
-        sys.exit("Error. Unable to open shapefile '%s'!" % filepath)
+        sys.exit("Error. Unable to open shapefile '%s'!" % folder_path)
     except Exception:
-        sys.exit("Unexpected error when opening shapefile '%s'!" % filepath)
+        sys.exit("Unexpected error when opening shapefile '%s'!" % folder_path)
     return data_source
 
 
@@ -69,6 +68,47 @@ def get_shapefile_crs(data_source):
     return epsg_code
 
 
+def get_raster_crs(data_source):
+    '''
+    Retrieves the ESPG Code of the raster CRS (Coordinate Reference System).
+
+    data_source: must be the result of GDAL Open applied to the respective GDAL
+    driver.
+    '''
+    try:
+        projection = data_source.GetProjectionRef()
+        ident = Sridentify(prj=projection)
+        epsg_code = ident.get_epsg()
+    except Exception as epsg_exception:
+        print(epsg_exception)
+        sys.exit("Error. Unable to get ESPG code of raster.")
+    return epsg_code
+
+
+def apply_buffer_to_polygon(buffer, polygon_extent, buffer_crs, polygon_crs):
+    '''
+    Applies a specific buffer to a polygon geometry.
+    buffer: buffer in buffer CRS units
+    polygon_extent: OGR geometry with polygon extent.
+    buffer_crs: EPSG code of the buffer CRS.
+    polygon_crs: EPSG code of the polygon CRS.
+    '''
+    if buffer_crs != polygon_crs:
+        buffer_sr = osr.SpatialReference()
+        buffer_sr.ImportFromEPSG(buffer_crs)
+        polygon_sr = osr.SpatialReference()
+        polygon_sr.ImportFromEPSG(polygon_crs)
+
+        polygon_extent.AssignSpatialReference(polygon_sr)
+        polygon_extent.TransformTo(buffer_sr)
+        polygon_with_buffer = polygon_extent.Buffer(buffer, 0)
+        polygon_with_buffer.TransformTo(polygon_sr)
+    else:
+        polygon_with_buffer = polygon_extent.Buffer(buffer, 0)
+
+    return polygon_with_buffer
+
+
 class CoresyfImageCrop(CoReSyFTool):
 
     def crop_raster(self, polygon_extent, output_crs):
@@ -91,7 +131,7 @@ class CoresyfImageCrop(CoReSyFTool):
         self.invoke_shell_command(command_template, **self.bindings)
 
     def run(self, bindings):
-        data_source = read_zip_shapefile(bindings['Sgrid'])
+        data_source = read_shapefile(bindings['Sgrid'])
         output_crs = get_shapefile_crs(data_source)
         polygon_extent = get_shapefile_polygon_extent(data_source)
         self.crop_raster(polygon_extent, output_crs)
