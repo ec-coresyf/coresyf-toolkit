@@ -1,26 +1,19 @@
 #!/usr/bin/python2
-from osgeo import ogr
 import zipfile
 import sys
 import os
-
+from osgeo import ogr
 from coresyftools.tool import CoReSyFTool
 from sridentify import Sridentify
 
 
-def read_zip_shapefile(filepath, temp_path="temp_input"):
+def read_zip_shapefile(filepath):
     '''
     It opens a zip file containing a shapefile and returns an handle to the
     OGRDataSource (a GDAL OGR object with the shapefile data).
     '''
-    zip_file = zipfile.ZipFile(filepath, 'r')
-    if not zip_file.infolist():
-        sys.exit("Input Zip file with shapefile '%s' is empty!" % filepath)
-    # Extract zip contents
-    zip_file.extractall(temp_path)
-    zip_file.close()
     # Get main file of the shapefile
-    input_list = [os.path.join(temp_path, x) for x in os.listdir(temp_path)
+    input_list = [os.path.join(filepath, x) for x in os.listdir(filepath)
                   if x.endswith(".shp")]
     if not input_list:
         sys.exit("Shapefile not found in '%s'!" % filepath)
@@ -69,7 +62,7 @@ def get_shapefile_crs(data_source):
         in_layer = data_source.GetLayer()
         spatial_ref = in_layer.GetSpatialRef()
         ident = Sridentify(prj=spatial_ref.ExportToWkt())
-        epsg_code = int(ident.get_epsg())
+        epsg_code = ident.get_epsg()
     except Exception as epsg_exception:
         print(epsg_exception)
         sys.exit("Error. Unable to get ESPG code of grid shapefile.")
@@ -78,9 +71,27 @@ def get_shapefile_crs(data_source):
 
 class CoresyfImageCrop(CoReSyFTool):
 
+    def crop_raster(self, polygon_extent, output_crs):
+        '''
+        Crops the image specified by input_raster using the limits defined in
+        polygon_extent.
+
+        input_path: path to the image to be cropped.
+        output_raster_file: the output file path.
+        polygon_extent: POLYGON object to be used for the crop limits.
+        dest_crs: the CRS of the output raster.
+        '''
+        envelope = polygon_extent.GetEnvelope()
+        bounds = "{} {} {} {}".format(str(envelope[0]), str(envelope[2]),
+                                      str(envelope[1]), str(envelope[3]))
+
+        command_template = "gdalwarp -t_srs EPSG:{} -te {}".format(
+            str(output_crs), bounds)
+        command_template += ' {Ssource} {Ttarget}'
+        self.invoke_shell_command(command_template, **self.bindings)
+
     def run(self, bindings):
-        pass
-        # read_zip_shapefile(shapefile_zip_path)
-        # get_shapefile_crs(ogr_datasource) - retrieves the ESPG code of the shapefile CRS.
-        # get_shapefile_polygon_extent(ogr_datasource) - retrieves the extent of the grid represented as OGR:Polygon.
-        # crop_raster(raster_path, output_path, extent_polygon, output_crs) - applies the crop to the input image by executing gdal_warp in command line.
+        data_source = read_zip_shapefile(bindings['Sgrid'])
+        output_crs = get_shapefile_crs(data_source)
+        polygon_extent = get_shapefile_polygon_extent(data_source)
+        self.crop_raster(polygon_extent, output_crs)
