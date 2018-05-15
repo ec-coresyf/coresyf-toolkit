@@ -1,0 +1,27 @@
+{
+    "name": "CoresyfImageCrop",
+    "type": "Image Crop",
+    "description": "Tool that uses GDAL raster utility program 'gdalwarp' to crop an image for a specific region of interest, defined by the bounds of a Grid Shapefile.",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        },
+        {
+            "identifier": "Sgrid",
+            "name": "grid",
+            "description": "The path for the Grid Shapefile",
+            "type": "Grid"
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "Raster"
+        }
+    ]
+}
