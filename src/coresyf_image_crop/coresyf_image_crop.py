@@ -2,7 +2,7 @@
 import zipfile
 import sys
 import os
-from osgeo import ogr
+from osgeo import ogr, gdal
 from coresyftools.tool import CoReSyFTool
 from sridentify import Sridentify
 
@@ -67,6 +67,24 @@ def get_shapefile_crs(data_source):
         print(epsg_exception)
         sys.exit("Error. Unable to get ESPG code of grid shapefile.")
     return epsg_code
+
+
+def get_raster_resolution(raster_path):
+    '''
+    Retrieves the resolution of the raster located at raster_path,
+    in meters/pixel or degress/pixel.
+    '''
+    gdal_raster = gdal.Open(raster_path)
+    transform = gdal_raster.GetGeoTransform()
+    return transform[1]
+
+
+def convert_buffer_units(raster_resolution, buffer):
+    '''
+    Converts the units of the buffer (given in pixels) to the units of the
+    image (given either in meters/pixel or degrees/pixel)
+    '''
+    return raster_resolution*buffer
 
 
 class CoresyfImageCrop(CoReSyFTool):
