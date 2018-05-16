@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 import sys
 import os
-from osgeo import ogr, osr
+from osgeo import ogr, osr, gdal
 from coresyftools.tool import CoReSyFTool
 from sridentify import Sridentify
 
@@ -17,15 +17,11 @@ def read_shapefile(folder_path):
     if not input_list:
         sys.exit("Shapefile not found in '%s'!" % folder_path)
     shapefile_shp = input_list[0]
-    try:
-        driver = ogr.GetDriverByName('ESRI Shapefile')
-        data_source = driver.Open(shapefile_shp, 0)  # 0 means read-only.
-        if not data_source:
-            raise IOError()
-    except IOError:
-        sys.exit("Error. Unable to open shapefile '%s'!" % folder_path)
-    except Exception:
-        sys.exit("Unexpected error when opening shapefile '%s'!" % folder_path)
+
+    driver = ogr.GetDriverByName('ESRI Shapefile')
+    data_source = driver.Open(shapefile_shp, 0)  # 0 means read-only.
+    if not data_source:
+        raise IOError("Error. Unable to open shapefile at '%s'!" % folder_path)
     return data_source
 
 
@@ -52,38 +48,30 @@ def get_shapefile_polygon_extent(data_source):
     return ogr_polygon
 
 
-def get_shapefile_crs(data_source):
+def get_datasource_epsg(data_source):
     '''
-    Retrieves the ESPG Code of the shapefile CRS (Coordinate Reference System).
+    Retrieves the ESPG Code of a GDAL/OGR datasource CRS (Coordinate Reference
+    System).
 
-    data_source: must be the result of GDAL Open applied to the respective OGR
-    driver.
+    data_source: must be the result of GDAL/OGR Open applied to the respective
+                 data.
     '''
-    try:
+    if isinstance(data_source, ogr.DataSource):
+        name = data_source.GetName()
         in_layer = data_source.GetLayer()
         spatial_ref = in_layer.GetSpatialRef()
-        ident = Sridentify(prj=spatial_ref.ExportToWkt())
-        epsg_code = ident.get_epsg()
-    except Exception as epsg_exception:
-        print(epsg_exception)
-        sys.exit("Error. Unable to get ESPG code of grid shapefile.")
-    return epsg_code
+        projection_wkt = spatial_ref.ExportToWkt()
+    elif isinstance(data_source, gdal.Dataset):
+        name = data_source.GetDescription()
+        projection_wkt = data_source.GetProjectionRef()
+    else:
+        raise TypeError("Input is not of ogr.DataSource or gdal.Dataset type!")
 
-
-def get_raster_crs(data_source):
-    '''
-    Retrieves the ESPG Code of the raster CRS (Coordinate Reference System).
-
-    data_source: must be the result of GDAL Open applied to the respective GDAL
-    driver.
-    '''
-    try:
-        projection = data_source.GetProjectionRef()
-        ident = Sridentify(prj=projection)
-        epsg_code = ident.get_epsg()
-    except Exception as epsg_exception:
-        print(epsg_exception)
-        sys.exit("Error. Unable to get ESPG code of raster.")
+    sridentify_obj = Sridentify(prj=projection_wkt)
+    epsg_code = sridentify_obj.get_epsg()
+    if not epsg_code:
+        raise ValueError("Error. Unable to get ESPG code of datasource '%s'." %
+                         name)
     return epsg_code
 
 
@@ -136,6 +124,6 @@ class CoresyfImageCrop(CoReSyFTool):
 
     def run(self, bindings):
         data_source = read_shapefile(bindings['Sgrid'])
-        output_crs = get_shapefile_crs(data_source)
+        output_crs = get_datasource_epsg(data_source)
         polygon_extent = get_shapefile_polygon_extent(data_source)
         self.crop_raster(polygon_extent, output_crs)
