@@ -1,10 +1,7 @@
 from unittest import TestCase
-import os
-import shutil
-from osgeo import ogr, gdal
+from osgeo import ogr, osr
 from ..coresyf_image_crop import get_shapefile_polygon_extent, \
-    get_shapefile_crs, read_shapefile, apply_buffer_to_polygon, \
-    get_raster_crs
+    get_shapefile_crs, read_shapefile, apply_buffer_to_polygon
 
 TEMP_PATH = "temp_path"
 
@@ -13,7 +10,7 @@ class TestImageCrop(TestCase):
 
     def setUp(self):
         self.data_source = read_shapefile('test_data/grid_EPSG_3763')
-        self.extent_polygon_wkt = "POLYGON ((" + \
+        self.polygon_extent_wkt = "POLYGON ((" + \
             "-61575.57812574980926 103754.81329901740537 0," \
             "-54172.937265817548905 103754.81329901740537 0," \
             "-54172.937265817548905 107225.478697661776096 0," \
@@ -30,25 +27,30 @@ class TestImageCrop(TestCase):
     def test_get_shapefile_polygon_extent(self):
         extent_polygon = get_shapefile_polygon_extent(self.data_source)
         self.assertTrue(extent_polygon.IsValid())
-        self.assertEqual(extent_polygon.ExportToWkt(), self.extent_polygon_wkt)
+        self.assertEqual(extent_polygon.ExportToWkt(), self.polygon_extent_wkt)
 
     def test_get_shapefile_crs(self):
         epsg_code = get_shapefile_crs(self.data_source)
         self.assertEqual(epsg_code, self.epsg_code)
 
     def test_apply_buffer_to_polygon(self):
-        buffer_crs = get_raster_crs(gdal.Open(self.test_image_4236))
-        polygon_extent = get_shapefile_polygon_extent(self.data_source)
-        buffer_4326 = 0.022207
-        buffer_3763 = 2000
-        polygon_crs = get_shapefile_crs(self.data_source)
+        buffer_4326_units = 0.022207
+        buffer_3763_units = 2000
+        crs_buffer = 4326
+        crs_polygon = 3763
+        polygon_extent = ogr.CreateGeometryFromWkt(self.polygon_extent_wkt)
+        osr_polygon = osr.SpatialReference()
+        osr_polygon.ImportFromEPSG(crs_polygon)
+        polygon_extent.AssignSpatialReference(osr_polygon)
 
-        polygon_with_buffer = apply_buffer_to_polygon(buffer_4326, polygon_extent,
-                                                      buffer_crs, polygon_crs)
+        polygon_with_buffer = apply_buffer_to_polygon(polygon_extent,
+                                                      buffer_4326_units,
+                                                      crs_polygon,
+                                                      crs_buffer)
 
-        expected_polygon = ogr.CreateGeometryFromWkt(self.extent_polygon_wkt)
-        expected_polygon = expected_polygon.Buffer(buffer_3763, 0)
+        expected_polygon = polygon_extent.Buffer(buffer_3763_units, 0)
 
         for n in range(4):
             self.assertAlmostEqual(polygon_with_buffer.GetEnvelope()[n],
-                                   expected_polygon.GetEnvelope()[n], delta=500)
+                                   expected_polygon.GetEnvelope()[n],
+                                   delta=500)
