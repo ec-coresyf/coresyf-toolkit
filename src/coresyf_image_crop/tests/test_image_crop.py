@@ -3,7 +3,8 @@ import os
 import shutil
 from osgeo import ogr
 from ..coresyf_image_crop import get_shapefile_polygon_extent, \
-    get_shapefile_crs, read_zip_shapefile
+    get_shapefile_crs, read_zip_shapefile, get_raster_resolution
+
 
 TEMP_PATH = "temp_path"
 
@@ -11,8 +12,7 @@ TEMP_PATH = "temp_path"
 class TestImageCrop(TestCase):
 
     def setUp(self):
-        self.data_source = read_zip_shapefile('test_data/grid_EPSG_3763.zip',
-                                              TEMP_PATH)
+        self.data_source = read_zip_shapefile('test_data/grid_EPSG_3763')
         self.extent_polygon_wkt = "POLYGON ((" + \
             "-61575.57812574980926 103754.81329901740537 0," \
             "-54172.937265817548905 103754.81329901740537 0," \
@@ -23,7 +23,7 @@ class TestImageCrop(TestCase):
         self.epsg_code = 3763
         self.test_image = 'test_data/Aveiro_resampled.tif'
         self.output_path = os.path.join(TEMP_PATH, 'output')
-
+        
     def tearDown(self):
         if os.path.isdir(TEMP_PATH):
             shutil.rmtree(TEMP_PATH)
@@ -37,3 +37,6 @@ class TestImageCrop(TestCase):
         epsg_code = get_shapefile_crs(self.data_source)
         self.assertEqual(epsg_code, self.epsg_code)
 
+    def test_get_raster_resolution(self):
+        resolution = get_raster_resolution(self.test_image)
+        self.assertGreater(abs(resolution), 0)
