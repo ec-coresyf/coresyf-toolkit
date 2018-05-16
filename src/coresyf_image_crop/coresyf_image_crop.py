@@ -8,7 +8,7 @@ from sridentify import Sridentify
 
 def read_shapefile(folder_path):
     '''
-    It opens folder with a shapefile and returns an handle to the
+    It opens a folder with a shapefile and returns an handle to the
     OGRDataSource (a GDAL OGR object with the shapefile data).
     '''
     # Get main file of the shapefile
@@ -37,6 +37,7 @@ def get_shapefile_polygon_extent(data_source):
     """
     layer = data_source.GetLayer()
     extent = layer.GetExtent()
+    polygon_spatial_ref = layer.GetSpatialRef()
 
     # Create a Polygon from the extent tuple
     ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -47,6 +48,7 @@ def get_shapefile_polygon_extent(data_source):
     ring.AddPoint(extent[0], extent[2])
     ogr_polygon = ogr.Geometry(ogr.wkbPolygon)
     ogr_polygon.AddGeometry(ring)
+    ogr_polygon.AssignSpatialReference(polygon_spatial_ref)
     return ogr_polygon
 
 
@@ -85,26 +87,28 @@ def get_raster_crs(data_source):
     return epsg_code
 
 
-def apply_buffer_to_polygon(buffer, polygon_extent, buffer_crs, polygon_crs):
+def apply_buffer_to_polygon(polygon_extent, buffer, crs_polygon, crs_buffer):
     '''
     Applies a specific buffer to a polygon geometry.
-    buffer: buffer in buffer CRS units
     polygon_extent: OGR geometry with polygon extent.
-    buffer_crs: EPSG code of the buffer CRS.
-    polygon_crs: EPSG code of the polygon CRS.
+    buffer: buffer in buffer CRS units
+    crs_polygon: EPSG code of the polygon CRS.
+    crs_buffer: EPSG code of the buffer CRS.
     '''
-    if buffer_crs != polygon_crs:
-        buffer_sr = osr.SpatialReference()
-        buffer_sr.ImportFromEPSG(buffer_crs)
-        polygon_sr = osr.SpatialReference()
-        polygon_sr.ImportFromEPSG(polygon_crs)
+    # Make copy of object to preserve original 'polygon_extent'
+    polygon = polygon_extent.Clone()
 
-        polygon_extent.AssignSpatialReference(polygon_sr)
-        polygon_extent.TransformTo(buffer_sr)
-        polygon_with_buffer = polygon_extent.Buffer(buffer, 0)
-        polygon_with_buffer.TransformTo(polygon_sr)
+    if crs_buffer != crs_polygon:
+        sr_buffer = osr.SpatialReference()
+        sr_buffer.ImportFromEPSG(crs_buffer)
+        sr_polygon = osr.SpatialReference()
+        sr_polygon.ImportFromEPSG(crs_polygon)
+
+        polygon.TransformTo(sr_buffer)
+        polygon_with_buffer = polygon.Buffer(buffer, 0)
+        polygon_with_buffer.TransformTo(sr_polygon)
     else:
-        polygon_with_buffer = polygon_extent.Buffer(buffer, 0)
+        polygon_with_buffer = polygon.Buffer(buffer, 0)
 
     return polygon_with_buffer
 
