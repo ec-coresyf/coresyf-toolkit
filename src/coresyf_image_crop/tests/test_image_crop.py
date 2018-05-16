@@ -1,9 +1,7 @@
 from unittest import TestCase
-import os
-import shutil
-from osgeo import ogr
+from osgeo import ogr, osr
 from ..coresyf_image_crop import get_shapefile_polygon_extent, \
-    get_shapefile_crs, read_zip_shapefile
+    get_datasource_epsg, read_shapefile, apply_buffer_to_polygon
 
 TEMP_PATH = "temp_path"
 
@@ -11,29 +9,48 @@ TEMP_PATH = "temp_path"
 class TestImageCrop(TestCase):
 
     def setUp(self):
-        self.data_source = read_zip_shapefile('test_data/grid_EPSG_3763.zip',
-                                              TEMP_PATH)
-        self.extent_polygon_wkt = "POLYGON ((" + \
+        self.data_source = read_shapefile('test_data/grid_EPSG_3763')
+
+    def tearDown(self):
+        pass
+
+    def test_get_shapefile_polygon_extent(self):
+        polygon_extent_wkt = "POLYGON ((" + \
             "-61575.57812574980926 103754.81329901740537 0," \
             "-54172.937265817548905 103754.81329901740537 0," \
             "-54172.937265817548905 107225.478697661776096 0," \
             "-61575.57812574980926 107225.478697661776096 0,"\
             "-61575.57812574980926 103754.81329901740537 0))"
 
-        self.epsg_code = 3763
-        self.test_image = 'test_data/Aveiro_resampled.tif'
-        self.output_path = os.path.join(TEMP_PATH, 'output')
-
-    def tearDown(self):
-        if os.path.isdir(TEMP_PATH):
-            shutil.rmtree(TEMP_PATH)
-
-    def test_get_shapefile_polygon_extent(self):
         extent_polygon = get_shapefile_polygon_extent(self.data_source)
+
         self.assertTrue(extent_polygon.IsValid())
-        self.assertEqual(extent_polygon.ExportToWkt(), self.extent_polygon_wkt)
+        self.assertEqual(extent_polygon.ExportToWkt(), polygon_extent_wkt)
 
-    def test_get_shapefile_crs(self):
-        epsg_code = get_shapefile_crs(self.data_source)
-        self.assertEqual(epsg_code, self.epsg_code)
+    def test_get_datasource_epsg(self):
+        epsg_code = get_datasource_epsg(self.data_source)
+        self.assertEqual(epsg_code, 3763)
 
+    def test_apply_buffer_to_polygon(self):
+        buffer_3763_units = 2000  # aprox. 0.01808333 degrees in EPSG:4326
+        crs_buffer = 3763
+        crs_polygon = 4326
+        polygon_extent = ogr.CreateGeometryFromWkt(
+                                                "POLYGON ((" +
+                                                "0.0 0.0 0," +
+                                                "0.01808333 0.0 0," +
+                                                "0.01808333 0.03616667 0," +
+                                                "0.0 0.03616667 0," +
+                                                "0.0 0.0 0))")
+        sr_polygon = osr.SpatialReference()
+        sr_polygon.ImportFromEPSG(crs_polygon)
+        polygon_extent.AssignSpatialReference(sr_polygon)
+        expected_envelope = (-0.017784821097606172, 0.03586646107971625,
+                             -0.01790423549555848, 0.054070905482337325)
+
+        polygon_with_buffer = apply_buffer_to_polygon(polygon_extent,
+                                                      buffer_3763_units,
+                                                      crs_polygon,
+                                                      crs_buffer)
+
+        self.assertEqual(polygon_with_buffer.GetEnvelope(), expected_envelope)
