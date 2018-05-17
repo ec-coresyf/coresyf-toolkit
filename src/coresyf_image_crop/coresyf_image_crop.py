@@ -108,13 +108,13 @@ def get_raster_resolution(raster_path):
     '''
     gdal_raster = gdal.Open(raster_path)
     transform = gdal_raster.GetGeoTransform()
-    return transform[1]
+    return abs(transform[1])
 
 
 def convert_buffer_units(raster_resolution, buffer):
     '''
     Converts the units of the buffer (given in pixels) to the units of the
-    image (given either in meters/pixel or degrees/pixel)
+    image (given either in meters or degrees).
     '''
     return raster_resolution*buffer
 
