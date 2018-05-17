@@ -4,9 +4,6 @@ from ..coresyf_image_crop import get_shapefile_polygon_extent, \
             get_datasource_epsg, read_shapefile, apply_buffer_to_polygon, \
             get_raster_resolution
 
-TEMP_PATH = "temp_path"
-
-
 class TestImageCrop(TestCase):
 
     def setUp(self):
