@@ -56,12 +56,12 @@ def get_datasource_epsg(data_source):
     data_source: must be the result of GDAL/OGR Open applied to the respective
                  data.
     '''
-    if isinstance(data_source, ogr.DataSource):
+    if isinstance(data_source, ogr.DataSource):  # Vector
         name = data_source.GetName()
         in_layer = data_source.GetLayer()
         spatial_ref = in_layer.GetSpatialRef()
         projection_wkt = spatial_ref.ExportToWkt()
-    elif isinstance(data_source, gdal.Dataset):
+    elif isinstance(data_source, gdal.Dataset):  # Raster
         name = data_source.GetDescription()
         projection_wkt = data_source.GetProjectionRef()
     else:
@@ -97,14 +97,18 @@ def apply_buffer_to_polygon(polygon_extent, buffer, crs_buffer):
     return polygon_with_buffer
 
 
-def get_raster_resolution(raster_path):
+def get_raster_properties(raster_path):
     '''
-    Retrieves the resolution of the raster located at raster_path,
-    in meters/pixel or degress/pixel.
+    Retrieves information about the resolution (meters/pixel or degress/pixel)
+    and the EPSG code of a raster.
+
+    raster_path: file path to the raster.
+    Return value: a tuple (resolution, epsg_code)
     '''
     gdal_raster = gdal.Open(raster_path)
     transform = gdal_raster.GetGeoTransform()
-    return abs(transform[1])
+    epsg_code = get_datasource_epsg(gdal_raster)
+    return abs(transform[1]), epsg_code
 
 
 def convert_buffer_units(raster_resolution, buffer):
@@ -138,6 +142,10 @@ class CoresyfImageCrop(CoReSyFTool):
 
     def run(self, bindings):
         data_source = read_shapefile(bindings['Sgrid'])
-        output_crs = get_datasource_epsg(data_source)
+        grid_crs = get_datasource_epsg(data_source)
         polygon_extent = get_shapefile_polygon_extent(data_source)
-        self.crop_raster(polygon_extent, output_crs)
+        raster_res, raster_crs = get_raster_properties(bindings['Ssource'])
+        buffer = convert_buffer_units(raster_res, bindings['Pbuffer'])
+        polygon_with_buffer = apply_buffer_to_polygon(polygon_extent, buffer,
+                                                      raster_crs)
+        self.crop_raster(polygon_with_buffer, grid_crs)
