@@ -4,11 +4,31 @@ from ..coresyf_image_crop import get_shapefile_polygon_extent, \
             get_datasource_epsg, read_shapefile, apply_buffer_to_polygon, \
             get_raster_resolution
 
+
+def create_polygon_geometry_4326():
+    polygon = ogr.CreateGeometryFromWkt("POLYGON ((0.0 0.0 0," +
+                                        "0.01808333 0.0 0," +
+                                        "0.01808333 0.03616667 0," +
+                                        "0.0 0.03616667 0," +
+                                        "0.0 0.0 0))")
+    sr_polygon = osr.SpatialReference()
+    sr_polygon.ImportFromEPSG(4326)
+    polygon.AssignSpatialReference(sr_polygon)
+    return polygon
+
+
 class TestImageCrop(TestCase):
 
     def setUp(self):
         self.data_source = read_shapefile('test_data/grid_EPSG_3763')
         self.test_image = 'test_data/Aveiro_resampled.tif'
+        self.buffer_4326_units = 0.01808333
+        self.buffer_3763_units = 2000
+        self.expected_envelope_1 = (-0.017784821097606172, 0.03586646107971625,
+                                    -0.01790423549555848, 0.054070905482337325)
+        self.expected_envelope_2 = (-0.01808333, 0.03616666,
+                                    -0.01808333, 0.05425)
+        self.polygon_geo_in_4326 = create_polygon_geometry_4326()
 
     def tearDown(self):
         pass
@@ -30,29 +50,33 @@ class TestImageCrop(TestCase):
         epsg_code = get_datasource_epsg(self.data_source)
         self.assertEqual(epsg_code, 3763)
 
-    def test_apply_buffer_to_polygon(self):
-        buffer_3763_units = 2000  # aprox. 0.01808333 degrees in EPSG:4326
-        crs_buffer = 3763
-        crs_polygon = 4326
-        polygon_extent = ogr.CreateGeometryFromWkt(
-                                                "POLYGON ((" +
-                                                "0.0 0.0 0," +
-                                                "0.01808333 0.0 0," +
-                                                "0.01808333 0.03616667 0," +
-                                                "0.0 0.03616667 0," +
-                                                "0.0 0.0 0))")
-        sr_polygon = osr.SpatialReference()
-        sr_polygon.ImportFromEPSG(crs_polygon)
-        polygon_extent.AssignSpatialReference(sr_polygon)
-        expected_envelope = (-0.017784821097606172, 0.03586646107971625,
-                             -0.01790423549555848, 0.054070905482337325)
+    def test_apply_buffer_to_polygon_1(self):
+        '''
+        Applies a buffer of 2000 meters (in EPSG:3763), aproximately 0.01808333
+        degrees in EPSG:4326, to a polygon in EPSG:4326 (units: degreee).
+        In this case, the polygon is transformed to buffer Spatial Reference
+        and back to the original one after applying the buffer.
+        '''
+        polygon_with_buffer = apply_buffer_to_polygon(self.polygon_geo_in_4326,
+                                                      self.buffer_3763_units,
+                                                      3763)
 
-        polygon_with_buffer = apply_buffer_to_polygon(polygon_extent,
-                                                      buffer_3763_units,
-                                                      crs_polygon,
-                                                      crs_buffer)
+        self.assertEqual(polygon_with_buffer.GetEnvelope(),
+                         self.expected_envelope_1)
 
-        self.assertEqual(polygon_with_buffer.GetEnvelope(), expected_envelope)
+    def test_apply_buffer_to_polygon_2(self):
+        '''
+        Applies a buffer of 0.01808333 degrees (in EPSG:4326) to a polygon in
+        the same Spatial Reference system.
+        In this case, no conversions between SRS are required.
+        '''
+        polygon_with_buffer = apply_buffer_to_polygon(self.polygon_geo_in_4326,
+                                                      self.buffer_4326_units,
+                                                      4326)
+
+        self.assertEqual(polygon_with_buffer.GetEnvelope(),
+                         self.expected_envelope_2)
+
 
     def test_get_raster_resolution(self):
         resolution = get_raster_resolution(self.test_image)

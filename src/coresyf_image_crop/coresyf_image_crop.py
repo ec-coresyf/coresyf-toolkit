@@ -75,29 +75,25 @@ def get_datasource_epsg(data_source):
     return epsg_code
 
 
-def apply_buffer_to_polygon(polygon_extent, buffer, crs_polygon, crs_buffer):
+def apply_buffer_to_polygon(polygon_extent, buffer, crs_buffer):
     '''
     Applies a specific buffer to a polygon geometry.
     polygon_extent: OGR geometry with polygon extent.
     buffer: buffer in buffer CRS units
-    crs_polygon: EPSG code of the polygon CRS.
     crs_buffer: EPSG code of the buffer CRS.
     '''
     # Make copy of object to preserve original 'polygon_extent'
     polygon = polygon_extent.Clone()
+    sr_polygon = polygon.GetSpatialReference()
+    sr_buffer = osr.SpatialReference()
+    sr_buffer.ImportFromEPSG(crs_buffer)
 
-    if crs_buffer != crs_polygon:
-        sr_buffer = osr.SpatialReference()
-        sr_buffer.ImportFromEPSG(crs_buffer)
-        sr_polygon = osr.SpatialReference()
-        sr_polygon.ImportFromEPSG(crs_polygon)
-
+    if sr_buffer.IsSame(sr_polygon):
+        polygon_with_buffer = polygon.Buffer(buffer, 0)
+    else:
         polygon.TransformTo(sr_buffer)
         polygon_with_buffer = polygon.Buffer(buffer, 0)
         polygon_with_buffer.TransformTo(sr_polygon)
-    else:
-        polygon_with_buffer = polygon.Buffer(buffer, 0)
-
     return polygon_with_buffer
 
 
