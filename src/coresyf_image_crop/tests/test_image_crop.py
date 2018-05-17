@@ -1,15 +1,14 @@
 from unittest import TestCase
 from osgeo import ogr, osr
 from ..coresyf_image_crop import get_shapefile_polygon_extent, \
-    get_datasource_epsg, read_shapefile, apply_buffer_to_polygon
-
-TEMP_PATH = "temp_path"
-
+            get_datasource_epsg, read_shapefile, apply_buffer_to_polygon, \
+            get_raster_resolution
 
 class TestImageCrop(TestCase):
 
     def setUp(self):
         self.data_source = read_shapefile('test_data/grid_EPSG_3763')
+        self.test_image = 'test_data/Aveiro_resampled.tif'
 
     def tearDown(self):
         pass
@@ -54,3 +53,7 @@ class TestImageCrop(TestCase):
                                                       crs_buffer)
 
         self.assertEqual(polygon_with_buffer.GetEnvelope(), expected_envelope)
+
+    def test_get_raster_resolution(self):
+        resolution = get_raster_resolution(self.test_image)
+        self.assertEqual(resolution, 180)

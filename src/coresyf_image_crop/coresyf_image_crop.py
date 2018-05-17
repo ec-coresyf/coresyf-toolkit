@@ -101,6 +101,24 @@ def apply_buffer_to_polygon(polygon_extent, buffer, crs_polygon, crs_buffer):
     return polygon_with_buffer
 
 
+def get_raster_resolution(raster_path):
+    '''
+    Retrieves the resolution of the raster located at raster_path,
+    in meters/pixel or degress/pixel.
+    '''
+    gdal_raster = gdal.Open(raster_path)
+    transform = gdal_raster.GetGeoTransform()
+    return abs(transform[1])
+
+
+def convert_buffer_units(raster_resolution, buffer):
+    '''
+    Converts the units of the buffer (given in pixels) to the units of the
+    image (given either in meters or degrees).
+    '''
+    return raster_resolution*buffer
+
+
 class CoresyfImageCrop(CoReSyFTool):
 
     def crop_raster(self, polygon_extent, output_crs):

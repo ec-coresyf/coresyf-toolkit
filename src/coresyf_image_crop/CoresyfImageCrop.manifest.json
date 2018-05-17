@@ -16,6 +16,14 @@
             "type": "Grid"
         }
     ],
+    "parameters": [
+        {
+            "identifier": "Pbuffer",
+            "name": "buffer",
+            "description": "Buffer (in pixels) to be applied around the crop region",
+            "type": "float"
+        }
+    ],
     "outputs": [   
         {
             "identifier": "Ttarget",
