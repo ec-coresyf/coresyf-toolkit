@@ -2,7 +2,7 @@ from unittest import TestCase
 from osgeo import ogr, osr
 from ..coresyf_image_crop import get_shapefile_polygon_extent, \
             get_datasource_epsg, read_shapefile, apply_buffer_to_polygon, \
-            get_raster_resolution
+            get_raster_properties
 
 
 def create_polygon_geometry_4326():
@@ -77,7 +77,7 @@ class TestImageCrop(TestCase):
         self.assertEqual(polygon_with_buffer.GetEnvelope(),
                          self.expected_envelope_2)
 
-
-    def test_get_raster_resolution(self):
-        resolution = get_raster_resolution(self.test_image)
+    def test_get_raster_properties(self):
+        resolution, epsg_code = get_raster_properties(self.test_image)
         self.assertEqual(resolution, 180)
+        self.assertEqual(epsg_code, 3763)
