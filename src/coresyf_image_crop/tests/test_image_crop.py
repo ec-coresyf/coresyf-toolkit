@@ -55,5 +55,5 @@ class TestImageCrop(TestCase):
         self.assertEqual(polygon_with_buffer.GetEnvelope(), expected_envelope)
 
     def test_get_raster_resolution(self):
-            resolution = get_raster_resolution(self.test_image)
-            self.assertGreater(abs(resolution), 0)
+        resolution = get_raster_resolution(self.test_image)
+        self.assertEqual(resolution, 180)
