@@ -1,8 +1,8 @@
 from unittest import TestCase
-from osgeo import ogr, osr
+from osgeo import ogr, osr, gdal
 from ..coresyf_image_crop import get_shapefile_polygon_extent, \
             get_datasource_epsg, read_shapefile, apply_buffer_to_polygon, \
-            get_raster_properties
+            get_raster_resolution
 
 
 def create_polygon_geometry_4326():
@@ -22,6 +22,7 @@ class TestImageCrop(TestCase):
     def setUp(self):
         self.data_source = read_shapefile('test_data/grid_EPSG_3763')
         self.test_image = 'test_data/Aveiro_resampled.tif'
+        self.image_datasource = gdal.Open(self.test_image)
         self.buffer_4326_units = 0.01808333
         self.buffer_3763_units = 2000
         self.expected_envelope_1 = (-0.017784821097606172, 0.03586646107971625,
@@ -77,7 +78,10 @@ class TestImageCrop(TestCase):
         self.assertEqual(polygon_with_buffer.GetEnvelope(),
                          self.expected_envelope_2)
 
-    def test_get_raster_properties(self):
-        resolution, epsg_code = get_raster_properties(self.test_image)
+    def test_get_raster_resolution(self):
+        resolution = get_raster_resolution(self.image_datasource)
         self.assertEqual(resolution, 180)
+        
+    def test_get_raster_epsg(self):
+        epsg_code = get_datasource_epsg(self.image_datasource)
         self.assertEqual(epsg_code, 3763)
