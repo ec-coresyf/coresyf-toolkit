@@ -7,7 +7,7 @@
             "identifier": "Ssource",
             "name": "source",
             "description": "Sets source to <filepath>",
-            "type": "Raster"
+            "type": "GeoTIFF"
         },
         {
             "identifier": "Sgrid",
@@ -30,7 +30,7 @@
             "identifier": "Ttarget",
             "name": "target",
             "description": "Sets the target to <filepath>",
-            "type": "Raster"
+            "type": "GeoTIFF"
         }
     ]
 }
