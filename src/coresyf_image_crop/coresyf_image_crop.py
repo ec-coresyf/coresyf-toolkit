@@ -15,7 +15,7 @@ def read_shapefile(folder_path):
     input_list = [os.path.join(folder_path, x) for x in os.listdir(folder_path)
                   if x.endswith(".shp")]
     if not input_list:
-        sys.exit("Shapefile not found in '%s'!" % folder_path)
+        raise FileNotFoundError("Shapefile not found in '%s'!" % folder_path)
     shapefile_shp = input_list[0]
 
     driver = ogr.GetDriverByName('ESRI Shapefile')
