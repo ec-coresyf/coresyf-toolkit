@@ -1,0 +1,6 @@
+#!/usr/bin/python2
+from coresyf_image_crop import CoresyfImageCrop
+
+
+if __name__ == '__main__':
+    CoresyfImageCrop(__file__, 'CoresyfImageCrop.manifest.json').execute()
