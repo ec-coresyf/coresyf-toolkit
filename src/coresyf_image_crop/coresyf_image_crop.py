@@ -124,10 +124,10 @@ class CoresyfImageCrop(CoReSyFTool):
         Crops the image specified by input_raster using the limits defined in
         polygon_extent.
 
-        input_path: path to the image to be cropped.
-        output_raster_file: the output file path.
         polygon_extent: POLYGON object to be used for the crop limits.
-        dest_crs: the CRS of the output raster.
+        output_crs: the CRS of the output raster.
+        input_path: path to the image to be cropped.
+        output_path: the output file path.
         '''
         in_out_bindings = {'Ssource': input_path, 'Ttarget': output_path}
         envelope = polygon_extent.GetEnvelope()
