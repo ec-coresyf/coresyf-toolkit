@@ -27,7 +27,7 @@ def read_shapefile(folder_path):
 
 def get_shapefile_polygon_extent(data_source):
     """
-    Retrieves the extent of the grid represented as OGR:Polygon.
+    Retrieves the extent of the shapefile represented as OGR:Polygon.
 
     :param obj data_source: a shapefile represented as a OGR:DataSource object.
     """
@@ -75,40 +75,38 @@ def get_datasource_epsg(data_source):
     return epsg_code
 
 
-def apply_buffer_to_polygon(polygon_extent, buffer, crs_buffer):
+def apply_buffer_to_polygon(polygon, buffer, crs_buffer):
     '''
     Applies a specific buffer to a polygon geometry.
-    polygon_extent: OGR geometry with polygon extent.
+    polygon: OGR geometry with polygon extent.
     buffer: buffer in buffer CRS units
     crs_buffer: EPSG code of the buffer CRS.
     '''
-    # Make copy of object to preserve original 'polygon_extent'
-    polygon = polygon_extent.Clone()
-    sr_polygon = polygon.GetSpatialReference()
+    polygon_copy = polygon.Clone()
+    sr_polygon = polygon_copy.GetSpatialReference()
     sr_buffer = osr.SpatialReference()
     sr_buffer.ImportFromEPSG(crs_buffer)
 
     if sr_buffer.IsSame(sr_polygon):
-        polygon_with_buffer = polygon.Buffer(buffer, 0)
+        polygon_with_buffer = polygon_copy.Buffer(buffer, 0)
     else:
-        polygon.TransformTo(sr_buffer)
-        polygon_with_buffer = polygon.Buffer(buffer, 0)
+        polygon_copy.TransformTo(sr_buffer)
+        polygon_with_buffer = polygon_copy.Buffer(buffer, 0)
         polygon_with_buffer.TransformTo(sr_polygon)
     return polygon_with_buffer
 
 
-def get_raster_properties(raster_path):
+def get_raster_resolution(data_source):
     '''
     Retrieves information about the resolution (meters/pixel or degress/pixel)
     and the EPSG code of a raster.
 
-    raster_path: file path to the raster.
-    Return value: a tuple (resolution, epsg_code)
+    data_source: GDAL datasource of a raster.
+    Return value: the resolution of the raster.
     '''
-    gdal_raster = gdal.Open(raster_path)
-    transform = gdal_raster.GetGeoTransform()
-    epsg_code = get_datasource_epsg(gdal_raster)
-    return abs(transform[1]), epsg_code
+    transform = data_source.GetGeoTransform()
+    resolution = abs(transform[1])
+    return resolution
 
 
 def convert_buffer_units(raster_resolution, buffer):
@@ -121,7 +119,7 @@ def convert_buffer_units(raster_resolution, buffer):
 
 class CoresyfImageCrop(CoReSyFTool):
 
-    def crop_raster(self, polygon_extent, output_crs):
+    def crop_raster(self, polygon_extent, output_crs, input_path, output_path):
         '''
         Crops the image specified by input_raster using the limits defined in
         polygon_extent.
@@ -131,6 +129,7 @@ class CoresyfImageCrop(CoReSyFTool):
         polygon_extent: POLYGON object to be used for the crop limits.
         dest_crs: the CRS of the output raster.
         '''
+        in_out_bindings = {'Ssource': input_path, 'Ttarget': output_path}
         envelope = polygon_extent.GetEnvelope()
         bounds = "{} {} {} {}".format(str(envelope[0]), str(envelope[2]),
                                       str(envelope[1]), str(envelope[3]))
@@ -138,14 +137,24 @@ class CoresyfImageCrop(CoReSyFTool):
         command_template = "gdalwarp -t_srs EPSG:{} -te {}".format(
             str(output_crs), bounds)
         command_template += ' {Ssource} {Ttarget}'
-        self.invoke_shell_command(command_template, **self.bindings)
+        self.invoke_shell_command(command_template, **in_out_bindings)
 
     def run(self, bindings):
-        data_source = read_shapefile(bindings['Sgrid'])
-        grid_crs = get_datasource_epsg(data_source)
-        polygon_extent = get_shapefile_polygon_extent(data_source)
-        raster_res, raster_crs = get_raster_properties(bindings['Ssource'])
-        buffer = convert_buffer_units(raster_res, bindings['Pbuffer'])
+        raster_path = bindings['Ssource']
+        output_path = bindings['Ttarget']
+        grid_path = bindings['Sgrid']
+        pbuffer = bindings['Pbuffer']
+        grid_datasource = read_shapefile(grid_path)
+        raster_datasource = gdal.Open(raster_path)
+
+        grid_crs = get_datasource_epsg(grid_datasource)
+        polygon_extent = get_shapefile_polygon_extent(grid_datasource)
+        raster_resolution = get_raster_resolution(raster_datasource)
+        raster_crs = get_datasource_epsg(raster_datasource)
+
+        buffer = convert_buffer_units(raster_resolution, pbuffer)
         polygon_with_buffer = apply_buffer_to_polygon(polygon_extent, buffer,
                                                       raster_crs)
-        self.crop_raster(polygon_with_buffer, grid_crs)
+        
+        self.crop_raster(polygon_with_buffer, grid_crs,
+                         raster_path, output_path)
