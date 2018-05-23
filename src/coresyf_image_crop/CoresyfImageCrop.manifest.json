@@ -21,7 +21,7 @@
         {
             "identifier": "Pbuffer",
             "name": "buffer",
-            "description": "Buffer (in pixels) to be applied around the crop region",
+            "description": "Buffer (in buffer units) to be applied around the crop region",
             "type": "float",
             "default": 5
         },
