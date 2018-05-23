@@ -81,7 +81,7 @@ class TestImageCrop(TestCase):
     def test_get_raster_resolution(self):
         resolution = get_raster_resolution(self.image_datasource)
         self.assertEqual(resolution, 180)
-        
+
     def test_get_raster_epsg(self):
         epsg_code = get_datasource_epsg(self.image_datasource)
         self.assertEqual(epsg_code, 3763)
