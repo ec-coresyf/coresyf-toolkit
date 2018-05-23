@@ -160,7 +160,7 @@ class ManageComponents(UserOperation):
             component_params['inputs'].append(param)
 
         for output in outputs:
-            output['type'] = self.get_data_type_id(_input['type'])
+            output['type'] = self.get_data_type_id(output['type'])
             output['isParam'] = False
             component_params['outputs'].append(output)
 
