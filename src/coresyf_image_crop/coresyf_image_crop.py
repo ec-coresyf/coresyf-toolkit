@@ -154,7 +154,7 @@ class CoresyfImageCrop(CoReSyFTool):
         grid_path = bindings['Sgrid']
         pbuffer = bindings['Pbuffer']
         pbufferUnits = bindings['PbufferUnits']
-        
+
         grid_datasource = read_shapefile(grid_path)
         grid_crs = get_datasource_epsg(grid_datasource)
         polygon_extent = get_shapefile_polygon_extent(grid_datasource)
