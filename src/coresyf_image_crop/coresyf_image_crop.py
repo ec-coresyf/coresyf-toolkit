@@ -1,27 +1,39 @@
 #!/usr/bin/python2
-import sys
 import os
 from osgeo import ogr, osr, gdal
 from coresyftools.tool import CoReSyFTool
 from sridentify import Sridentify
 
 
-def read_shapefile(folder_path):
+DEGREE_CRS_CODE = 4326
+METRE_CRS_CODE = 3857
+
+
+class ShapefileNotFound(Exception):
+    """Exception thrown when a shapefile cannot be found."""
+    def __init__(self, dir_path):
+        super(ShapefileNotFound, self).__init__(
+                            "Shapefile not found in '{}'!".format(dir_path))
+
+
+def read_shapefile(dir_path):
     '''
     It opens a folder with a shapefile and returns an handle to the
     OGRDataSource (a GDAL OGR object with the shapefile data).
+
+    :param str dir_path: path of folder containing a shapefile.
     '''
     # Get main file of the shapefile
-    input_list = [os.path.join(folder_path, x) for x in os.listdir(folder_path)
+    input_list = [os.path.join(dir_path, x) for x in os.listdir(dir_path)
                   if x.endswith(".shp")]
     if not input_list:
-        raise FileNotFoundError("Shapefile not found in '%s'!" % folder_path)
+        raise ShapefileNotFound(dir_path)
     shapefile_shp = input_list[0]
 
     driver = ogr.GetDriverByName('ESRI Shapefile')
     data_source = driver.Open(shapefile_shp, 0)  # 0 means read-only.
     if not data_source:
-        raise IOError("Error. Unable to open shapefile at '%s'!" % folder_path)
+        raise IOError("Error. Unable to open shapefile at '%s'!" % dir_path)
     return data_source
 
 
@@ -53,8 +65,8 @@ def get_datasource_epsg(data_source):
     Retrieves the ESPG Code of a GDAL/OGR datasource CRS (Coordinate Reference
     System).
 
-    data_source: must be the result of GDAL/OGR Open applied to the respective
-                 data.
+    :param obj data_source: must be the result of GDAL/OGR Open applied to the
+                            respective data.
     '''
     if isinstance(data_source, ogr.DataSource):  # Vector
         name = data_source.GetName()
@@ -77,10 +89,12 @@ def get_datasource_epsg(data_source):
 
 def apply_buffer_to_polygon(polygon, buffer, crs_buffer):
     '''
-    Applies a specific buffer to a polygon geometry.
-    polygon: OGR geometry with polygon extent.
-    buffer: buffer in buffer CRS units
-    crs_buffer: EPSG code of the buffer CRS.
+    Applies a specific buffer to a polygon geometry. It checks if polygon and
+    buffer have the same Spatial reference, converts the buffer (if required)
+    and apply it to the polygon geometry.
+    :param obj polygon: OGR geometry with polygon extent.
+    :param int buffer: buffer in buffer CRS units
+    :param int crs_buffer: EPSG code of the buffer CRS.
     '''
     polygon_copy = polygon.Clone()
     sr_polygon = polygon_copy.GetSpatialReference()
@@ -98,10 +112,10 @@ def apply_buffer_to_polygon(polygon, buffer, crs_buffer):
 
 def get_raster_resolution(data_source):
     '''
-    Retrieves information about the resolution (meters/pixel or degress/pixel)
+    Retrieves information about the resolution (meters/pixel or degrees/pixel)
     and the EPSG code of a raster.
 
-    data_source: GDAL datasource of a raster.
+    :param obj data_source: GDAL datasource of a raster.
     Return value: the resolution of the raster.
     '''
     transform = data_source.GetGeoTransform()
@@ -109,10 +123,12 @@ def get_raster_resolution(data_source):
     return resolution
 
 
-def convert_buffer_units(raster_resolution, buffer):
+def buffer_to_raster_units(raster_resolution, buffer):
     '''
     Converts the units of the buffer (given in pixels) to the units of the
     image (given either in meters or degrees).
+    :param float raster_resolution: raster resolution in units/pixel
+    :param int buffer: buffer in pixels.
     '''
     return raster_resolution*buffer
 
@@ -124,10 +140,10 @@ class CoresyfImageCrop(CoReSyFTool):
         Crops the image specified by input_raster using the limits defined in
         polygon_extent.
 
-        polygon_extent: POLYGON object to be used for the crop limits.
-        output_crs: the CRS of the output raster.
-        input_path: path to the image to be cropped.
-        output_path: the output file path.
+        :param obj polygon_extent: POLYGON object to be used for crop limits.
+        :param int output_crs: EPSG code of the CRS of the output raster.
+        :param str input_path: path to the image to be cropped.
+        :param str output_path: the output file path.
         '''
         in_out_bindings = {'Ssource': input_path, 'Ttarget': output_path}
         envelope = polygon_extent.GetEnvelope()
@@ -144,17 +160,28 @@ class CoresyfImageCrop(CoReSyFTool):
         output_path = bindings['Ttarget']
         grid_path = bindings['Sgrid']
         pbuffer = bindings['Pbuffer']
-        grid_datasource = read_shapefile(grid_path)
-        raster_datasource = gdal.Open(raster_path)
+        pbufferUnits = bindings['PbufferUnits']
 
+        grid_datasource = read_shapefile(grid_path)
         grid_crs = get_datasource_epsg(grid_datasource)
         polygon_extent = get_shapefile_polygon_extent(grid_datasource)
-        raster_resolution = get_raster_resolution(raster_datasource)
-        raster_crs = get_datasource_epsg(raster_datasource)
 
-        buffer = convert_buffer_units(raster_resolution, pbuffer)
+        if pbufferUnits == 'pixels':
+            raster_datasource = gdal.Open(raster_path)
+            raster_resolution = get_raster_resolution(raster_datasource)
+            buffer = buffer_to_raster_units(raster_resolution, pbuffer)
+            buffer_crs = get_datasource_epsg(raster_datasource)
+        elif pbufferUnits == 'meters':
+            buffer = pbuffer
+            buffer_crs = METRE_CRS_CODE
+        elif pbufferUnits == 'degrees':
+            buffer = pbuffer
+            buffer_crs = DEGREE_CRS_CODE
+        else:
+            raise ValueError("Invalid buffer units: '%s'" % pbufferUnits)
+
         polygon_with_buffer = apply_buffer_to_polygon(polygon_extent, buffer,
-                                                      raster_crs)
-        
+                                                      buffer_crs)
+
         self.crop_raster(polygon_with_buffer, grid_crs,
                          raster_path, output_path)
