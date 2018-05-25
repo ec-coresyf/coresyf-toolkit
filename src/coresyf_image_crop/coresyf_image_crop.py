@@ -9,24 +9,31 @@ DEGREE_CRS_CODE = 4326
 METRE_CRS_CODE = 3857
 
 
-def read_shapefile(folder_path):
+class ShapefileNotFound(Exception):
+    """Exception thrown when a shapefile cannot be found."""
+    def __init__(self, dir_path):
+        super(ShapefileNotFound, self).__init__(
+                            "Shapefile not found in '{}'!".format(dir_path))
+
+
+def read_shapefile(dir_path):
     '''
     It opens a folder with a shapefile and returns an handle to the
     OGRDataSource (a GDAL OGR object with the shapefile data).
 
-    :param str folder_path: path of folder containing a shapefile.
+    :param str dir_path: path of folder containing a shapefile.
     '''
     # Get main file of the shapefile
-    input_list = [os.path.join(folder_path, x) for x in os.listdir(folder_path)
+    input_list = [os.path.join(dir_path, x) for x in os.listdir(dir_path)
                   if x.endswith(".shp")]
     if not input_list:
-        raise IOError("Shapefile not found in '%s'!" % folder_path)
+        raise ShapefileNotFound(dir_path)
     shapefile_shp = input_list[0]
 
     driver = ogr.GetDriverByName('ESRI Shapefile')
     data_source = driver.Open(shapefile_shp, 0)  # 0 means read-only.
     if not data_source:
-        raise IOError("Error. Unable to open shapefile at '%s'!" % folder_path)
+        raise IOError("Error. Unable to open shapefile at '%s'!" % dir_path)
     return data_source
 
 
