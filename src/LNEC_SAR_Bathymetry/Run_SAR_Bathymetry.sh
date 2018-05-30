@@ -37,7 +37,7 @@ wait
 fun3 () {
 	local filename=$1
 	fname=$(echo $filename| cut -d'/' -f 4)
-	SAR_GridPoints_Subdivision/run -i $fname -a Config_Inversion.ini -l 0 -T 16.6 -m direct -w linear -o $fname.sub  -v
+	SAR_GridPoints_Subdivision/run -i $fname -a Config_Inversion.ini -l 0 -T 16.6 -m direct -w linear -o ${fname}.sub  -v
 }
 for filename in Spectrum*.out; do fun3 "$filename" & done
 wait
@@ -52,7 +52,7 @@ wait
 fun2 () {
 	local filename=$1
 	fname=$(echo $filename| cut -d'/' -f 4)
-	SAR_Inversion/run -i $fname -o $fname.inv -v
+	SAR_Inversion/run -i $fname -o ${fname}.inv -v
 }
 
 #if [ -f ComputationPoints0.out ]

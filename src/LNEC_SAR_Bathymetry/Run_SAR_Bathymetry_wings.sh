@@ -38,7 +38,7 @@ wait
 fun3 () {
 	local filename=$1
 	fname=$(echo $filename| cut -d'/' -f 4)
-	sudo /var/lib/tomcat8/.wings/storage/users/admin/coresyf/code/library/sarPointsSubdivision/run -i $fname -a Config_Inversion.ini -l 0 -T 16.6 -m direct -w linear -o $fname.sub  -v
+	sudo /var/lib/tomcat8/.wings/storage/users/admin/coresyf/code/library/sarPointsSubdivision/run -i $fname -a Config_Inversion.ini -l 0 -T 16.6 -m direct -w linear -o ${fname}.sub  -v
 }
 for filename in Spectrum*.out; do fun3 "$filename" & done
 wait
@@ -53,7 +53,7 @@ wait
 fun2 () {
 	local filename=$1
 	fname=$(echo $filename| cut -d'/' -f 4)
-	sudo /var/lib/tomcat8/.wings/storage/users/admin/coresyf/code/library/sarInversion/run -i $fname -o $fname.inv -v
+	sudo /var/lib/tomcat8/.wings/storage/users/admin/coresyf/code/library/sarInversion/run -i $fname -o ${fname}.inv -v
 }
 
 #if [ -f ComputationPoints0.out ]
