@@ -354,10 +354,14 @@ def ReadZipShapefile(filename, temp_path="temp_input"):
     # Extract zip contents
     myzip.extractall(temp_path)
     myzip.close()
+    # Get main contents
+    contents = [os.path.join(temp_path, x) for x in os.listdir(temp_path)]
+    if os.path.isdir(contents[0]):
+        contents = [os.path.join(contents[0], x) for x in os.listdir(contents[0])]     
     # Get main file of the shapefile
-    input_list = [os.path.join(temp_path, x) for x in os.listdir(temp_path) if x.endswith(".shp")] 
-    shapefile_shp = input_list[0]
-    if not input_list:
+    files_list = [x for x in contents if x.endswith(".shp")] 
+    shapefile_shp = files_list[0]
+    if not files_list:
         sys.exit("Shapefile not found in '%s'!" % filename)
     try:
         driver = ogr.GetDriverByName('ESRI Shapefile')
