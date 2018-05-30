@@ -110,9 +110,14 @@ class Packager():
 @click.option('--scihub_pass')
 def pack_tool(tool_dir, target_dir, scihub_user, scihub_pass):
     click.echo('Packaging {} to {}..'.format(tool_dir, target_dir))
-    packager = Packager(tool_dir, target_dir, (scihub_user, scihub_pass))
-    packager.pack_tool()
-    click.echo('Packaging finished.')
+    try:
+        packager = Packager(tool_dir, target_dir, (scihub_user, scihub_pass))
+        packager.pack_tool()
+    except ToolErrorsException as tool_errors:
+        for error in tool_errors.errors:
+            click.echo('Packaging error: {}'.format(error), err=True)
+    else:
+        click.echo('Packaging finished.')
 
 if __name__ == '__main__':
     pack_tool()
