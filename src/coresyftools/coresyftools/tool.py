@@ -212,5 +212,3 @@ class CoReSyFTool(object):
                 archive.write(os.path.join(output_path, file_), file_)
             archive.close()
             shutil.rmtree(output_path)
-
-

@@ -3,9 +3,6 @@ import os
 import logging
 import subprocess
 import requests
-import json
-import glob
-from urlparse import urlparse
 from os.path import exists, getsize
 from argument_parser import CoReSyFArgumentParser
 from manifest import get_manifest, find_manifest_files
@@ -13,10 +10,11 @@ from manifest import get_manifest, find_manifest_files
 DOWNLOAD_TIMEOUT = 30
 SCHIHUB_DOMAIN = 'https://scihub.copernicus.eu'
 
+
 class InvalidInputSource(Exception):
-    
     def __init__(self, source_url):
         self.source_url = source_url
+
 
 class InvalidCommandException(Exception):
     pass
@@ -54,6 +52,7 @@ class ToolExampleCommand(object):
 
     def __str__(self):
         return ' '.join(self.command)
+
 
 class ToolTester(object):
 
@@ -161,7 +160,7 @@ class ToolTester(object):
         self.log[command] = stdout
         if returncode:
             self.errors.append(NonZeroReturnCode(returncode,
-                                self._byte_to_str(stderror)))
+                               self._byte_to_str(stderror)))
         elif stderror:
             self.errors.append(NonEmptyStderr(stderror))
         else:
@@ -196,6 +195,7 @@ class ToolTester(object):
         with open(file_name, "a+") as input_file:
             for chunk in response.iter_content(chunk_size=1024):
                 input_file.write(chunk)
+
 
 class TestFailure(Exception):
     pass
