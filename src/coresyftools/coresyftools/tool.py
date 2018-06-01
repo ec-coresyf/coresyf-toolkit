@@ -94,6 +94,7 @@ class CoReSyFTool(object):
         self.logger = logging.getLogger(CoReSyFTool.__name__)
         self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.setLevel(logging.DEBUG)
+        self.logger.propagate = False
 
     def _get_logger(self):
         logger = logging.getLogger(self.__class__.__name__)
@@ -211,5 +212,3 @@ class CoReSyFTool(object):
                 archive.write(os.path.join(output_path, file_), file_)
             archive.close()
             shutil.rmtree(output_path)
-
-
