@@ -28,8 +28,10 @@ class MissingManifestFileException(Exception):
 class MissingExamplesFileException(Exception):
     pass
 
+
 class MultipleManifestFileException(Exception):
     pass
+
 
 class ToolErrorsException(Exception):
 
@@ -59,7 +61,7 @@ class Packager():
             raise MultipleManifestFileException()
         if not exists(join(self.tool_dir, 'examples.sh')):
             raise MissingExamplesFileException()
-    
+
     def _read_manifest(self):
         manifest_file_name = find_manifest_files(self.tool_dir)[0]
         self.manifest = get_manifest(manifest_file_name)
@@ -118,6 +120,7 @@ def pack_tool(tool_dir, target_dir, scihub_user, scihub_pass):
             click.echo('Packaging error: {}'.format(error), err=True)
     else:
         click.echo('Packaging finished.')
+
 
 if __name__ == '__main__':
     pack_tool()
