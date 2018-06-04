@@ -21,6 +21,13 @@
             "default": "'Product Auxiliary File'"
         },
         {
+            "identifier": "Ppolarisations",
+            "name": "Selected Polarisations",
+            "type": "string",
+            "description": "The list of Selected Polarisations to be processed.",
+            "default": ""
+        },
+        {
             "identifier": "PcreateBetaBand",
             "name": "create beta band",
             "type": "boolean",
