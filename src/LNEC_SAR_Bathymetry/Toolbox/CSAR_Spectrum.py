@@ -362,26 +362,28 @@ def Influence_Radius(spectrum):
 	# determine radius within which spectrum energy if concentrated		
 	#------------------------------------------------------------------
 	# radial projection
+	print '1'
 	R, RadialIntegration = RadialProjection(spectrum.Spectrum)
-	
+	print '2'
 	# corresponding wavenumber
 	dk = np.sum(np.diff(spectrum.k))/(spectrum.k.shape[0]-1)
 	kr = R*dk
-	
+	print '3'
 	#Radius with maximum energy	
 	Rm = 2*np.pi/kr[np.argmax(RadialIntegration)]
 	
-	# Radius with energy >20% of the maximum 	
+	# Radius with energy >20% of the maximum
+	print '4' 	
 	thr = 20./100*np.max(RadialIntegration)
 	index = np.where((RadialIntegration-thr)>0)
 	R20 = np.array([np.round((2*np.pi/kr[index[0][0]])/10)*10, np.floor((2*np.pi/kr[index[0][-1]])/10)*10])	
-
+	print '5'
 	# radius including all spectrum energy
 	# Detect crossing with 5 % of the maximum
 	thr = 5./100*np.max(RadialIntegration)
 	index = np.where((RadialIntegration-thr)>0)
 	Radius = np.floor((2*np.pi/kr[index[0][-1]])/10)*10
-
+	print '6'
 	return Radius, Rm, R20
 
 def Direction180Ambiguity(Directions, parameters):
@@ -604,16 +606,17 @@ def SubsetSpectrum(parameters, subset_input):
 	
 	#--------------------------
 	# A) Subset Processing
-	#--------------------------
-	# scale sub-images
+	#--------------------------subset_input.image
+	# parameters
 	IP_Parameters = parameters.SubsetProcessingParameters
-	image = IP.ScaleImage(subset_input.image,IP_Parameters.IntensityType)
-	subset = CL.Subset(subset_input.CenterPoint, image, subset_input.coordinates, subset_input.resolution,subset_input.FlagFlip)
 
 	#stretch contrast
 	if IP_Parameters.ConstrastStretchFlag:
-		image = IP.ContrastStretch(image, IP_Parameters.IntensityType)
-		subset = CL.Subset(subset.CenterPoint, image, subset.coordinates, subset.resolution, subset.FlagFlip)
+		image = IP.ScaleImage(IP.ContrastStretch(subset_input.image, IP_Parameters.IntensityType), subset_input.image.astype('float32'))
+		subset = CL.Subset(subset_input.CenterPoint, image, subset_input.coordinates, subset_input.resolution, subset_input.FlagFlip)
+	else:
+		image = IP.ScaleImage(subset_input.image, subset_input.image.astype('float32'))
+		subset = CL.Subset(subset_input.CenterPoint, image, subset_input.coordinates, subset_input.resolution, subset_input.FlagFlip)
 	#--------------------------
 	# B) Subset Spectrum
 	#--------------------------		
@@ -630,9 +633,8 @@ def SubsetSpectrum(parameters, subset_input):
 	#-------------------------------------
 	IF_Parameters = parameters.FilterParameters;
 	if IF_Parameters.FlagFilter:
-		FilteredImage = ImageFilter(IF_Parameters, subset, direction)
-		image = IP.ScaleImage(FilteredImage,32)		
-		subset = CL.Subset(subset.CenterPoint, image, subset.coordinates, subset.resolution, subset.FlagFlip)
+		FilteredImage = ImageFilter(IF_Parameters, subset, direction)		
+		subset = CL.Subset(subset.CenterPoint, FilteredImage, subset.coordinates, subset.resolution, subset.FlagFlip)
 		Image_Spectrum = ImageSpectrum(IP_Parameters, subset)
 				
 		#---------------------------
@@ -773,37 +775,41 @@ def RadialSpectrum(parameters, subset_input):
 	# A) Subset Processing
 	#--------------------------
 	
-	# scale sub-images
-	IP_Parameters = parameters.SubsetProcessingParameters
-	image = IP.ScaleImage(subset_input.image,IP_Parameters.IntensityType)
-	subset = CL.Subset(subset_input.CenterPoint, image, subset_input.coordinates, subset_input.resolution, subset_input.FlagFlip)
+	# Parameters
+	IP_Parameters = parameters.SubsetProcessingParameters	
 	#stretch contrast
+	print 'test1'
 	if IP_Parameters.ConstrastStretchFlag>0:
-		image = IP.ContrastStretch(image, IP_Parameters.IntensityType)
-		subset = CL.Subset(subset.CenterPoint, image, subset.coordinates, subset.resolution, subset.FlagFlip)
+		image = IP.ScaleImage(IP.ContrastStretch(subset_input.image, IP_Parameters.IntensityType), subset_input.image.astype('float32'))
+		subset = CL.Subset(subset_input.CenterPoint, image, subset_input.coordinates, subset_input.resolution, subset_input.FlagFlip)
+	else:
+		image = IP.ScaleImage(subset_input.image, subset_input.image.astype('float32'))
+		subset = CL.Subset(subset_input.CenterPoint, image, subset_input.coordinates, subset_input.resolution, subset_input.FlagFlip)
 	#--------------------------
 	# B) Subset Spectrum
 	#--------------------------	
+	print 'test2'
 	Image_Spectrum = ImageSpectrum(IP_Parameters, subset)
 
 	#--------------------------
 	# C) Direction Estimate
 	#--------------------------
 	# determine radius of influence
+	print 'test3'
 	R, _, _ = Influence_Radius(Image_Spectrum)
+	print 'test31'
 	DE_Parameters = parameters.DirectionEstimateParameters	
 	direction = DirectionEstimate(DE_Parameters, subset, Image_Spectrum)
-
+	print 'test4'
 	#--------------------------------------
 	# D) Apply Butterworth Elliptic Filter
 	#-------------------------------------
 	IF_Parameters = parameters.FilterParameters
 	DE_Parameters = parameters.DirectionEstimateParameters
 	if IF_Parameters.FlagFilter:
-		FilteredImage = ImageFilter(IF_Parameters, subset, direction)
-		image = IP.ScaleImage(FilteredImage,32)		
-		subset = CL.Subset(subset.CenterPoint, image, subset.coordinates, subset.resolution, subset.FlagFlip)
-
+		FilteredImage = ImageFilter(IF_Parameters, subset, direction)		
+		subset = CL.Subset(subset.CenterPoint, FilteredImage, subset.coordinates, subset.resolution, subset.FlagFlip)
+	print 'test5'
 	#------------------------------
 	# E) Perform Image Padding
 	#------------------------------
@@ -814,7 +820,7 @@ def RadialSpectrum(parameters, subset_input):
 	#----------------------------------------------------	
 	Image_Spectrum = ImageSpectrum(IP_Parameters, subset)
 	direction = DirectionEstimate(DE_Parameters, subset, Image_Spectrum)
-	
+	print 'test6'
 	#------------------------------------------------
 	# G) Process Spectrum 
 	#------------------------------------------------
@@ -822,12 +828,12 @@ def RadialSpectrum(parameters, subset_input):
 	Spectrum = Image_Spectrum.Spectrum; k = Image_Spectrum.k;
 	mask = MaskPlot(R, subset)	
 	Spectrum[mask] = 0 
-	
+	print 'test7'
 	#---------------------------------------------
 	# H) Compute radial integration and 
 	#---------------------------------------------	
 	Rr, RadialIntegration = RadialProjection(Spectrum)
-
+	print 'test8'
 
 	#---------------------------------------------	
 	# I) Evaluate k-axis in agreement with Radius

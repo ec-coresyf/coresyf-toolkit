@@ -123,7 +123,7 @@ def InputSubsetParameters():
 	file_path_name = CL.File_path_name('', args.input, '', '')
 	Point = np.zeros(2) + 1000; Point = Point.astype(int)
 	LandMask_Parameters = CL.LandMaskParameters()	
-	ProcessingParameters = CL.Processing_Parameters('uint16', Slant_Correction, 1., Contrast_Stretch, LandMask_Parameters)
+	ProcessingParameters = CL.Processing_Parameters(Slant_Correction, 1., Contrast_Stretch, LandMask_Parameters)
 	SpatialReferenceSystem = CL.Spatial_Reference_System(EPSG_In, EPSG_Out)
 	Subsetparameters = CL.SubsetParameters(Point, float(args.dimension), True, float(args.shift), int(float(args.window)))
 	Image_Parameters = CL.ImageParameters(file_path_name, ProcessingParameters, SpatialReferenceSystem)
@@ -210,9 +210,8 @@ def ReadSARImg(parameters):
 	coordinates = CL.Coordinates(northing,easting)
 	
 	# read projected image and get raster image
-	f, _, img = ReadGtiffRaster(flin, parameters.ProcessingParameters.DataType)
-        print 'TEST 1'
-        print np.nanmean(img)
+	f, _, img = ReadGtiffRaster(flin)
+
 	# close raster
 	f = None
 	#-------------------------------------------------------------------------------------
@@ -226,7 +225,6 @@ def ReadSARImg(parameters):
 		os.system("cp " + flin + " " + fout)
 
 	#create land mask
-
 	if parameters.ProcessingParameters.LandMaskParameters.LandMaskFlag:
 		
 		filename = filein[:-4].split(pattern)[-1]+"_Masked.tif"
@@ -248,12 +246,6 @@ def ReadSARImg(parameters):
 	else:
 		LMaskFile = flin
 		mask = img
-	"""
-	fig, ax = plt.subplots(1)
-	E=coordinates.easting; N=coordinates.northing;
-	ax.imshow(img, cmap=plt.cm.gray, interpolation=None, aspect='auto', origin='upper', extent=[np.min(E), np.max(E), np.min(N), np.max(N)])
-	plt.show()
-	"""
 
 	return coordinates, img, res
 
@@ -424,7 +416,7 @@ def ImageCenter(img):
 
 	return center
 
-def ScaleImage(img,type):
+def ScaleImage(img, imgref):
 	#------------------------------------------------------------
 	# scale image to the selected format (8, 16 or 32 bits)
 	#------------------------------------------------------------
@@ -433,57 +425,53 @@ def ScaleImage(img,type):
 	If type = 16 => dtype=np.uint16 => n_colors = 65536 and range from 0 to 65535
 	If type = 32 => dtype=np.float32 => n_colors = 1 and range from 0 to 1.
 	"""
-	n_colors={"8": 255., "16": 65536. ,"32": 1.}
-	if type == 8:
-		out_type=np.uint8
-	elif type == 16:
-		out_type=np.uint16
-	elif type == 32:
-		out_type=np.float32
-	elif type == 0:
-		out_type=np.float32
-	else:
-		print "ERROR! Check <type> argument!!!"
+	typestr=str(imgref.dtype)
+	if typestr == 'uint8': 
+		fac = 255.
+	elif typestr == 'uint16':
+		fac = 65536.
+	elif typestr.find('float')>-1:
+		fac = 1.
+ 
+	img_new = np.array(img*fac/np.nanmax(img))
 
-	if type > 0:
-                print 'IMAGE'
-                print img
-                print np.size(img)
-		img_new = np.array(img*n_colors[str(type)]/np.nanmax(img),dtype=out_type)
-	else:	
-		img_new = img
-	return img_new
+	return img_new.astype(imgref.dtype)
 
 
-def ContrastStretch(img,intensitytype=32):
+def ContrastStretch(img):
 	#------------------------------------------------------------------
 	# stretch image band (0->1, 0->255,...) depending on image format
-	#------------------------------------------------------------------
-	
-	# intensity reference
-	if intensitytype == 8: 
-		fac = 255.
-	elif intensitytype == 16:
-		fac = 65536.
-	elif intensitytype == 32:
-		fac = 1.
-	
-	# normalize image
-	#img = img /np.max(img)		
+	#------------------------------------------------------------------	
 
 	# equalize image histogram
 	choice = 3
-
+	
 	if choice == 1:
 		p2 = np.percentile(img, 2)
 		p98 = np.percentile(img, 98)
-		img_eq = exposure.rescale_intensity(img, in_range=(p2, p98))
+		typestr=str(img.dtype)
+		imgf = img_as_float(img) if typestr.find('float')>0 else img
+		try:
+			img_eq = exposure.rescale_intensity(imgf, in_range=(p2, p98), dtype=imgf.dtype)
+		except:
+			img_eq = exposure.rescale_intensity(imgf, in_range=(p2, p98))	
 	elif choice == 2:
-		img_eq = exposure.equalize_hist(img)
+		typestr=str(img.dtype)
+		imgf = img_as_float(img) if typestr.find('float')>0 else img
+		try:
+			img_eq = exposure.equalize_hist(imgf, dtype=imgf.dtype)
+		except:
+			img_eq = exposure.equalize_hist(imgf)
 	elif choice == 3:	
-	        img_eq = exposure.equalize_adapthist(img, clip_limit=0.03)
+		typestr=str(img.dtype)
+		imgf = img_as_float(img) if typestr.find('float')>0 else img	
+		try:	
+			img_eq = exposure.equalize_adapthist(imgf, clip_limit=0.03, dtype=imgf.dtype)
+		except:
+			img_eq = exposure.equalize_adapthist(imgf, clip_limit=0.03)
 	elif choice == 4:
-		img_eq = fac * (img - np.min(img)) / (np.max(img) - np.min(img))
+		img_eq = (img - np.min(img)) / (np.max(img) - np.min(img))
+
 	#figure (control)
 	flagplot=0
 	
@@ -514,8 +502,7 @@ def ImageContrastStretch(coordinates, img, filein, EPSG, Band=1):
 	if len(fileCS)==0:
 		#A create file if it does not exist
 		# Stretch contrast
-		img = ContrastStretch(img)
-
+		img = ScaleImage(ContrastStretch(img),img)
 		#consider 1st band if multiband gray image
 		if len(img.shape)==3:
 			img = img[Band-1,:,:]
@@ -543,12 +530,10 @@ def SlantRangeGTiFF(filein,fileout):
 	
 	# open file and get information
 	img, Info = GetGtiffInformation(filein)
-	
 	# image processing
 	img1 = ContrastStretch(img)		# stretch contrast
 	img2 = SlantRangeCorrection(img1)	# Slant Range correction
-	imgr = ScaleImage(img2,8)		# image scaling according to type
-	
+	imgr = ScaleImage(img2, img)		# image scaling according to type
 	# create Gtiff output image
 	CreateOutputGtiff(imgr, fileout, Info)
 
@@ -576,10 +561,6 @@ def SlantRangeCorrection(img):
 	
 	#apply correction to the whole image
 	img_corr=img*slant_corr[:,np.newaxis].transpose()
-
-	#plt.figure(), plt.imshow(img,cmap=plt.cm.gray)
-	#plt.figure(), plt.imshow(img_corr,cmap=plt.cm.gray)
-	#plt.show(), sys.exit()
 
 	return img_corr
 
@@ -620,16 +601,19 @@ def Convert1BandTiff(filein,band):
 	return fileout
 
 
-def ReadGtiffRaster(filein, datatype = 'uint16'):
+def ReadGtiffRaster(filein):
+	
 	# read projected image and get rasterband
 	f = gdal.Open(filein); a = f.GetRasterBand(1)
+	raster = f.ReadAsArray(0, 0, a.XSize, a.YSize)
 
 	# reconstitute image from raster
-	if datatype == 'uint16':
-		img = f.ReadAsArray(0, 0, a.XSize, a.YSize).astype(np.uint16)
-	elif datatype == 'float32':
-		img = f.ReadAsArray(0, 0, a.XSize, a.YSize).astype(np.float32)
+	img = raster.astype(np.uint16) if str(raster.dtype).find('uint')>-1 else raster.astype(np.float32)
 	
+	# exceptions
+	if (str(img.dtype)=='float32' and np.max(img)>1.):
+		img=img/np.max(img)
+
 	return f, a, img 
  
 def GetGtiffInformation(filein,EPSG=0):
@@ -705,7 +689,7 @@ def array2raster(img, coordinates, EPSG, filein, fileout="ImgOut.tif"):
 	_,Info = GetGtiffInformation(filein, EPSG)
 
 	#process image
-	img=ScaleImage(img,8)
+	img=ScaleImage(img, img)
 	
 	# get corner coordinates
 	
@@ -740,7 +724,7 @@ def CreateGTiFF(filein,fileout,band,EPSG=4326):
 
 	# image processing 
 	img = UnibandTransform(img,band)
-	img = ScaleImage(img,8)
+	img = ScaleImage(img,img)
 	
 	# create output raster 
 	CreateOutputGtiff(img, fileout, Info)
@@ -769,14 +753,6 @@ def ImagePadding(parameters,subset):
 	# paste subset image in padding image
 	indx = C[0]-center[0]; indy = C[1]-center[1];
 	Image[indx:indx+dimension[0], indy:indy+dimension[1]]  = image
-	
-	#figure	
-	"""
-	fig, (ax1, ax2) = plt.subplots(2)
-	ax1.imshow(image); ax1.plot(center[0],center[1],'o')
-	ax2.imshow(Image); ax2.plot(C[0],C[1],'o')
-	plt.show()
-	"""
 
 	return Image
 
@@ -883,7 +859,7 @@ def CreateLandMask(filein, coordinates_image, parameters):
 	#*********************
 	filename = fileout_image								# the mask is pasted into the image mask file (mandatory for gdal_merge to keep dimensions)
 	os.system("gdal_merge.py -n 0. -o "+fileout_image+" "+fileout_mask+" "+ filename)	# merge mask image using gdal_merge
-	f, _, finalmask = ReadGtiffRaster(filename,'float32'); f = None;			# read mask
+	f, _, finalmask = ReadGtiffRaster(filename); f = None;			# read mask
 	os.system("rm"+" "+fileout_mask+" "+fileout_image)					# clean directory
 
 	
@@ -960,7 +936,7 @@ def ReadTopography(parameters):
 	
 	# read raster
 	filename= path + flin
-	f, _, topography = ReadGtiffRaster(filename,'float32')
+	f, _, topography = ReadGtiffRaster(filename)
 	f = None
 
 	# process exception
