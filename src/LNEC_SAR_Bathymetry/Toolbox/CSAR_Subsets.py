@@ -67,20 +67,12 @@ def GetImageSubset(subsetparameters, data, dimensions):
 	# Create square image subset from predefined corner points
 	#------------------------------------------------------------------	
 	Point = subsetparameters.Point
-        print '>> TEST 4 <<'
-        print data.image	
+        
+        	
 	# get and scale image subset
 	BoxRange = dimensions.BoxRange; BoxRange = BoxRange.astype(int); 
-        print BoxRange
-        print Point[1]
-        print Point[1] - BoxRange[0]
-        print Point[1]+BoxRange[1]
-        print Point[0]-BoxRange[0]
-        print Point[0]+BoxRange[1]
 	image = data.image[Point[1]-BoxRange[0]:Point[1]+BoxRange[1],Point[0]-BoxRange[0]:Point[0]+BoxRange[1]]
-        print image
-	image = IP.ScaleImage(image,8)
-        print image
+
 	# get and store corresponding coordinates	
 	easting = data.coordinates.easting[Point[1]-BoxRange[0]:Point[1]+BoxRange[1],Point[0]-BoxRange[0]:Point[0]+BoxRange[1]]
 	northing = data.coordinates.northing[Point[1]-BoxRange[0]:Point[1]+BoxRange[1],Point[0]-BoxRange[0]:Point[0]+BoxRange[1]]
@@ -121,30 +113,21 @@ def GetFFTBoxes(subsetparameters, data, dimension):
 	#---------------------------------------------------------------------------------------------------------------
 	# Create list of overlapping subset images to estimate spectrum at a given grid point (center of main subset) 
 	#---------------------------------------------------------------------------------------------------------------
-
 	# initialisation	
 	#images, northings, eastings= [],[],[]
 	Subsets=[]
 	# Get the various subset images centers (box defined with an offset from the main subset, the overlapping is controlled by the offset) 
 	offset = subsetparameters.Shift*dimension.BoxRange; 
 	subset_centers =  GetSubsetCenters(subsetparameters.Point, offset, subsetparameters.BoxNb)
-        print '>>>> TEST 3 <<<<<'
-        print data.image
-        print np.nanmean(data.image)
 	# get information on subsets (coordinates, image footprint)
 	for i in subset_centers:
-                print i
 		# get subset	
 		subsetparameters.Point = i
-                print subsetparameters
-                print data.image
-                print dimension
 		subset = GetImageSubset(subsetparameters, data, dimension)
-		# scale image
-		image = IP.ScaleImage(subset.image,8)
+		# get coordinates
 		coordinates = CL.Coordinates(subset.coordinates.northing, subset.coordinates.easting)
 		FlagFlip = IP.CheckImageOrientation(coordinates)
-		subsets = CL.Subset(i, image, coordinates, data.resolution, FlagFlip) 
+		subsets = CL.Subset(i, data.image, coordinates, data.resolution, FlagFlip) 
 		Subsets.append(subsets)	
 		"""
 		# concatenate data
