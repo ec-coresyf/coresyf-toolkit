@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+'''
+@summary:
+This module creates a dummy output file.
+'''
+import gdal
+from osgeo import osr
+from optparse import OptionParser
+import numpy as np
+
+
+rasterOrigin = (-123.25745, 45.43013)
+pixelWidth = 10
+pixelHeight = 10
+array = np.array(
+       [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1],
+        [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1],
+        [1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1],
+        [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])
+
+
+def array2raster(newRasterfn, rasterOrigin, pixelWidth, pixelHeight, array):
+    cols = array.shape[1]
+    rows = array.shape[0]
+    originX = rasterOrigin[0]
+    originY = rasterOrigin[1]
+
+    driver = gdal.GetDriverByName('GTiff')
+    outRaster = driver.Create(newRasterfn, cols, rows, 1, gdal.GDT_Byte)
+    outRaster.SetGeoTransform((originX, pixelWidth, 0,
+                               originY, 0, pixelHeight))
+    outband = outRaster.GetRasterBand(1)
+    outband.WriteArray(array)
+    outRasterSRS = osr.SpatialReference()
+    outRasterSRS.ImportFromEPSG(4326)
+    outRaster.SetProjection(outRasterSRS.ExportToWkt())
+    outband.FlushCache()
+
+
+def main():
+    parser = OptionParser()
+    parser.add_option('--Ssource',
+                      dest="input_raster", metavar=' ',
+                      help="input raster product")
+    parser.add_option('--o1',
+                      dest="output_raster1", metavar=' ',
+                      help=("output dummy raster file "
+                            "(default: 'dummy_raster.tif')"),
+                      default="dummy_raster.tif")
+    parser.add_option('--o2',
+                      dest="output_raster2", metavar=' ',
+                      help=("output dummy raster file "
+                            "(default: 'dummy_raster.tif')"),
+                      default="dummy_raster.tif")
+    parser.add_option('--o3',
+                      dest="output_raster3", metavar=' ',
+                      help=("output dummy raster file "
+                            "(default: 'dummy_raster.tif')"),
+                      default="dummy_raster.tif")
+
+    (opts, args) = parser.parse_args()
+
+    if not opts.input_raster:
+        print("No input raster provided. Nothing to do!")
+        return
+
+    reversed_arr = array[::-1]  # reverse array so the tif looks like the array
+
+    array2raster(opts.output_raster1, rasterOrigin, pixelWidth, pixelHeight,
+                 reversed_arr)  # convert array to raster
+    array2raster(opts.output_raster2, rasterOrigin, pixelWidth, pixelHeight,
+                 reversed_arr)  # convert array to raster
+    array2raster(opts.output_raster3, rasterOrigin, pixelWidth, pixelHeight,
+                 reversed_arr)  # convert array to raster
+
+
+if __name__ == "__main__":
+    main()
