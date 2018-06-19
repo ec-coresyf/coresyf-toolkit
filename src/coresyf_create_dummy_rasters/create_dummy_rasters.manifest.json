@@ -1,0 +1,34 @@
+{
+    "name": "create_dummy_rasters",
+    "type": "test",
+    "description": "Dummy test tool to create 3 dummy rasters",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        }
+    ],
+    "parameters": [],
+    "outputs": [   
+        {
+            "identifier": "o1",
+            "name": "output1",
+            "description": "Sets the target to <filepath>",
+            "type": "GeoTIFF"
+        },
+        {
+            "identifier": "o2",
+            "name": "output2",
+            "description": "Sets the target to <filepath>",
+            "type": "GeoTIFF"
+        },
+        {
+            "identifier": "o3",
+            "name": "output3",
+            "description": "Sets the target to <filepath>",
+            "type": "GeoTIFF"
+        }
+    ]
+}
