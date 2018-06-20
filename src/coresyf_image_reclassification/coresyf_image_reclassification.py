@@ -19,8 +19,8 @@ def create_gdal_calc_expression(file_path):
     logic of the data transformation.
     :param str file_path: path of the text file.
     '''
-    with open(file_path) as f:
-        content = f.readlines()
+    with open(file_path) as file_classes:
+        content = file_classes.readlines()
     interval_list = [x.strip() for x in content]
 
     ranges_exp = ''
@@ -69,5 +69,6 @@ class CoresyfImageReclass(CoReSyFTool):
         self.invoke_shell_command(command_template, **bindings)
 
     def run(self, bindings):
-        gdal_cal_exp = create_gdal_calc_expression(bindings['Sclass'])
+        filepath_classes = bindings['Sclass']
+        gdal_cal_exp = create_gdal_calc_expression(filepath_classes)
         self.reclassify_image(bindings, gdal_cal_exp)
