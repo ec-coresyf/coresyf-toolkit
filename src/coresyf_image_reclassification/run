@@ -1,0 +1,10 @@
+#!/usr/bin/python2
+import sys
+sys.dont_write_bytecode = True
+
+from coresyf_image_reclassification import CoresyfImageReclass
+
+
+if __name__ == '__main__':
+    CoresyfImageReclass(__file__,
+                        'CoresyfImageReclass.manifest.json').execute()

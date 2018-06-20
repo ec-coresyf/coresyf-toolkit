@@ -1,0 +1,37 @@
+{
+    "name": "CoresyfImageReclassification",
+    "type": "ImageReclassification",
+    "description": 
+        "Tool that uses GDAL raster utility program 'gdal_calc' to reclassify an image, according with the classes (interval of values) defined in a text file.",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Filepath of the input raster",
+            "type": "GeoTIFF"
+        },
+        {
+            "identifier": "Sclass",
+            "name": "class",
+            "description": "The path for the text file containing the correspondence between input and output classes.",
+            "type": "text"
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "NoDataValue",
+            "name": "NoDataValue",
+            "description": "Output no data value.",
+            "type": "float",
+            "default": 0
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Filepath of the output raster",
+            "type": "GeoTIFF"
+        }
+    ]
+}
