@@ -74,6 +74,7 @@ MANIFEST_SCHEMA = {
                 },
                 'metavar': {
                     'type': 'string',
+                    'empty': True
                 },
                 'default': {},
                 'options': {
