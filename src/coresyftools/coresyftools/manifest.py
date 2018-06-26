@@ -69,6 +69,12 @@ MANIFEST_SCHEMA = {
                     'type': 'string',
                     'allowed': ['string', 'boolean', 'int', 'float', 'date']
                 },
+                'nargs':{
+                    'type': 'string',
+                },
+                'metavar': {
+                    'type': 'string',
+                },
                 'default': {},
                 'options': {
                     'type': 'list',
