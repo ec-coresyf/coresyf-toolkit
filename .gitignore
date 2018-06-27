@@ -9,3 +9,6 @@ src/coresyftools/dist
 src/coresyftools/coresyftools/tests/tool4.zip
 tool_examples/
 src/coresyf_image_crop/tests/test_data/Aveiro_resampled.tif
+
+env2/
+build/
