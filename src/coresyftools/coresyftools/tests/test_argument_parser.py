@@ -233,3 +233,16 @@ class TestCoReSyFArgParser(TestCase):
         arg_parser = self.parse_with_arg(arg, command.split())
         self.assertEqual(arg_parser.bindings['nargsparam'], ['1','2','3','4'])
 
+    def test_parse_parameter_metavar_args(self):
+        manifest = self.base_manifest.copy()
+        arg = {
+            'identifier': 'metavarparam',
+            'name': 'parameter with metavar',
+            'description': 'parameter with metavar discriping arguments',
+            'nargs': "3",
+            'type': 'string',
+            'metavar': "('var1', 'var2', 'var3')"
+        }
+        command = '--input f1 --output f2 --metavarparam 1 2 3 '
+        arg_parser = self.parse_with_arg(arg, command.split())
+        self.assertEqual(arg_parser.bindings['metavarparam'], ['1','2','3'])

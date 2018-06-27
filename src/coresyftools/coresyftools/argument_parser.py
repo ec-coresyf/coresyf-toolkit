@@ -1,6 +1,8 @@
 from datetime import date
 import logging
 
+from ast import literal_eval as make_tuple
+
 from argparse import ArgumentParser
 from manifest import validate_manifest, MANIFEST_SCHEMA
 
@@ -60,6 +62,9 @@ class CoReSyFArgumentParser():
             except ValueError as e:
                 pass
             add_arguments_kwargs['nargs'] = nargs
+        if 'metavar' in arg:
+            add_arguments_kwargs['metavar'] = make_tuple(arg['metavar'])
+        print add_arguments_kwargs
         self.arg_parser.add_argument('--' + name, type=_type, help=_help,
                                      **add_arguments_kwargs)
         self.logger.debug('Parsed %s parameter argument.', name)

@@ -72,6 +72,10 @@ MANIFEST_SCHEMA = {
                 'nargs':{
                     'type': 'string',
                 },
+                'metavar': {
+                    'type': 'string',
+                    'empty': True
+                },
                 'default': {},
                 'options': {
                     'type': 'list',
