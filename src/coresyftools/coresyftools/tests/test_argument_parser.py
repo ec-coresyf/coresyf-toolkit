@@ -205,3 +205,44 @@ class TestCoReSyFArgParser(TestCase):
         arg_parser.parse_arguments(command.split())
         self.assertEqual(arg_parser.bindings['coloutput'],
                          ['fc2', 'fc3', 'fc4'])
+
+    def test_parse_parameter_nargs_init(self):
+        """Test nargs parameter with number of expected arguments."""
+        manifest = self.base_manifest.copy()
+        arg = {
+            'identifier': 'nargsparam',
+            'name': 'parameter nargs',
+            'description': 'parameter with multiple arguments',
+            'nargs': "4",
+            'type': 'string'
+        }
+        command = '--input f1 --output f2 --nargsparam 1 2 3 4'
+        arg_parser = self.parse_with_arg(arg, command.split())
+        self.assertEqual(arg_parser.bindings['nargsparam'], ['1','2','3','4'])
+
+    def test_parse_parameter_nargs_all_args(self):
+        manifest = self.base_manifest.copy()
+        arg = {
+            'identifier': 'nargsparam',
+            'name': 'parameter nargs',
+            'description': 'parameter with multiple arguments',
+            'nargs': "*",
+            'type': 'string'
+        }
+        command = '--input f1 --output f2 --nargsparam 1 2 3 4'
+        arg_parser = self.parse_with_arg(arg, command.split())
+        self.assertEqual(arg_parser.bindings['nargsparam'], ['1','2','3','4'])
+
+    def test_parse_parameter_metavar_args(self):
+        manifest = self.base_manifest.copy()
+        arg = {
+            'identifier': 'metavarparam',
+            'name': 'parameter with metavar',
+            'description': 'parameter with metavar discriping arguments',
+            'nargs': "3",
+            'type': 'string',
+            'metavar': "('var1', 'var2', 'var3')"
+        }
+        command = '--input f1 --output f2 --metavarparam 1 2 3 '
+        arg_parser = self.parse_with_arg(arg, command.split())
+        self.assertEqual(arg_parser.bindings['metavarparam'], ['1','2','3'])
