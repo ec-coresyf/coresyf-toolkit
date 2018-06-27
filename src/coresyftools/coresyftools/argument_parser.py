@@ -53,6 +53,13 @@ class CoReSyFArgumentParser():
             add_arguments_kwargs['default'] = arg['default']
         if 'required' in arg:
             add_arguments_kwargs['required'] = arg['required']
+        if 'nargs' in arg:
+            nargs = arg['nargs']
+            try:
+                nargs = int(nargs) # try to convert to int
+            except ValueError as e:
+                pass
+            add_arguments_kwargs['nargs'] = nargs
         self.arg_parser.add_argument('--' + name, type=_type, help=_help,
                                      **add_arguments_kwargs)
         self.logger.debug('Parsed %s parameter argument.', name)
