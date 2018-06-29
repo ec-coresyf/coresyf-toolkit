@@ -1,0 +1,39 @@
+{
+    "name": "CoReSyFDataCubeCreation",
+    "type": "DataCubeCreation",
+    "description":
+        "This tool extract spatial data from a bunch of netCDF files in a folder by bounding box and creates a stacked 3D data cube of grid data.",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Path to a folder containing the input NetCDF dataset files.",
+            "type": "String"
+          }
+    ],
+    "parameters": [
+        {
+          "identifier": "bbox",
+          "name": "bounding box",
+          "description": "AOI as bounding box of geographic coordinates in eastern dregree.",
+          "type": "string",
+          "nargs": "4"
+        },
+        {
+            "identifier": "var",
+            "name": "variables",
+            "description": "variables to extract from dataset",
+            "type": "string",
+            "default": "",
+            "nargs": "+"
+        }
+    ],
+    "outputs": [
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Target path for the data cube file.",
+            "type": "NetCDF"
+        }
+    ]
+}

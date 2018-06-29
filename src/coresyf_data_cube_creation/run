@@ -1,0 +1,50 @@
+#! /usr/bin/python2.7
+
+import os
+
+from coresyftools.tool import CoReSyFTool
+
+from data_cube import search_files
+from data_cube import extract_data
+from data_cube import create_netcdf
+from data_cube import write_netcdf
+
+class CoReSyFDataCubeCreation(CoReSyFTool):
+    def run(self, bindings):
+
+        # Input
+        input_folder = bindings['Ssource']
+        bbox = tuple(bindings['bbox'])
+        variables = tuple(bindings['var'])
+
+        # Output
+        out_netcdf = bindings['Ttarget']
+
+        # get files
+        files = search_files(input_folder, pattern="*.nc")
+        self.logger.info("Found {} in '{}'.".format(len(files),input_folder ))
+
+        for file in files:
+            self.logger.debug('run extraction')
+            data = extract_data(file, bbox)
+
+            # run masking
+            # TODO: fix massking to zero and one
+            # data = masked_by_flags(data, mask_var="mask", flags=[2,5,9,13])
+
+        self.logger.debug('create netcdf')
+        # TODO: check if excetions exists
+        if not os.path.exists(out_netcdf):
+            try:
+                create_netcdf(data, out_netcdf)
+            except Exception as e:
+                raise e
+
+        # TODO: check if excetions exists
+        try:
+            write_netcdf(data, out_netcdf)
+        except Exception as e:
+            raise e
+
+if __name__ == '__main__':
+    CoReSyFDataCubeCreation(__file__, 'CoReSyFDataCubeCreation.manifest.json').execute()
