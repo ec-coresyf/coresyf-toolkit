@@ -8,24 +8,15 @@
             "identifier": "Ssource",
             "name": "source",
             "description": "Path to a folder containing the input NetCDF dataset files.",
-            "type": "String"
+            "type": "string"
           }
     ],
     "parameters": [
         {
-          "identifier": "bbox",
-          "name": "bounding box",
-          "description": "AOI as bounding box of geographic coordinates in eastern dregree.",
-          "type": "string",
-          "nargs": "4"
-        },
-        {
             "identifier": "var",
             "name": "variables",
-            "description": "variables to extract from dataset",
-            "type": "string",
-            "default": "",
-            "nargs": "+"
+            "description": "Variables to extract from dataset. String of names separated by comma.",
+            "type": "string"
         }
     ],
     "outputs": [
@@ -33,7 +24,7 @@
             "identifier": "Ttarget",
             "name": "target",
             "description": "Target path for the data cube file.",
-            "type": "NetCDF"
+            "type": "string"
         }
     ]
 }
