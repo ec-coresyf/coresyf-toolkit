@@ -221,17 +221,17 @@ class CoReSyFDataCubeCreation(CoReSyFTool):
 
     def run(self, bindings):
 
-        try:
-            inputs = get_inputs(input_dir, pattern="*.nc")
-        except IOError as e:
-            logging.error("No inputs found.".format(output))
-            logging.debug((os.strerror(e.errno)))
-            sys.exit()
-
         # parse Parameters
         input_folder = bindings['Ssource']
         variables = tuple(bindings['var'].split(','))
         output = bindings['Ttarget']
+
+        try:
+            inputs = get_inputs(input_folder, pattern="*.nc")
+        except IOError as e:
+            logging.error("No inputs found.".format(output))
+            logging.debug((os.strerror(e.errno)))
+            sys.exit()
 
         try:
             stacking(inputs, variables, output)
