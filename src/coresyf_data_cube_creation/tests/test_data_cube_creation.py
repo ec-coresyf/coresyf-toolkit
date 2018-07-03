@@ -204,7 +204,7 @@ class TestStacking(unittest.TestCase):
 
     def test_number_stack_slices_same_as_input(self):
         """test number of time slices equal to number of files"""
-
+        stacking(self.inputs, VARIABLES, self.output)
         with Dataset(self.output, 'r') as stack:
             slices = stack.dimensions['time']
             self.assertEqual(len(slices), 7)
