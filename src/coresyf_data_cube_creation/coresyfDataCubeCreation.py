@@ -55,8 +55,10 @@ def get_inputs(folder, pattern="*.nc"):
     """
 
     search_path = os.path.join(folder, pattern)
-    inputs = glob.iglob(search_path)
-    # TODO: add results logging
+    inputs_iter = glob.iglob(search_path)
+
+    inputs = sorted(inputs_iter) # sort by file name
+    logging.info("Fount {} inputs in {}.".format(len(inputs)), folder)
 
     try:
         first = inputs.next()
@@ -64,7 +66,6 @@ def get_inputs(folder, pattern="*.nc"):
         msg = "No files found in {}! Search pattern are {}."
         raise IOError(msg.format(folder, search_path))
     else:
-        inputs = itertools.chain([first], inputs)
         return inputs
 
 
