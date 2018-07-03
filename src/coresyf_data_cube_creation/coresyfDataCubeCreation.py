@@ -179,12 +179,18 @@ def write_slice(slice, ds_path):
     else:
         with dataset:
             # create stack by adding layers
-            slice_time = len(dataset.dimensions["time"])
+            try:
+                time_var = dataset.variables["time"][:]
+                time_num = int(time_var)
+            except KeyError as e:
+                logging.WARNING("No time variable found. Write slices to stack ordered by file name.")
+
+            # sort stack by date
 
             for var in slice.keys():
                 if var != 'dimensions':
                     var_data = dataset.variables[var]
-                    var_data[slice_time, :, :] = slice[var]
+                    var_data[time_num, :, :] = slice[var]
 
 def stacking(inputs, variables, output):
     """This go over alle inputs, extract data and write results to file."""
