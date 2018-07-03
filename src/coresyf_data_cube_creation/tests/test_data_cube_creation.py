@@ -209,5 +209,12 @@ class TestStacking(unittest.TestCase):
             slices = stack.dimensions['time']
             self.assertEqual(len(slices), 7)
 
+    def test_number_variables(self):
+        stacking(self.inputs, VARIABLES, self.output)
+        with Dataset(self.output, 'r') as stack:
+            var_in = stack.variables.keys()
+            contains = all(elem in var_in for elem in VARIABLES)
+            self.assertTrue(contains)
+
 if __name__ == '__main__':
     unittest.main()
