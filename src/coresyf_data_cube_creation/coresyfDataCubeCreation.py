@@ -171,7 +171,7 @@ def create_stack_file(data, ds_path, dimensions_names=("time", "lat", "lon")):
                 else:
                     dataset.createVariable(var, data[var].dtype, dimensions_names, zlib=True)
 
-def write_slice(slice, ds_path):
+def write_slice(slice, ds_path, index=None):
 
     try:
         dataset = Dataset(ds_path, 'a', format="NETCDF4")
@@ -185,6 +185,8 @@ def write_slice(slice, ds_path):
                 time_num = int(time_var)
             except KeyError as e:
                 logging.WARNING("No time variable found. Write slices to stack ordered by file name.")
+            else:
+                time_num = index
 
             # sort stack by date
 
@@ -196,7 +198,7 @@ def write_slice(slice, ds_path):
 def stacking(inputs, variables, output):
     """This go over alle inputs, extract data and write results to file."""
 
-    for input__ in inputs:
+    for count, input__ in enumerate(inputs):
         logging.info('Extracting data from {}'.format(set))
         slice = extract_slice(input__, variables=variables)
 
@@ -215,7 +217,7 @@ def stacking(inputs, variables, output):
                 raise e
 
         try:
-            write_slice(slice, output)
+            write_slice(slice, output, index=count)
         except EnvironmentError as e:
             os.remove(output)
 
