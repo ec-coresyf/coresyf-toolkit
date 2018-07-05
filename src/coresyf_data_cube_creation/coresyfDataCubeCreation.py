@@ -111,7 +111,8 @@ def extract_slice(file_path, variables=None):
     try:
         dataset = Dataset(file_path, "r", format="NETCDF4")
     except IOError as e:
-        raise e("Can not open {}.".format(file_path))
+        logging.error("Can not open {}.".format(file_path))
+        raise e
 
     lat = dataset.variables["lat"][:]
     lon = dataset.variables["lon"][:]
@@ -225,7 +226,7 @@ def stacking(inputs, variables, output):
     """This go over alle inputs, extract data and write results to file."""
 
     for count, input__ in enumerate(inputs):
-        logging.info('Extracting data from {}'.format(set))
+        logging.info('Extracting data from {}'.format(inputs))
         slice = extract_slice(input__, variables=variables)
 
         # run masking
