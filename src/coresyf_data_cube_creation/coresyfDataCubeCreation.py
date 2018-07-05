@@ -182,8 +182,34 @@ def create_stack_file(data, ds_path, dimensions_names=("time", "lat", "lon")):
                 else:
                     dataset.createVariable(var, data[var].dtype, dimensions_names, zlib=True)
 
-def write_slice(slice, ds_path, index=None):
+def write_slice(slice, ds_path, index):
+    """
+    This write slice to a netCDF file to create a stack.
 
+    Slice is an numpy array holding the data. The destination file is a path in string
+    by the ds_path. Use index parameter to specify the position in the stack.
+
+
+    Parameters
+    ----------
+
+    slice: dict
+        Dictionary of numpy arrays and variable names as Keys.
+
+    ds_path: string
+        Path to the destination netCDF file.
+
+    index: int
+        Position of slice in data stack.
+
+    Side effect
+    -------
+    NetCDF file in holding the slice as a stack.
+
+    Example
+    -------
+
+    """
     try:
         dataset = Dataset(ds_path, 'a', format="NETCDF4")
     except IOError as e:
