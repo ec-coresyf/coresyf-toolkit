@@ -17,6 +17,7 @@ __version__ = "0.0.1"
 __copyright__ = "Copyright 2018, MaREI Centre for Marine and Renewable Energy"
 
 # import python modules
+import dateutil
 import glob
 import itertools
 import logging
@@ -103,6 +104,7 @@ def extract_slice(file_path, variables=None):
         'dimensions': {
             'lat': None,
             'lon': None,
+            'time': None,
         },
     }
 
@@ -116,6 +118,15 @@ def extract_slice(file_path, variables=None):
 
     data['dimensions']['lat'] = lat
     data['dimensions']['lon'] = lon
+
+    # read date and write in dict
+    try:
+      date_attr = dataset.date_created
+      date = dateutil.parser.parse(date_attr)
+      data['dimensions']['time'] = date.toordinal()
+    except AttributeError as e:
+      logging.warning("No date_created attribut found in input dataset.")
+      logging.debug(e)
 
     # filter by variable
     if not variables:
@@ -179,21 +190,10 @@ def write_slice(slice, ds_path, index=None):
         raise
     else:
         with dataset:
-            # create stack by adding layers
-            try:
-                time_var = dataset.variables["time"][:]
-                time_num = int(time_var)
-            except KeyError as e:
-                logging.WARNING("No time variable found. Write slices to stack ordered by file name.")
-            else:
-                time_num = index
-
-            # sort stack by date
-
             for var in slice.keys():
                 if var != 'dimensions':
                     var_data = dataset.variables[var]
-                    var_data[time_num, :, :] = slice[var]
+                    var_data[index, :, :] = slice[var]
 
 def stacking(inputs, variables, output):
     """This go over alle inputs, extract data and write results to file."""
@@ -217,7 +217,13 @@ def stacking(inputs, variables, output):
                 raise e
 
         try:
-            write_slice(slice, output, index=count)
+            index = slice['dimension']['time']
+        except KeyError as e:
+            logging.warning("No time dimension found, use index after file name order.")
+            index = count
+
+        try:
+            write_slice(slice, output, index=index)
         except EnvironmentError as e:
             os.remove(output)
 
