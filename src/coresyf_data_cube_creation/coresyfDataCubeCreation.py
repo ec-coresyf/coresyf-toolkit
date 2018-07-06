@@ -17,13 +17,14 @@ __version__ = "0.0.1"
 __copyright__ = "Copyright 2018, MaREI Centre for Marine and Renewable Energy"
 
 # import python modules
-import dateutil
+import dateutil.parser
 import glob
 import itertools
 import logging
 import numpy as np
 import os
 import sys
+
 
 from collections import namedtuple
 
@@ -57,20 +58,51 @@ def get_inputs(folder, pattern="*.nc"):
 
     search_path = os.path.join(folder, pattern)
     inputs_iter = glob.iglob(search_path)
-
     inputs = sorted(inputs_iter) # sort by file name
-    logging.info("Fount {} inputs in {}.".format(len(inputs)), folder)
 
-    try:
-        first = inputs.next()
-    except StopIteration:
+    if inputs:
+        logging.info("Fount {} inputs in {}.".format(len(inputs), folder))
+        return inputs
+    else:
         msg = "No files found in {}! Search pattern are {}."
         raise IOError(msg.format(folder, search_path))
-    else:
-        return inputs
 
+def sorted_inputs(paths, key="date_created"):
+    """Return one by date sorted list of paths as tuples like (path, date).
+    Key parameter is used to find attribut in netCDF to sort by.
 
+    Returns
+    -------
 
+    list of tuple
+        Sorted list of tuples holding input files path as string and date as integar e.g. (path, date).
+        List ist sorted afer date. Date is integar in dayes based on January 1 of year 1 (see date.toordinal() for more info).
+
+    """
+    inputs = []
+
+    # get date
+    for i, path in enumerate(paths):
+        try:
+            dataset = Dataset(path, "r", format="NETCDF4")
+        except IOError as e:
+            raise e
+        else:
+            with dataset:
+                try:
+                  date_attr = dataset.getncattr(key)
+                except AttributeError as e:
+                  logging.warning("No date_created attribut found in input dataset, file name order to sort.")
+                  logging.debug(e)
+                  date = i
+                else:
+                  date = dateutil.parser.parse(date_attr).toordinal()
+
+        item = (path, date)
+        inputs.append(item)
+
+    # sort list after date attribut
+    return sorted(inputs, key=lambda item: item[1], reverse=True)
 
 def extract_slice(file_path, variables=None):
     """Extract data from dataset by given variables.
@@ -101,17 +133,18 @@ def extract_slice(file_path, variables=None):
 
 
     data = {
+        'date': None,
         'dimensions': {
             'lat': None,
             'lon': None,
-            'time': None,
         },
+        'variables': {
+        }
     }
 
     try:
         dataset = Dataset(file_path, "r", format="NETCDF4")
     except IOError as e:
-        logging.error("Can not open {}.".format(file_path))
         raise e
 
     lat = dataset.variables["lat"][:]
@@ -123,11 +156,12 @@ def extract_slice(file_path, variables=None):
     # read date and write in dict
     try:
       date_attr = dataset.date_created
-      date = dateutil.parser.parse(date_attr)
-      data['dimensions']['time'] = date.toordinal()
     except AttributeError as e:
       logging.warning("No date_created attribut found in input dataset.")
       logging.debug(e)
+    else:
+      date = dateutil.parser.parse(date_attr)
+      data['date'] = date.toordinal()
 
     # filter by variable
     if not variables:
@@ -146,44 +180,61 @@ def extract_slice(file_path, variables=None):
         except IndexError as e:
             raise e
         else:
-            data[var] = set
+            data['variables'][var] = set
 
     dataset.close()
 
     return data
 
+def create_stack(slice, ds_path):
+    """This open a NetCDF4 file and creates basic stack structure.
 
-# TODO: write documentation
-def create_stack_file(data, ds_path, dimensions_names=("time", "lat", "lon")):
+    Parameters
+    ----------
 
-    # TODO: add IOError messages in log
+    slice: dict
+        Dictionary holding dimmensions information.
+
+    ds_path: string
+        Destination Path for stack file.
+
+    Returns
+    -------
+    stack: file object
+        Stack as open file handle.
+
+    """
+
+    dimensions = slice['dimensions']
+    variables = slice['variables']
+
+    stacking_dimmension = "date"
+    stack_dimmensions = (stacking_dimmension,'lat', 'lon',)
+
     try:
-        dataset = Dataset(ds_path, 'w', format="NETCDF4")
+        stack = Dataset(ds_path, 'w', format="NETCDF4")
     except IOError:
         raise
     else:
-        with dataset:
 
-            # create dimensions
-            for dim in data['dimensions']:
-                if data['dimensions'][dim] is None:
-                    dataset.createDimension(dim, None)  # add as unlimited dimension
-                else:
-                    dataset.createDimension(dim, len(data['dimensions'][dim]))
+        stack.createDimension(stacking_dimmension, None)
+        stack.createVariable(stacking_dimmension, "i4", (stacking_dimmension,))
 
-            # create infinite time dimmension
-            dataset.createDimension("time", None)
+        # create and fill additional dimmensions (e.g. lat, lon)
+        for dim, dim_data in dimensions.items():
+            if len(dim_data):
+                stack.createDimension(dim, len(dim_data))
+            else:
+                stack.createDimension(dim, None) # add as unlimited dimension
 
-            # create variables
-            for var in data.keys():
-                if var == 'dimensions':
-                    for dim in data['dimensions']:
-                        dim_var = dataset.createVariable(dim, data['dimensions'][dim].dtype, (dim,))
-                        dim_var[:] = data['dimensions'][dim]
-                else:
-                    dataset.createVariable(var, data[var].dtype, dimensions_names, zlib=True)
+            dim_var = stack.createVariable(dim, dim_data.dtype, (dim,))
+            dim_var[:] = dim_data
 
-def write_slice(slice, ds_path, index):
+        for var, var_data in variables.items():
+            stack.createVariable(var, var_data.dtype, stack_dimmensions, zlib=True)
+    return stack
+
+def write_slice(slice, stack, index):
     """
     This write slice to a netCDF file to create a stack.
 
@@ -197,37 +248,57 @@ def write_slice(slice, ds_path, index):
     slice: dict
         Dictionary of numpy arrays and variable names as Keys.
 
-    ds_path: string
-        Path to the destination netCDF file.
+    stack: file object
+        File handel to stack file.
 
     index: int
         Position of slice in data stack.
 
     Side effect
     -------
-    NetCDF file in holding the slice as a stack.
+    Write slice to file stacked by index.
 
     Example
     -------
 
     """
-    try:
-        dataset = Dataset(ds_path, 'a', format="NETCDF4")
-    except IOError as e:
-        raise
-    else:
-        with dataset:
-            for var in slice.keys():
-                if var != 'dimensions':
-                    var_data = dataset.variables[var]
-                    var_data[index, :, :] = slice[var]
+    variables = slice['variables']
+
+    for var, data in variables.items():
+        var_data = stack.variables[var]
+        var_data[index, :, :] = data
 
 def stacking(inputs, variables, output):
-    """This go over alle inputs, extract data and write results to file."""
+    """This loob over inputs, extract data, write slices to file.
+
+    Parameters
+    ----------
+
+    inputs: list of tuple
+        List of tuples holding input files and date e.g. (path, date).
+
+    variables: list
+        Variables to stack. Must be same as variables in the input files.
+
+    output: string
+        Path to the 3D file.
+
+    Side effect
+    -------
+    Create 3D stack file from inputs file.
+
+    Example
+    -------
+    """
+
+    print inputs
 
     for count, input__ in enumerate(inputs):
-        logging.info('Extracting data from {}'.format(inputs))
-        slice = extract_slice(input__, variables=variables)
+
+        input_path = input__[0] # unpack input tuple
+
+        logging.info('Extracting data from {}'.format(input_path))
+        slice = extract_slice(input_path, variables=variables)
 
         # run masking
         # TODO: fix masking to zero and one
@@ -237,20 +308,14 @@ def stacking(inputs, variables, output):
             logging.info('Create {} file.'.format(output))
 
             try:
-                create_stack_file(slice, output)
+                stack = create_stack(slice, output)
             except EnvironmentError as e:
                 logging.error("Can't create {}".format(output))
                 logging.debug((os.strerror(e.errno)))
                 raise e
 
         try:
-            index = slice['dimension']['time']
-        except KeyError as e:
-            logging.warning("No time dimension found, use index after file name order.")
-            index = count
-
-        try:
-            write_slice(slice, output, index=index)
+            write_slice(slice, stack, index=count)
         except EnvironmentError as e:
             os.remove(output)
 
@@ -270,6 +335,7 @@ class CoReSyFDataCubeCreation(CoReSyFTool):
 
         try:
             inputs = get_inputs(input_folder, pattern="*.nc")
+            inputs = sorted_inputs(inputs)
         except IOError as e:
             logging.error("No inputs found.".format(output))
             logging.debug((os.strerror(e.errno)))

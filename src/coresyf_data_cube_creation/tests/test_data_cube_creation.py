@@ -11,9 +11,10 @@ from netCDF4 import Dataset
 
 from coresyf_data_cube_creation.coresyfDataCubeCreation import get_inputs
 from coresyf_data_cube_creation.coresyfDataCubeCreation import extract_slice
-from coresyf_data_cube_creation.coresyfDataCubeCreation import create_stack_file
+from coresyf_data_cube_creation.coresyfDataCubeCreation import create_stack
 from coresyf_data_cube_creation.coresyfDataCubeCreation import write_slice
 from coresyf_data_cube_creation.coresyfDataCubeCreation import stacking
+from coresyf_data_cube_creation.coresyfDataCubeCreation import sorted_inputs
 
 
 # Change if test data is changed
@@ -53,14 +54,44 @@ class TestGetInputs(unittest.TestCase):
             inputs = get_inputs(empty, pattern="*.nc")
 
     def test_inputs_found(self):
-        pass
+        inputs = get_inputs(TEST_FOLDER)
 
+
+class TestSortedInputs(unittest.TestCase):
+    """docstring for TestSortedInputs."""
+    def setUp(self):
+        self.inputs = get_inputs(TEST_FOLDER)
+
+    def test_file_not_found(self):
+        self.inputs[0] = "broken.nc"
+        with self.assertRaises(IOError):
+            inputs = sorted_inputs(self.inputs)
+
+    def test_sorted_inputs(self):
+        inputs = sorted_inputs(self.inputs)
+        self.assertTrue(inputs)
+
+    def test_youngest_first(self):
+        inputs = sorted_inputs(self.inputs)
+        first = inputs[0][1]
+        secound = inputs[1][1]
+        self.assertGreater(first, secound)
+
+    def test_key_attribut_not_found(self):
+        inputs = sorted_inputs(self.inputs, key="not_found_attribut")
+        inputs_range = range(inputs[-1][1], inputs[0][1])
+        self.assertEqual(inputs_range, range(0,6))
 
 class TestExtractData(unittest.TestCase):
     def setUp(self):
         self.file_path = os.path.abspath(TEST_DATA)
 
-    def test_create_dimensions(self):
+    def test_get_date_created(self):
+        """This tests getting date created from input dataset"""
+        data = extract_slice(self.file_path)
+        self.assertEqual(data['date'], 736333)
+
+    def test_dimensions(self):
         """This tests if data dict has dimensions."""
 
         data = extract_slice(self.file_path)
@@ -69,22 +100,22 @@ class TestExtractData(unittest.TestCase):
         self.assertTrue(data['dimensions']['lat'].size > 0, "Latitude dimension is empty!")
         self.assertTrue(data['dimensions']['lon'].size > 0, "Longitude dimension is empty!")
 
-    def test_extract_variable(self):
+    def test_one_variables(self):
         """This tests if data dict has variables."""
         data = extract_slice(self.file_path, variables=['analysed_sst'])
-        self.assertIsNotNone(data['analysed_sst'], "Variable is not in data dict!")
-        self.assertTrue(data['analysed_sst'].size > 0, "Variable is empty!")
+        self.assertIsNotNone(data['variables']['analysed_sst'], "Variable is not in data dict!")
+        self.assertTrue(data['variables']['analysed_sst'].size > 0, "Variable is empty!")
 
     def test_extract_variables_list(self):
         """This tests if data dict has variables."""
         data = extract_slice(self.file_path, variables=['analysed_sst','analysis_error'])
-        self.assertIsNotNone(data['analysed_sst'], "Variable is not in data dict!")
-        self.assertTrue(data['analysed_sst'].size > 0, "Variable is empty!")
+        self.assertIsNotNone(data['variables']['analysed_sst'], "Variable is not in data dict!")
+        self.assertTrue(data['variables']['analysed_sst'].size > 0, "Variable is empty!")
 
     def test_variables_are_2D(self):
         """This tests if data dict has variables."""
         data = extract_slice(self.file_path)
-        self.assertTrue(data['analysed_sst'].ndim == 2, "Variable is not 2D!")
+        self.assertTrue(data['variables']['analysed_sst'].ndim == 2, "Variable is not 2D!")
 
     def test_variable_not_in_dataset(self):
         """Test print error message if variable is not in dataset."""
@@ -95,7 +126,7 @@ class TestExtractData(unittest.TestCase):
     def test_skipping_not_in_dataset_variables(self):
         """Test print error message if variable is not in dataset."""
         data = extract_slice(self.file_path, variables=['not_in_dataset', 'analysed_sst'])
-        self.assertIsNotNone(data['analysed_sst'], "Skipping of not in dataset failed.")
+        self.assertIsNotNone(data['variables']['analysed_sst'], "Skipping of not in dataset failed.")
 
     def test_skipping_not_2D_variables(self):
         """Test print error message if variable is not in dataset."""
@@ -104,7 +135,7 @@ class TestExtractData(unittest.TestCase):
             data['lat']
 
 
-class TestCreateNetcdf(unittest.TestCase):
+class TestCreateStack(unittest.TestCase):
     def setUp(self):
         self.data = get_data_dict()
         self.dest_path = get_dest_path()
@@ -116,97 +147,72 @@ class TestCreateNetcdf(unittest.TestCase):
     def test_create_netcdf(self):
         dest_path = self.dest_path
         data = self.data
-        create_stack_file(data, dest_path)
+        stack = create_stack(data, dest_path)
         self.assertTrue(os.path.exists(dest_path), "File {} not created.".format(dest_path))
+        stack.close()
 
-class TestCreateNetCDFStructure(unittest.TestCase):
+class TestStackStructure(unittest.TestCase):
     def setUp(self):
-        self.data = get_data_dict()
+        data = get_data_dict()
+        self.variables = data['variables']
+        self.dimmensions = data['dimensions']
         self.dest_path = get_dest_path()
-        create_stack_file(self.data, self.dest_path)
+        self.stack = create_stack(data, self.dest_path)
 
     def tearDown(self):
+        self.stack.close()
         if os.path.exists(self.dest_path):
             os.remove(self.dest_path)
 
     def test_lat_lon_dimensions_filled(self):
-        with Dataset(self.dest_path, 'r', format="NETCDF4") as dataset:
-            dim = dataset.dimensions
-            self.assertTrue(dim['lat'].size > 0)
-            self.assertTrue(dim['lon'].size > 0)
+        dim = self.stack.dimensions
+        self.assertTrue(dim['lat'].size > 0)
+        self.assertTrue(dim['lon'].size > 0)
 
     def test_variables_in_dataset(self):
-        with Dataset(self.dest_path, 'r', format="NETCDF4") as dataset:
-            variables = self.data.keys()
-            for var in variables:
-                if var != 'dimensions':
-                    self.assertTrue(var in dataset.variables.keys(), "Variable {} not in dataset.".format(var))
+        msg = "Variable {} not in dataset."
+        for var in self.stack.variables:
+            self.assertTrue(var in self.stack.variables.keys(), msg.format(var))
 
 
-class TestWriteNetcdf(unittest.TestCase):
+class TestWriteSlice(unittest.TestCase):
     def setUp(self):
         self.data = get_data_dict()
         self.dest_path = get_dest_path()
-        create_netcdf_file(self.data, self.dest_path)
+        self.stack = create_stack(self.data, self.dest_path)
+        self.variables = self.data["variables"]
 
     def tearDown(self):
+        self.stack.close()
         if os.path.exists(self.dest_path):
             os.remove(self.dest_path)
 
-    def test_fiel_not_exists(self):
-
-        not_exists = get_dest_path(f_path='not_exists.nc')
-
-        with self.assertRaises(IOError):
-            write_slice(self.data, not_exists)
-
     def test_write_variable(self):
-
         msg = "Variable {} is empty in dataset."
-
-        write_slice(self.data, self.dest_path)
-        with Dataset(self.dest_path, 'r', format="NETCDF4") as dataset:
-            variables = self.data.keys()
-            for var in variables:
-                if var != 'dimensions':
-                    self.assertTrue(dataset.variables[var].size > 0, msg.format(var))
-
-    def test_time_dimension_is_one(self):
-
-        msg = "Time dimension size is {} not 1."
-
-        write_slice(self.data, self.dest_path)
-        with Dataset(self.dest_path, 'r', format="NETCDF4") as dataset:
-            time_dimension = dataset.dimensions['time']
-            self.assertTrue(time_dimension.size == 1, msg.format(time_dimension.size))
+        write_slice(self.data, self.stack, index=1)
+        for var in self.variables:
+            self.assertTrue(self.stack.variables[var].size > 0, msg.format(var))
 
     def test_time_dimension_is_three(self):
         msg = "Time dimension size is {} not {}."
-
         times = 3
-
         for step in range(0,times):
-            write_slice(self.data, self.dest_path)
+            write_slice(self.data, self.stack, index=step)
 
-        with Dataset(self.dest_path, 'r', format="NETCDF4") as dataset:
-            time_dimension = dataset.dimensions['time']
-            self.assertTrue(time_dimension.size == times, msg.format(time_dimension.size, times))
+        time_dimension = self.stack.dimensions['date']
+        self.assertTrue(time_dimension.size == times, msg.format(time_dimension.size, times))
 
 class TestStacking(unittest.TestCase):
     def setUp(self):
-        self.inputs = get_inputs(TEST_FOLDER)
+        self.inputs = sorted_inputs(get_inputs(TEST_FOLDER))
         self.empty_dir = tempfile.mkdtemp()
         self.output = get_dest_path()
-
-    def test_try_empty_inputs(self):
-        stacking([], VARIABLES, self.output)
-
 
     def test_number_stack_slices_same_as_input(self):
         """test number of time slices equal to number of files"""
         stacking(self.inputs, VARIABLES, self.output)
         with Dataset(self.output, 'r') as stack:
-            slices = stack.dimensions['time']
+            slices = stack.dimensions['date']
             self.assertEqual(len(slices), 7)
 
     def test_number_variables(self):
