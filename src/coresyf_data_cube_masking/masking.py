@@ -67,3 +67,37 @@ def get_slice(cube, dim_ids):
     return slice
 
 
+def mask_by_flags(slice, flags=[], name="mask"):
+    """Returns new `numpy.array` masked by flags.
+
+    This select mask variable in `slice` by `name` and extend mask by flags.
+    If variable called `name` not founed try find mask from random variable
+    and raise AttributeError if failed.
+
+    Parameters
+    ----------
+    slice : dictionary
+        Keys are variables names and values are np.ma.array.
+    flags : list
+        List of integar to masked out by.
+    name : string
+        Name of the mask variable.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    mask = []
+
+    if name in slice.keys():
+        int_mask = slice[name]
+        mask = np.isin(int_mask, flags)
+    else:
+        try:
+            one_var = next(iter(slice))
+            mask = slice[one_var].mask  # use mask from one variable
+        except AttributeError as e:
+            raise e("No mask found.")
+    return mask
