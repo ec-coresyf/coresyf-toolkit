@@ -1,0 +1,38 @@
+{
+    "name": "CoReSyFDataCubeMasking",
+    "type": "DataCubeMasking",
+    "description":
+        "This aggregates the masks of all slices in a data cube to one tow dimension mask
+        and applie this to all slices.",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Path to a netCDF data cube.",
+            "type": "string"
+          }
+    ],
+    "parameters": [
+        {
+            "identifier": "flags",
+            "name": "flags",
+            "description": "Falgs to maskout data as a List.",
+            "type": "string"
+        },
+        {
+            "identifier": "mask_file",
+            "name": "mask_file",
+            "description": "Set if aggregated mask should me exported as tif file.",
+            "type": "string",
+            "default": "false"
+        }
+    ],
+    "outputs": [
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Path to write masked data cube",
+            "type": "string"
+        }
+    ]
+}
