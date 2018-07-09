@@ -101,3 +101,44 @@ def mask_by_flags(slice, flags=[], name="mask"):
         except AttributeError as e:
             raise e("No mask found.")
     return mask
+
+
+def aggregate_mask(cube, flags, dim="date", mask_var="mask"):
+    """Returns one aggregated mask for all slices.
+
+    Parameters
+    ----------
+    cube : netCDF4 Dataset handle
+        File handle to read from.
+    flags : list
+        List of integar to masked out by.
+    dim : string
+        Dimension direction to aggregated.
+    mask_var : string
+        Name of the mask variable in `cube`.
+
+    Returns
+    -------
+    numpy.array
+        Aggregated mask for cube.
+    """
+
+    # first slice
+    slices = Slices(cube, dim)
+    aggregate_mask = mask_by_flags(slices.next(), flags, name=mask_var)
+
+    for nr, s in enumerate(Slices(cube, dim)):
+        logging.debug("Aggregate slice number: {}".format(nr))
+
+        mask = mask_by_flags(s, flags, name=mask_var)
+        aggregate_mask = aggregate_mask | mask
+
+    return aggregate_mask
+
+
+def masking_cube(cube, mask, dim='date'):
+    for s in Slices(cube, dim):
+        for _, var in s.items():
+            var.mask = mask
+            print var.mask
+    pass
