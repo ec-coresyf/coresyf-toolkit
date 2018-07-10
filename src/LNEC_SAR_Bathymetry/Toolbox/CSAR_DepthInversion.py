@@ -112,43 +112,17 @@ def DiscriminatedGroups(parameters, Points):
 		else:
 			Otherpoints.append(point)
 	# gather points
-	DWpoints=np.asarray(DWpoints); SWpoints=np.asarray(SWpoints)
+	DWpoints, SWpoints, ComputationPoints = np.asarray(DWpoints), np.asarray(SWpoints), np.asarray(Otherpoints)
 	ExceptionPoints = CL.ExceptionPoints(DWpoints,SWpoints)
 
-	# if no deep water points look for near deep water point
-	lDW = len(DWpoints)
-	Otherpoints=np.asarray(Otherpoints)
-	if lDW == 0 and parameters.InversionMethod != 'direct':
-		nDWpoints = []; 
-		for point in Otherpoints:
-			flag = point.DiscriminationFlag
-			if flag == 0.5:
-				nDWpoints.append(point)
-			else:
-				GlobalPoints.append(point)
-	else:
-		GlobalPoints = Otherpoints
-
-	#gather points
-	nDWpoints = np.asarray(nDWpoints); GlobalPoints = np.asarray(GlobalPoints)
-	ComputationPoints = CL.ComputationPoints(GlobalPoints, nDWpoints)
-	 
 	# sum up grid point status
 	print 'total number of points', len(Points)
 	print 'number exception points', len(DWpoints)+len(SWpoints)
 	print '- number of deep water points', len(DWpoints)
 	print '- number of shallow water points', len(SWpoints)
-	print 'number Computation points', len(nDWpoints)+len(GlobalPoints)
-	print '- number of quasi deep water points', len(nDWpoints)
-	print '- number of normal computation points', len(GlobalPoints)
-		
-	# if no deep or near deep water points only direct method is used
-	if (len(DWpoints)==0) and (len(nDWpoints)==0):
-		method = 'direct'
-	else:
-		method = parameters.InversionMethod	
+	print 'number Computation points', len(ComputationPoints)	
 
-	return ExceptionPoints, ComputationPoints, method
+	return ExceptionPoints, ComputationPoints
 
 def DiscriminateGridPoints(apriori_bathymetry, Lambda):
 	#--------------------------------------------------------------------------

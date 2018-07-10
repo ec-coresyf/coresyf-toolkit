@@ -13,7 +13,7 @@
 
 import os
 #
-import shutil
+import shutil, glob
 #
 import argparse
 import ConfigParser
@@ -37,8 +37,9 @@ print '|------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='Co-ReSyF: SAR Bathymetry Research Application')
 #input output
 parser.add_argument('-a', '--param', help='Parameters file for Wings (.ini file)', default = 'Config_Inversion.ini',required=False)
-parser.add_argument('-i', '--input', nargs='+', help='Input grid point files (spectrum.out) for point subdivision', required=False)
-parser.add_argument('-o', '--output', help='Output transfer file (exception.out & Computation#.out)', required=False)
+parser.add_argument('-i', '--input', help=' Generic name for output spectrum files (ex: Spectrum.out) for point subdivision', default='Spectrum.out',required=False)
+parser.add_argument('-o', '--output', help='Generic Name for output transfer file (ex: Spectrum.sub)', default='Spectrum.sub',required=False)
+parser.add_argument('-e', '--exception', help='Generic Name for output transfer file (ex: Spectrum.sub) for Shallow/Deep water points(inversion not needed)', default='exception.sub',required=False)
 #inversion parameters
 parser.add_argument('-l', '--tide', help='Tide level for depth correction', default=0,  required=False)
 parser.add_argument('-T', '--Tp', help='Peak Wave Period (buoys or model data)', default=12,  required=False)
@@ -58,6 +59,7 @@ parOut = open(args.param, "w"); Config = ConfigParser.ConfigParser(); Config.add
 #input/output	
 Config.set("Arguments", "Input_file", args.input);
 Config.set("Arguments", "Output_file", args.output); 
+Config.set("Arguments", "Exception_file", args.exception); 
 
 #inversion parameters
 Config.set("Arguments", "Tide", args.tide); 
@@ -75,10 +77,9 @@ parameters = CL.InversionParameters(HydroParameters, args.method, args.wave_theo
 # merge all the spectrum data in an array
 ComputationPoints = []
 
-if args.input:
-	FileList = args.input
-else:
-	FileList = [x for x in os.listdir('./') if x.startswith("Spectrum")]
+rootname_input = args.input.split('.')[0] if args.input else 'Spectrum'
+
+FileList = [x for x in os.listdir('./') if x.startswith(rootname_input)]
 
 for fname in FileList:
 	point = UT.Unpickle_File(fname)
@@ -89,35 +90,23 @@ for fname in FileList:
 #####################
 
 # divide domain in between exception (deep/shallow water) and real computation points
-ExceptionPoints, ComputationPoints, method = INV.DiscriminatedGroups(parameters, ComputationPoints)
-
-# redefine inversion parameters if change in method
-InversionParameters_global = CL.InversionParameters(parameters.HydrodynamicParameters, method, parameters.WaveTheory)
-InversionParameters_reference = CL.InversionParameters(parameters.HydrodynamicParameters, 'direct', parameters.WaveTheory)
+ExceptionPoints, ComputationPoints = INV.DiscriminatedGroups(parameters, ComputationPoints)
 
 # store exception points and dispatch other points
 
 #exception points
 if len(ExceptionPoints.DeepWaterPoints)>0 or len(ExceptionPoints.ShallowWaterPoints)>0:
-	fname = args.output
-	UT.Pickle_File(fname, ExceptionPoints)
+	UT.Pickle_File(args.exception, ExceptionPoints)
 
-# global computation points
-# Quasi Deep water points
-if len(ComputationPoints.QuasiDeepWaterPoints)>0:
-	InversionParameters = InversionParameters_reference
-	filename = 'QuasiDeepwaterPoints'
-	for i,point in enumerate(np.asarray(ComputationPoints.QuasiDeepWaterPoints)):
-		fname = args.output
-		data = CL.InversionData(InversionParameters, point) 
-		data.pickle(fname)
+
 # global points
-if len(ComputationPoints.GlobalPoints)>0:
-	filename = 'ComputationPoints'
-	InversionParameters = InversionParameters_global
-	for i,point in enumerate(np.asarray(ComputationPoints.GlobalPoints)):
-		fname = args.output
-		data = CL.InversionData(InversionParameters, point) 
+rootname_output = args.output.split('.')[0] if args.output else 'Spectrum'
+ext_output = '.' + args.output.split('.')[-1] if args.output else '.sub'
+if len(ComputationPoints)>0:
+	for i, point in enumerate(ComputationPoints):
+		fname = rootname_output + str(i) + ext_output
+		data = CL.InversionData(parameters, point) 
 		data.pickle(fname)
 
-
+#clean computation files
+[os.remove(L) for L in glob.glob('*.out')]

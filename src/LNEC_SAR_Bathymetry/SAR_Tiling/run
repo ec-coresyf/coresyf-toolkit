@@ -25,7 +25,7 @@ import Toolbox.CSAR_Subsets as SUB
 # input parameters
 #-------------------
 SubsetsParameters, ImageParameters, args, verbose = IP.InputSubsetParameters()
-
+print verbose
 #**********************************
 #
 #  Pre-processing step
@@ -47,7 +47,6 @@ if verbose:
 	print '| 	Read and Process SAR image		 |'
 	print '|------------------------------------------------|'
 coordinates, image, pixelresolution = IP.ReadSARImg(ImageParameters)
-
 FlagFlip = IP.CheckImageOrientation(coordinates)			# check whether preprocessing image flip process affects direction estimate
 data = CL.Subset(0, image, coordinates, pixelresolution, FlagFlip)	# store main data (image, coordinates) as list
 

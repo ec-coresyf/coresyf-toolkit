@@ -10,24 +10,16 @@ Compute/estimate  Spectrum-Related distribution and parameters
  Date: May/2017
  Last update: Nov/2017
 =====================================================================================================
-
 	DIRECTION ESTIMATE:		DirectionEstimate	MaskPlot	DirectionalProjection
-
 	IMAGE SPECTRUM:			SpectrumRange	ImageSpectrum
-
 	WAVE SERIES SPECTRA:		SubsetSpectrum	WavesMeanSpectrum
-
 	RADIAL PROJECTION SPECTRUM:	RadialSpectrum RadialProjection
-
 	FILTERS
 					ButterworthEllipticFilter	ImageFilter
 					imfft		imifft
-
-
 	UTILITIES			Spectrum1D	DefineLine	FindOffsetPoints	dx	dy
 					DetectLineEdge	Powerof2	resolutionpadding
 					zerospadding	Distance4Line
-
 """
 #
 import re
@@ -238,7 +230,6 @@ def DirectionalIntegration(spectrum):
 	ax4.plot(spectrum_sorted)
 	ax5.imshow(spectrum)
 	ax6.plot(theta_sorted, spectrum_sorted)
-
 	plt.show()
 	"""
 
@@ -403,7 +394,6 @@ def Direction180Ambiguity(Directions, parameters):
 def MaskPlot(radius, subset):
 	"""
 	create a mask for spectrum plot
-
 	"""
 	# estimate the location of the center of the image
 	image = subset.image
@@ -778,7 +768,6 @@ def RadialSpectrum(parameters, subset_input):
 	# Parameters
 	IP_Parameters = parameters.SubsetProcessingParameters
 	#stretch contrast
-	#print 'test1'
 	if IP_Parameters.ConstrastStretchFlag>0:
 		image = IP.ScaleImage(IP.ContrastStretch(subset_input.image, IP_Parameters.IntensityType), subset_input.image.astype('float32'))
 		subset = CL.Subset(subset_input.CenterPoint, image, subset_input.coordinates, subset_input.resolution, subset_input.FlagFlip)
@@ -788,19 +777,23 @@ def RadialSpectrum(parameters, subset_input):
 	#--------------------------
 	# B) Subset Spectrum
 	#--------------------------
-	#print 'test2'
 	Image_Spectrum = ImageSpectrum(IP_Parameters, subset)
 
+	"""
+	fig, (ax1,ax2) = plt.subplots(2)
+	ax1.imshow(subset.image)
+	ax2.imshow(Image_Spectrum.Spectrum)
+	plt.show()
+	"""
+			
 	#--------------------------
 	# C) Direction Estimate
 	#--------------------------
 	# determine radius of influence
-	#print 'test3'
 	R, _, _ = Influence_Radius(Image_Spectrum)
 	#print 'test31'
 	DE_Parameters = parameters.DirectionEstimateParameters
 	direction = DirectionEstimate(DE_Parameters, subset, Image_Spectrum)
-	#print 'test4'
 	#--------------------------------------
 	# D) Apply Butterworth Elliptic Filter
 	#-------------------------------------
@@ -809,7 +802,6 @@ def RadialSpectrum(parameters, subset_input):
 	if IF_Parameters.FlagFilter:
 		FilteredImage = ImageFilter(IF_Parameters, subset, direction)
 		subset = CL.Subset(subset.CenterPoint, FilteredImage, subset.coordinates, subset.resolution, subset.FlagFlip)
-	#print 'test5'
 	#------------------------------
 	# E) Perform Image Padding
 	#------------------------------
@@ -820,7 +812,6 @@ def RadialSpectrum(parameters, subset_input):
 	#----------------------------------------------------
 	Image_Spectrum = ImageSpectrum(IP_Parameters, subset)
 	direction = DirectionEstimate(DE_Parameters, subset, Image_Spectrum)
-	#print 'test6'
 	#------------------------------------------------
 	# G) Process Spectrum
 	#------------------------------------------------
@@ -828,12 +819,10 @@ def RadialSpectrum(parameters, subset_input):
 	Spectrum = Image_Spectrum.Spectrum; k = Image_Spectrum.k;
 	mask = MaskPlot(R, subset)
 	Spectrum[mask] = 0
-	#print 'test7'
 	#---------------------------------------------
 	# H) Compute radial integration and
 	#---------------------------------------------
 	Rr, RadialIntegration = RadialProjection(Spectrum)
-	#print 'test8'
 
 	#---------------------------------------------
 	# I) Evaluate k-axis in agreement with Radius
@@ -860,7 +849,6 @@ def RadialSpectrum(parameters, subset_input):
 def RadialProjection(img):
     	"""
     	integrate the spectrum to create the averaged radial profile.
-
    	"""
 	# indices of image center
 	center = IP.ImageCenter(img)

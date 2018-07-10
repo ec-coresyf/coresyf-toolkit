@@ -127,7 +127,7 @@ def GetFFTBoxes(subsetparameters, data, dimension):
 		# get coordinates
 		coordinates = CL.Coordinates(subset.coordinates.northing, subset.coordinates.easting)
 		FlagFlip = IP.CheckImageOrientation(coordinates)
-		subsets = CL.Subset(i, data.image, coordinates, data.resolution, FlagFlip) 
+		subsets = CL.Subset(i, subset.image, coordinates, data.resolution, FlagFlip) 
 		Subsets.append(subsets)	
 		"""
 		# concatenate data
