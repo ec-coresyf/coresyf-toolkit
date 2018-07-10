@@ -55,7 +55,7 @@ from scipy.optimize import minimize
 
 import zipfile
 import shutil
-from osgeo import ogr
+from osgeo import ogr, osr
 from sridentify import Sridentify
 
 #*********************
@@ -322,25 +322,29 @@ def ReadPointsFromZippedShapefile(filename):
 
 
 def GetSpatialReferenceSystemFromGridShapefile(filename):
-    '''
-    It opens a zip file containing a shapefile with points and returns the EPSG
-    code of the Spatial Reference System.
-    '''
-    temp_path = os.path.abspath("temp_input") + "/"
-    try:
-        inDataSource = ReadZipShapefile(filename, temp_path)
-        inLayer = inDataSource.GetLayer()
-        spatialRef = inLayer.GetSpatialRef()
-        ident = Sridentify(prj=spatialRef.ExportToWkt())
-        epsg_code = ident.get_epsg()
-        epsg_code = int(epsg_code)
-    except Exception as e:
-        print (e)
-        sys.exit("Error. Unable to get EPSG code of the grid Shapefile '%s'!" % filename)
-    # Deleting temp directory
-    inDataSource = None
-    shutil.rmtree(temp_path)
-    return epsg_code
+	'''
+	It opens a zip file containing a shapefile with points and returns the EPSG
+	code of the Spatial Reference System.
+	'''
+	temp_path = os.path.abspath("temp_input") + "/"
+ 	
+	try:
+        	inDataSource = ReadZipShapefile(filename, temp_path)
+        	inLayer = inDataSource.GetLayer()
+        	spatialRef = inLayer.GetSpatialRef()
+        	ident = Sridentify(prj=spatialRef.ExportToWkt())
+        	epsg_code = ident.get_epsg()
+        	epsg_code = int(epsg_code)
+    	except:
+		epsg_code = [int(s) for s in re.findall(r'\d+', filename)][0]
+		print 'Warning. Unable to get EPSG code of the grid Shapefile information. Checked filename instead'
+		if not epsg_code:
+			sys.exit('No EPSG code specified')
+
+    	# Deleting temp directory
+    	inDataSource = None
+    	shutil.rmtree(temp_path)
+	return epsg_code
 
 
 def ReadZipShapefile(filename, temp_path="temp_input"):

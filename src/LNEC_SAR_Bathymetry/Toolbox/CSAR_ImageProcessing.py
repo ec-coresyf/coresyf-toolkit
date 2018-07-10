@@ -4,7 +4,6 @@
 """
 ===============================================================================
 IMAGE Library for image reading, processing and filtering
-
 ===============================================================================
  Authors: Florent Birrien and Alberto Azevedo and Francisco Sancho
  Date: June/2016
@@ -13,29 +12,19 @@ IMAGE Library for image reading, processing and filtering
 CONTENT:
 	READ IMAGE
 		ReadSARImg
-
 	IMAGE INFORMATION/COORDINATES
 		GetNorthingEasting	GetImgSize	GetCoords	GetImRes
 		GetImgType		GetProjImgInfo	GetEPSG
-
 	IMAGE PROCESSING
 		ImageCenter
-
 		ScaleImage		ContrastStretch		ContrastStretch2	ImageContrastStretch
 		SlantRangeGTiFF		SlantRangeCorrection
-
 		LabelToString		ImageLabel
-
 		UnibandTransform	Convert1BandTiff
-
 		ReadGtiffRaster		GetGtiffInformation	CreateOutputGtiff	array2raster	CreateGTiFF
-
 		ImagePadding		ResolutionPixels
-
 	MASK
 		CreateBandMask
-
-
 """
 
 import os,sys,re
@@ -48,7 +37,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 #
 import cv2
-from skimage import exposure
+from skimage import exposure,img_as_uint
 from osgeo import gdal, osr
 #
 import CSAR_Classes as CL
@@ -98,7 +87,6 @@ def InputSubsetParameters():
 	# store
 	args = parser.parse_args()
 	RunId = datetime.now().strftime('%Y%m%dT%H%M%S')
-
 
 	# Get EPSG_in and ESPG_out from input image and grid, respectively (STeam):
 	EPSG_In = GetDataProjectionSystem(args.input)
@@ -159,11 +147,7 @@ def ReadSARImg(parameters):
 
 	# Get image specific format and dimension
 	filein = fname_input; flin = path_input + filein;
-
 	ImgType, ImgSize, ImgRes = GetImgType(flin), GetImgSize(flin), GetImRes(flin)
-
-	# STeam commented this because these variables are never used
-	#f, RasterBand, img = ReadGtiffRaster(flin,parameters.ProcessingParameters.DataType)
 
 	# slant range correction
 	if parameters.ProcessingParameters.SlantRangeCorrection_Flag:
@@ -171,7 +155,6 @@ def ReadSARImg(parameters):
 			fileout_slant  = fname_input[:-4]+"_Slant.tif"; fout = path_input + fileout_slant
 			SlantRangeGTiFF(flin,fout)
 			filein = fileout_slant
-
 	# Scale image
 	if parameters.ProcessingParameters.ScaleFactor!=1.:
 		file_aux = filein[:-4].split(pattern)[-1]+"_scaled.tif"; flin = path_input + filein; fout = path_input + file_aux;
@@ -214,9 +197,10 @@ def ReadSARImg(parameters):
 
 	# read projected image and get raster image
 	f, _, img = ReadGtiffRaster(flin)
-
+			
 	# close raster
 	f = None
+
 	#-------------------------------------------------------------------------------------
 	# PROCESS IMAGE
 
@@ -226,6 +210,16 @@ def ReadSARImg(parameters):
 	else:
 		flin = path + filein; fout = path_output + filein[:-4].split(pattern)[-1] + "_CS.tif"
 		os.system("cp " + flin + " " + fout)
+	
+	"""
+	print 'max1', np.max(img1), np.mean(img1), img1.dtype
+	print 'max2', np.max(img), np.mean(img), img.dtype
+	
+	fig, (ax1,ax2) = plt.subplots(2)
+	ax1.imshow(img1)	
+	ax2.imshow(img)
+	plt.show()
+	"""
 
 	#create land mask
 	if parameters.ProcessingParameters.LandMaskParameters.LandMaskFlag:
@@ -534,9 +528,8 @@ def SlantRangeGTiFF(filein,fileout):
 	# open file and get information
 	img, Info = GetGtiffInformation(filein)
 	# image processing
-	img1 = ContrastStretch(img)		# stretch contrast
-	img2 = SlantRangeCorrection(img1)	# Slant Range correction
-	imgr = ScaleImage(img2, img)		# image scaling according to type
+	imgt = SlantRangeCorrection(img)	# Slant Range correction
+	imgr = ScaleImage(imgt, img)		# image scaling according to type
 	# create Gtiff output image
 	CreateOutputGtiff(imgr, fileout, Info)
 
@@ -614,8 +607,10 @@ def ReadGtiffRaster(filein):
 	img = raster.astype(np.uint16) if str(raster.dtype).find('uint')>-1 else raster.astype(np.float32)
 
 	# exceptions
-	if (str(img.dtype)=='float32' and np.max(img)>1.):
-		img=img/np.max(img)
+	if (str(img.dtype)=='float32'):
+		img=np.where(img<0., 0., img)
+		img=np.where(img>1., 1., img)
+		img=img_as_uint(img)
 
 	return f, a, img
 
@@ -870,21 +865,16 @@ def CreateLandMask(filein, coordinates_image, parameters):
 	#--------
 	# figure
 	#--------
-
 	fig, (ax1,ax2,ax3) = plt.subplots(3)
 	# image mask
 	E = coordinates_image.easting; N = coordinates_image.northing;
 	ax1.imshow(mask, cmap=plt.cm.jet, interpolation=None, aspect='auto', origin='upper', extent = [np.min(E), np.max(E), np.min(N), np.max(N)])
-
 	# topography mask
 	E = coordinates.easting; N = coordinates.northing;
 	ax2.imshow(topography, cmap=plt.cm.jet, interpolation=None, aspect='auto', origin='upper', extent = [np.min(E), np.max(E), np.min(N), np.max(N)])
-
 	#merge mask
 	E = coordinates_image.easting; N = coordinates_image.northing;
 	ax3.imshow(finalmask, cmap=plt.cm.jet, interpolation=None, aspect='auto', origin='upper', extent = [np.min(E), np.max(E), np.min(N), np.max(N)])
-
-
 	plt.show()
 	"""
 
