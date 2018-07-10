@@ -141,7 +141,7 @@ def aggregate_mask(cube, flags, dim="date", mask_var="mask"):
 
 def masking_cube(cube, mask, dim='date'):
     for s in Slices(cube, dim):
-        for _, var in s.items():
+        dim_ids = s["dim_ids"]
+        for name, var in s["variables"].items():
             var.mask = mask
-            print var.mask
-    pass
+            cube.variables[name][dim_ids, :, :].mask = var.mask
