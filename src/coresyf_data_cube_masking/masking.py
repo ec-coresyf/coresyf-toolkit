@@ -34,7 +34,7 @@ def Slices(cube, dim="date"):
         stop = len(cube.dimensions[dim])
     except KeyError as e:
         msg = "Dimension {} is no a cube dimension."
-        e(msg.format(dim))
+        rasie e(msg.format(dim))
 
     for dim_ids in range(0, stop):
         yield get_slice(cube, dim_ids)
