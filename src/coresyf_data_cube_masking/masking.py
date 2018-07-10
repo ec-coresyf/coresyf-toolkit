@@ -141,6 +141,23 @@ def aggregate_mask(cube, flags, dim="date", mask_var="mask"):
 
 
 def masking_cube(cube, mask, dim='date'):
+    """Short summary.
+
+    Parameters
+    ----------
+    cube : netCDF4 Dataset handle
+        File handle to read from.
+    mask : numpy array
+        Mask to applie on cube.
+    dim : string
+        Dimension direction to interate.
+
+    Returns
+    -------
+    side effect
+        Wirte new mask to each slice in cube.
+
+    """
     for s in Slices(cube, dim):
         dim_ids = s["dim_ids"]
         for name, var in s["variables"].items():
