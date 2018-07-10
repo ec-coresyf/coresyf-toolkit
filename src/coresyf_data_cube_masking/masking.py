@@ -128,7 +128,8 @@ def aggregate_mask(cube, flags, dim="date", mask_var="mask"):
 
     # first slice
     slices = Slices(cube, dim)
-    aggregate_mask = mask_by_flags(slices.next(), flags, name=mask_var)
+    random_slice = slices.next()
+    aggregate_mask = mask_by_flags(random_slice, flags, name=mask_var)
 
     for nr, s in enumerate(Slices(cube, dim)):
         logging.debug("Aggregate slice number: {}".format(nr))
