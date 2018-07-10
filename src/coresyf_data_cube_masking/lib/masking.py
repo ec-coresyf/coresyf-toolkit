@@ -163,4 +163,4 @@ def masking_cube(cube, mask, dim='date'):
         dim_ids = s["dim_ids"]
         for name, var in s["variables"].items():
             var.mask = mask
-            cube.variables[name][dim_ids, :, :].mask = var.mask
+            cube.variables[name][dim_ids, :, :] = var
