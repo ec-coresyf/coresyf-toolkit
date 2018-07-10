@@ -58,11 +58,14 @@ def get_slice(cube, dim_ids):
 
     """
 
-    slice = {}
+    slice = {
+        "dim_ids": dim_ids,
+        "variables": {},
+    }
     for name, var in cube.variables.items():
         if var.ndim == 3:
             data = var[dim_ids, :, :]
-            slice[name] = data
+            slice["variables"][name] = data
 
     return slice
 
@@ -91,13 +94,13 @@ def mask_by_flags(slice, flags=[], name="mask"):
     """
     mask = []
 
-    if name in slice.keys():
-        int_mask = slice[name]
+    if name in slice["variables"].keys():
+        int_mask = slice["variables"][name]
         mask = np.isin(int_mask, flags)
     else:
         try:
-            one_var = next(iter(slice))
-            mask = slice[one_var].mask  # use mask from one variable
+            one_var = next(iter(slice["variables"]))
+            mask = slice[variables][one_var].mask  # use mask from one variable
         except AttributeError as e:
             raise e("No mask found.")
     return mask
