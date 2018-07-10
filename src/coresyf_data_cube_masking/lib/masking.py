@@ -34,7 +34,7 @@ def Slices(cube, dim="date"):
         stop = len(cube.dimensions[dim])
     except KeyError as e:
         msg = "Dimension {} is no a cube dimension."
-        rasie e(msg.format(dim))
+        raise e(msg.format(dim))
 
     for dim_ids in range(0, stop):
         yield get_slice(cube, dim_ids)
@@ -64,6 +64,7 @@ def get_slice(cube, dim_ids):
     }
     for name, var in cube.variables.items():
         if var.ndim == 3:
+            # TODO: handle IndexError
             data = var[dim_ids, :, :]
             slice["variables"][name] = data
 
