@@ -329,7 +329,7 @@ def wave_params(dx,dy,sig_box,mean_dir):
         # Compute Mean with Spectrum Integration (Simpsons Rule)
         #-----------------------------------------------------------------------------
 
-		km = simps(simps(Sn*kl))/simps(simps(Sn))
+        km = simps(simps(Sn*kl))/simps(simps(Sn))
 
     return tp,km
 

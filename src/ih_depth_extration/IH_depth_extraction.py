@@ -114,7 +114,7 @@ for it in range(tracks):
     mdir0 = mdir[it]
 
     # initial tracking positions and depth
-	n = 0
+    n = 0
     lonp[it,n] = lon0
     latp[it,n] = lat0
     hp[it,n] = hi
