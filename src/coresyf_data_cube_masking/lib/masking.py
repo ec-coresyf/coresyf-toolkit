@@ -142,7 +142,10 @@ def aggregate_mask(cube, flags, dim="date", mask_var="mask"):
 
 
 def masking_cube(cube, mask, dim='date'):
-    """Short summary.
+    """Change variable mask in `cube` to aggregated version given by `mask`.
+
+    Set variabe used for time Slices by `dim` parameter. This musst by a
+    dimmension and variable in the `cube`. The default is 'date'.
 
     Parameters
     ----------
