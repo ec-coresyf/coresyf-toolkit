@@ -22,7 +22,7 @@ def parse_argparser_in_file(filename):
         return matches
 
 def write_manifest(manifest, tool_dir, tool_name):
-    manifest_json = json.dumps(manifest, indent=4)
+    manifest_json = json.dumps(manifest, indent=4, sort_keys=True)
     manifest_file_name = tool_name + '.manifest.json'
     manifest_file_path = Path(tool_dir) / manifest_file_name
     with open(str(manifest_file_path), 'w') as manifest_file:
