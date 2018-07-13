@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from coresyfDataCubeCreation import CoReSyFDataCubeCreation
+from coresyfDataCubeMasking import CoReSyFDataCubeMasking
 
 if __name__ == '__main__':
-    CoReSyFDataCubeCreation(__file__, 'CoReSyFDataCubeCreation.manifest.json').execute()
+    CoReSyFDataCubeMasking(__file__, 'CoReSyFDataCubeMasking.manifest.json').execute()

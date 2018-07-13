@@ -2,8 +2,7 @@
     "name": "CoReSyFDataCubeMasking",
     "type": "DataCubeMasking",
     "description":
-        "This aggregates the masks of all slices in a data cube to one tow dimension mask
-        and applie this to all slices.",
+        "This aggregates the masks of all slices in a data cube to one tow dimension mask and applie this to all slices.",
     "inputs": [
         {
             "identifier": "Ssource",
