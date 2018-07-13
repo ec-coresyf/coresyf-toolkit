@@ -3,7 +3,8 @@ from pathlib import Path
 
 class ArgumentParser:
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, description=None, *args, **kwargs):
+        self.description = description
         self.args = {}
         self.input_options = set()
         self.output_options = set()
@@ -42,6 +43,8 @@ class ArgumentParser:
             "parameters": [],
             "outputs": []
         }
+        if self.description is not None:
+            manifest['description'] = self.description
         for _id in self.input_options:
             arg = self.args[_id]
             manifest['inputs'].append(self._entry(_id, arg, True))

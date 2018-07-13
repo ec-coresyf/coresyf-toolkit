@@ -6,8 +6,11 @@ import json
 import click
 from pathlib import Path
 import logging
+import argparse
 from argparse import ArgumentParser
-ARG_ADDITION_REGEX = re.compile(r'.*parser.add_argument\(.*\)')
+
+#ARG_INIT_REGEX = re.compile(r'.*ArgumentParser(\(.*\)')
+ARG_ADDITION_REGEX = re.compile(r'.*ArgumentParser\(.*\)|.*parser.add_argument\(.*\)')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,10 +29,10 @@ def write_manifest(manifest, tool_dir, tool_name):
         manifest_file.write(manifest_json)
 
 def create_argument_parser(filename):
-    parser = ArgumentParser()
-    logger.info('Parsing...')
+    #parser = ArgumentParser()
+    logger.debug('Parsing...')
     for line in parse_argparser_in_file(filename):
-        logger.info('Parsing %s.', line)
+        logger.debug('Parsing %s.', line)
         exec(line.strip())
     return parser
 
@@ -42,14 +45,24 @@ def create_manifest(runfile, tool_dir=None):
         tool_dir = Path(runfile).parent
     name = Path(runfile).resolve().parent.name
     argparser = create_argument_parser(runfile)
+    if argparser.description is not None:
+        click.echo('Tool description:')
+        click.echo(argparser.description)
+    click.echo()
     click.echo('Parsed arguments:')
     for prefix, _help in argparser.get_arguments_list():
         click.echo('{}: {}'.format(prefix, _help))
-    input_options = raw_input('Which options are inputs? Write their prefixes separeted by space.\n')
-    output_options = raw_input('Which options are outputs? Write their prefixes separated by space.\n')
+    click.echo()
+    input_options = click.prompt('Please enter the input option prefixes separeted by space')
+    click.echo()
+    output_options = click.prompt('Please enter the output option prefixes separated by space')
     argparser.set_inputs(input_options.split())
     argparser.set_outputs(output_options.split())
     manifest = argparser.manifest()
+    manifest['name'] = name
+    click.echo()
+    tool_type = click.prompt('Please enter the tool type')
+    manifest['type'] = tool_type
     write_manifest(manifest, tool_dir, name)
 
 if __name__ == '__main__':
