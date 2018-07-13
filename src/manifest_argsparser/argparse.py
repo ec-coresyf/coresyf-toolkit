@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 class ArgumentParser:
 
@@ -41,9 +42,10 @@ class ArgumentParser:
                 manifest['parameters'].append(entry)
         return manifest
 
-    def generate_manifest(self, tool_name):
+    def generate_manifest(self, tool_dir, tool_name):
         manifest_json = json.dumps(self.manifest(), indent=4)
         manifest_file_name = tool_name + '.manifest.json'
-        with open(manifest_file_name, 'w') as manifest_file:
+        manifest_file_path = Path(tool_dir) / manifest_file_name
+        with open(str(manifest_file_path), 'w') as manifest_file:
             manifest_file.write(manifest_json)
 

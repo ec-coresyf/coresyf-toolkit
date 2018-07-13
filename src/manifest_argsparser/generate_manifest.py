@@ -1,6 +1,8 @@
+#!/usr/bin/python2
 import re
 import glob
 import os
+import click
 from pathlib import Path
 from argparse import ArgumentParser
 ARG_ADDITION_REGEX = re.compile(r'\s*parser.add_argument\(.*\)\n')
@@ -18,9 +20,14 @@ def create_argument_parser(filename):
     return parser
 
 
-#for pyfile in glob.glob('Toolbox/*.py'):
-#    create_argument_parser(pyfile).generate_manifest(os.path.splitext(os.path.basename(pyfile))[0])
+@click.command()
+@click.option('--runfile')
+@click.option('--tool_dir')
+def create_manifest(runfile, tool_dir=None):
+    if tool_dir is None:
+        tool_dir = Path(runfile).parent
+    name = Path(runfile).parent.name
+    create_argument_parser(runfile).generate_manifest(tool_dir, name)
 
-for pyfile in glob.glob('../SAR_*/run'):
-    name = Path(pyfile).parent.name
-    create_argument_parser(pyfile).generate_manifest(name)
+if __name__ == '__main__':
+    create_manifest()
