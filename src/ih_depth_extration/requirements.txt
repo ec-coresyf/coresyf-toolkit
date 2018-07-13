@@ -1,0 +1,5 @@
+numpy
+ConfigParser
+scipy
+matplotlib
+netCDF4
