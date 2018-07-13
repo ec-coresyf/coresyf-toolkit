@@ -1,0 +1,59 @@
+{
+    "description": "Depth Extraction using Ray-Tracing Algorithm (IH)", 
+    "inputs": [
+        {
+            "collection": true, 
+            "description": "initial bathymetry file (netcdf)", 
+            "identifier": "bat_file", 
+            "name": "bat_file"
+        }
+    ], 
+    "name": "ih_depth_extration", 
+    "outputs": [
+        {
+            "collection": true, 
+            "description": "name for the final bathymetry (netcdf)", 
+            "identifier": "outfilename", 
+            "name": "outfilename"
+        }
+    ], 
+    "parameters": [
+        {
+            "default": 100, 
+            "description": "distance between each track position (meters)", 
+            "identifier": "dm", 
+            "name": "dm"
+        }, 
+        {
+            "default": 15, 
+            "description": "stopping depth for the tracking algorithm (meters)", 
+            "identifier": "hstop", 
+            "name": "hstop"
+        }, 
+        {
+            "default": 100, 
+            "description": "starting depth for the tracking algorithm (meters)", 
+            "identifier": "hi", 
+            "name": "hi"
+        }, 
+        {
+            "default": 1000, 
+            "description": "y-dimension of the subscene (meters)", 
+            "identifier": "Dyi", 
+            "name": "Dyi"
+        }, 
+        {
+            "default": 1000, 
+            "description": "x-dimension of the subscene (meters)", 
+            "identifier": "Dxi", 
+            "name": "Dxi"
+        }, 
+        {
+            "default": 300, 
+            "description": "Maximum tracking points for each track (number)", 
+            "identifier": "pts", 
+            "name": "pts"
+        }
+    ], 
+    "type": "DepthExtraction"
+}
