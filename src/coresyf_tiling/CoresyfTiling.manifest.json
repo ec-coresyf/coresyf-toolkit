@@ -1,0 +1,37 @@
+{
+    "name": "CoresyfTiling",
+    "type": "ImageTiling",
+    "description": 
+        "Tool that uses SNAP utility program 'Subset' to create image tiles, according with the number of output tiles defined in a text file.",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Filepath of the input raster",
+            "type": "GeoTIFF"
+        },
+        {
+            "identifier": "Sclass",
+            "name": "class",
+            "description": "The path for the text file containing the correspondence between input and output classes.",
+            "type": "text"
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "Flag",
+            "name": "Name",
+            "description": "Description",
+            "type": "float",
+            "default": 0
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Filepath of the output raster",
+            "type": "GeoTIFF"
+        }
+    ]
+}
