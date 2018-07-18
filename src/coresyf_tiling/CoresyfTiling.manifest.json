@@ -26,8 +26,8 @@
             "name": "Number Of Tiles",
             "description": "The number of output tiles. Value must be on of '2', '4', '9', '16', '36', '64', '100', '256'.",
             "type": "int",
-            "options": ["2", "4", "9", "16", "36", "64", "100", "256"],
-            "default": "4"
+            "options": [2, 4, 9, 16, 36, 64, 100, 256],
+            "default": 4
         }
     ],
     "outputs": [   
