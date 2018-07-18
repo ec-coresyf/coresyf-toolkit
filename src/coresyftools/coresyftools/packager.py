@@ -86,8 +86,13 @@ class Packager():
         args = self._get_command()[1:]
         arg_parser.parse_arguments(args)
         inputs = [arg_parser.bindings[argin] for argin in arg_parser.inputs]
-        outputs = [arg_parser.bindings[argout] for argout in
-                   arg_parser.outputs]
+        outputs = []
+        for argout in arg_parser.outputs:
+            output = arg_parser.bindings[argout]
+            if isinstance(output, list):
+                outputs.extend(output)
+            else:
+                outputs.append(output)
         return inputs + outputs
 
     def _get_command(self):
