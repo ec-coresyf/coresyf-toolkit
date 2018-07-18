@@ -6,7 +6,7 @@
       <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>${targetProduct}</file>
+      <file>${targetBaseFile}</file>
       <formatName>${formatName}</formatName>
       <divisionBy>${divisionBy}</divisionBy>
       <numberOfTiles>${numberOfTiles}</numberOfTiles>

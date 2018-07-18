@@ -1,4 +1,4 @@
-input.tif="http://example.org"
+S1B_EW_GRDM_1SDH_20180717T100224_20180717T100239_011849_015CEE_ECDD.zip="http://example.org"
 #PASSING EXECUTION
 #Example of a passing execution
-./run --Ssource test_data/input.tif --Ttarget myoutput1.tif
+./run --Ssource test_data/S1B_EW_GRDM_1SDH_20180717T100224_20180717T100239_011849_015CEE_ECDD.zip --Ttarget tile1 tile2 tile3 tile4
