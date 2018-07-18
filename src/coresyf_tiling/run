@@ -1,9 +1,5 @@
 #!/usr/bin/python2
-import sys
-sys.dont_write_bytecode = True
-
-from coresyf_tiling import CoresyfTiling
-
+from coresyftools.gpt_tool import GPTCoReSyFTool
 
 if __name__ == '__main__':
-    CoresyfTiling(__file__, 'CoresyfTiling.manifest.json').execute()
+    GPTCoReSyFTool(__file__, 'CoresyfTiling.manifest.json').execute()

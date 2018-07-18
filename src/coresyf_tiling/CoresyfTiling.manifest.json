@@ -3,27 +3,31 @@
     "type": "ImageTiling",
     "description": 
         "Tool that uses SNAP utility program 'Subset' to create image tiles, according with the number of output tiles defined in a text file.",
+    "operation": {"graph": "tiling.graph.xml"},
     "inputs": [
         {
             "identifier": "Ssource",
             "name": "source",
-            "description": "Filepath of the input raster",
-            "type": "GeoTIFF"
-        },
-        {
-            "identifier": "Sclass",
-            "name": "class",
-            "description": "The path for the text file containing the correspondence between input and output classes.",
-            "type": "text"
+            "description": "Filepath of the input product",
+            "type": "raster"
         }
     ],
     "parameters": [
         {
-            "identifier": "Flag",
-            "name": "Name",
-            "description": "Description",
-            "type": "float",
-            "default": 0
+            "identifier": "PdivisionBy",
+            "name": "Division by mode",
+            "description": "How to divide the tiles. Value must be one of 'Tiles', 'Pixels'.",
+            "type": "string",
+            "options": ["Tiles", "Pixels"],
+            "default": "Tiles"
+        },
+        {
+            "identifier": "PnumberOfTiles",
+            "name": "Number Of Tiles",
+            "description": "The number of output tiles. Value must be on of '2', '4', '9', '16', '36', '64', '100', '256'.",
+            "type": "string",
+            "options": ["2", "4","9", "16", "36", "64", "100", "256"],
+            "default": "4"
         }
     ],
     "outputs": [   
