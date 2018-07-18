@@ -1,0 +1,17 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="TileWriter">
+    <operator>TileWriter</operator>
+    <sources>
+      <sourceProduct>${sourceProduct}</sourceProduct>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>${targetProduct}</file>
+      <formatName>${formatName}</formatName>
+      <divisionBy>${divisionBy}</divisionBy>
+      <numberOfTiles>${numberOfTiles}</numberOfTiles>
+      <pixelSizeX>200</pixelSizeX>
+      <pixelSizeY>200</pixelSizeY>
+    </parameters>
+  </node>
+</graph>
