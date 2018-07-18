@@ -1,6 +1,6 @@
 {
     "name": "CoresyfTiling",
-    "type": "ImageTiling",
+    "type": "Tiling",
     "description": 
         "Tool that uses SNAP utility program 'Subset' to create image tiles, according with the number of output tiles defined in a text file.",
     "operation": {"graph": "tiling.graph.xml"},
@@ -9,7 +9,7 @@
             "identifier": "Ssource",
             "name": "source",
             "description": "Filepath of the input product",
-            "type": "raster"
+            "type": "Raster"
         }
     ],
     "parameters": [
@@ -25,8 +25,8 @@
             "identifier": "PnumberOfTiles",
             "name": "Number Of Tiles",
             "description": "The number of output tiles. Value must be on of '2', '4', '9', '16', '36', '64', '100', '256'.",
-            "type": "string",
-            "options": ["2", "4","9", "16", "36", "64", "100", "256"],
+            "type": "int",
+            "options": ["2", "4", "9", "16", "36", "64", "100", "256"],
             "default": "4"
         }
     ],
