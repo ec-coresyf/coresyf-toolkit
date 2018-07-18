@@ -34,7 +34,8 @@
         {
             "identifier": "Ttarget",
             "name": "target",
-            "description": "Filepath of the output raster",
+            "collection": true,
+            "description": "List with output tile names",
             "type": "GeoTIFF"
         }
     ]
