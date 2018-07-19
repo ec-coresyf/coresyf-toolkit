@@ -1,0 +1,23 @@
+{
+    "name": "Coresyf_OHMA_Separability_Decision",
+    "type": "OHMA_Separability_Decision",
+    "description": 
+        "Tool that to extract the average and minimum, divergence and Jeffries Mathusita separability values from a .txt file and analysing them to locate the number of clusters whereby 1) a plateau in both average and minimum JM is reached, and this plateau coincides with a concident peak in average and minimum divergence. The resulting list of optimal numbers of clusters which summarise the variability in the data are then written back into a new original SeparabilityMeasuresDecision.txt file as a new line in a list form, followed by underpinning decision data. The 1st value on the second line of the SeparabilityMeasuresDecision textfileis the one for the algorithm to select for onward use.",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Filepath of the input textfile with separability values",
+            "type": "text"
+        },
+    ],
+    "parameters": [],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Filepath of the output textfile with the optimal number of clusters and underpinning decision data",
+            "type": "text"
+        }
+    ]
+}
