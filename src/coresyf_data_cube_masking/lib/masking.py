@@ -99,13 +99,13 @@ def mask_by_flags(slice_, flags=[], name="mask"):
 
     if name in slice_["variables"].keys():
         int_mask = slice_["variables"][name]
-        mask = np.isin(int_mask, flags)
+        mask = np.isin(int_mask, flags)  # get boolean array of element are in flags
     else:
         try:
             one_var = next(iter(slice_["variables"]))
             mask = slice_["variables"][one_var].mask  # use mask from one variable
         except AttributeError as e:
-            raise e("No mask found.")
+            raise AttributeError("No mask found.")
     return mask
 
 
