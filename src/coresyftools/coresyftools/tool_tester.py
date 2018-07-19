@@ -145,10 +145,17 @@ class ToolTester(object):
     def _output_errors(self, command):
         for output in command.outputs:
             self.logger.debug('Checking for output %s', output)
-            if not exists(output):
-                return NoOutputFile(output)
-            if not getsize(output) > 0:
-                return EmptyOutputFile(output)
+            if isinstance(output, list):
+                for output_elem in output:
+                    if not exists(output_elem):
+                        return NoOutputFile(output_elem)
+                    if not getsize(output_elem) > 0:
+                        return EmptyOutputFile(output_elem)
+            else:
+                if not exists(output):
+                    return NoOutputFile(output)
+                if not getsize(output) > 0:
+                    return EmptyOutputFile(output)
 
     def change_to_tool_dir(self):
         self.cwd = os.getcwd()
