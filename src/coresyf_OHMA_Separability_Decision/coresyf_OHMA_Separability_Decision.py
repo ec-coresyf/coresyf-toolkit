@@ -65,7 +65,7 @@ def make_peak_plateau_decisions(variable): # variable is a dictionary of "{key1:
     case of divergences, and identifying plateaus in JM""" 
 
     sepDec_dict = {}
-    for key, value in sep_dict.iteritems():
+    for key, value in variable.iteritems():
         if key in ["average_divergence", "minimum_divergence"]:
             sepDec_dict[key] = find_local_Div_peaks(value)
         elif key in ["average_jeffries_mathusita", "minimum_jeffries_mathusita"]:
@@ -94,16 +94,16 @@ def find_optimal_cluster(variable):
     """Selects and outputs the optimal number of clusters to represent dataset variability, which is the minimum number of clusters, where there is a peak in divergence measures, and a plateau in Jeffries Mathusita measures."""
 
     optimal_cluster = " "
-    for value in n_clusters:
+    for value in variable:
         if value > 0:
             optimal_cluster = int(value)
             break
     return optimal_cluster
 
-def record_details(variable): # variable = output file, termed here as out_file#
+def record_details(variable, opt_cluster, n_clusters, sepDec_dict, sep_dict): # variable = output file, termed here as out_file#
     """writes the decided optimal number of clusters, and underpinning decision data to a textfile, for the user to extract values for further use, or print for external evaluation"""
 
-    out_file.writelines([
+    variable.writelines([
         "1) Optimal number of clusters" + "\n",
         str(opt_cluster) + "\n",
         "2) Cluster outputs with coincident divergence peaks and Jeffries-Mathusita plateaus (0 = no coincidence, >0 = cluster number at which coincidence occurs)" + "\n",
@@ -138,5 +138,5 @@ class CoresyfOHMASeparabilityDecision(CoReSyFTool):
  
         print("Open file from {}.".format(outfile_path)) # TODO: change to logging module
         out_file = open(outfile_path,"w")
-        record_details(out_file)
+        record_details(out_file, opt_cluster, n_clusters, sepDec_dict, sep_dict)
         out_file.close()

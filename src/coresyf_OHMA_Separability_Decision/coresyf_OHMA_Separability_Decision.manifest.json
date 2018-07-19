@@ -9,7 +9,7 @@
             "name": "source",
             "description": "Filepath of the input textfile with separability values",
             "type": "text"
-        },
+        }
     ],
     "parameters": [],
     "outputs": [   
