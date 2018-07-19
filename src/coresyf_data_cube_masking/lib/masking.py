@@ -1,7 +1,11 @@
 #!/usr/bin/env python
-"""
-This aggregates the masks of all slices in a data cube to one tow dimension mask
-and applie this to all slices.
+"""Produce a data cube masked by flags with a certain value.
+
+Each element in the maske variable will by checked aginst values in flag list.
+It produces a new tow dimensional mask array for each slice. Thise arrays will
+by aggregated to a global mask and will by applied to all variables.
+
+This produces a clean data cube with Missing vlaues filled by fix values.
 
 """
 
