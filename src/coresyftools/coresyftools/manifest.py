@@ -71,10 +71,7 @@ MANIFEST_SCHEMA = {
                 },
                 'default': {},
                 'options': {
-                    'type': 'list',
-                    'schema': {
-                        'type': 'string'
-                    }
+                    'type': 'list'
                 },
                 'required': {
                     'type': 'boolean'
