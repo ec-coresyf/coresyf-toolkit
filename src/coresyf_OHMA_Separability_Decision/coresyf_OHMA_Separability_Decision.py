@@ -100,18 +100,18 @@ def find_optimal_cluster(variable):
             break
     return optimal_cluster
 
-def record_details(variable, opt_cluster, n_clusters, sepDec_dict, sep_dict): # variable = output file, termed here as out_file#
+def record_details(variable, var2): # variable = output file, termed here as out_file#
     """writes the decided optimal number of clusters, and underpinning decision data to a textfile, for the user to extract values for further use, or print for external evaluation"""
 
     variable.writelines([
         "1) Optimal number of clusters" + "\n",
-        str(opt_cluster) + "\n",
+        str(var2["opt_cluster"]) + "\n",
         "2) Cluster outputs with coincident divergence peaks and Jeffries-Mathusita plateaus (0 = no coincidence, >0 = cluster number at which coincidence occurs)" + "\n",
-        str(n_clusters) + "\n",
+        str(var2["n_clusters"]) + "\n",
         "3) Peak and Plateau decisions for each cluster output for each separability measure (min and average divergence, min and average Jeffries-Mathusita)" + "\n",
-        str(sepDec_dict) + "\n",
+        str(var2["sepDec_dict"]) + "\n",
         "4) Raw Separability values for each cluster output" + "\n",
-        str(sep_dict)
+        str(var2["sep_dict"])
         ])
 
 #Section 3) The implementation part of the tool when it's up and running on the system
@@ -134,9 +134,15 @@ class CoresyfOHMASeparabilityDecision(CoReSyFTool):
         sepDec_dict = make_peak_plateau_decisions(sep_dict)
         n_clusters = locate_peaks_plateau(sep_dict, sepDec_dict)
         opt_cluster = find_optimal_cluster(n_clusters)
+        variable_to_write = {
+                            "opt_cluster": opt_cluster, 
+                            "n_clusters": n_clusters, 
+                            "sepDec_dict": sepDec_dict, 
+                            "sep_dict": sep_dict
+                            }
         print opt_cluster # This is the output
  
         print("Open file from {}.".format(outfile_path)) # TODO: change to logging module
         out_file = open(outfile_path,"w")
-        record_details(out_file, opt_cluster, n_clusters, sepDec_dict, sep_dict)
+        record_details(out_file, variable_to_write)
         out_file.close()
