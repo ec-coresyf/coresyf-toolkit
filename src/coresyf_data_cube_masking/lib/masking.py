@@ -13,7 +13,7 @@ import logging
 import numpy as np
 
 
-def Slices(cube, dim="date"):
+def Slices(cube, var_name, dim="date"):
     """Create interator for `dim` dimension by using `get_slice` function.
 
     Attention!
@@ -43,8 +43,14 @@ def Slices(cube, dim="date"):
         stop = len(cube.dimensions[dim])
 
     for dim_ids in range(0, stop):
-        yield get_slice(cube, dim_ids)
 
+        var = cube[var_name]
+        data = var[dim_ids, :, :]
+
+        # TODO: Fix dict constructor  call
+        slice_ = dict(var_name=data)
+
+        yield dict("dim_ids"=dim_ids, slice_)
 
 def get_slice(cube, dim_ids):
     """Returns slice dictionary at index `dim_ids` from a three dimensional cube.
