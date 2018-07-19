@@ -166,6 +166,6 @@ def masking_cube(cube, mask, dim='date'):
     """
     for s in Slices(cube, dim):
         dim_ids = s["dim_ids"]
-        for name, var in s["variables"].items():
-            var.mask = mask
-            cube.variables[name][dim_ids, :, :] = var
+        for name, data in s["variables"].items():
+            data[mask] = -999
+            cube.variables[name][dim_ids, :, :] = data
