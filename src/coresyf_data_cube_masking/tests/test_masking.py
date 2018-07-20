@@ -25,30 +25,36 @@ def cube_file():
 def fill_test_cube(test_ds):
     """create a 3x3 test cube with 8 slices"""
 
-    data = np.ones((3, 3))
-    mask = np.zeros((3, 3), dtype=bool)
-
-    variables = []
-
-    index = 1
-    for i in range(len(mask)):
-        for j in range(len(data[i])):
-            if not (i == 1 and j == 1):
-                mask[i][j] = True
-                index += 1
-                variable = np.ma.array(data, mask=mask)
-
-                variables.append(variable)
-            mask = np.zeros((3, 3), dtype=bool)
-
+    # cube
     test_ds.createDimension("date", None)
     test_ds.createDimension("lat", 3)
     test_ds.createDimension("lon", 3)
 
     data_var = test_ds.createVariable("data", "i4", ("date", "lat", "lon"))
 
-    for idx, data in enumerate(variables):
-        data_var[idx, :, :] = data
+    # data
+    data = np.array([
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1]
+    ])
+
+    mask = np.array([
+        [False, False, False],
+        [False, False, False],
+        [False, False, False]
+    ])
+
+    # create slices with one maked element
+    sliece = 0  # slice index
+    for ix, iy in np.ndindex(data.shape):
+        if (ix == 2) and (iy == 2):
+            mask[ix, iy] = False
+        else:
+            mask[ix, iy] = True
+
+        data_var[idx, :, :] = np.ma.array(data, mask=mask)
+        sliece += sliece
 
 
 class TestGetSlice(unittest.TestCase):
