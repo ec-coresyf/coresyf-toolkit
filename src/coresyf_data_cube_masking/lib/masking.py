@@ -92,6 +92,7 @@ def mask_by_flags(slice_, flags=[], name="mask"):
     return mask
 
 
+def aggregated_mask(cube, flags, dim="date", mask_var="mask"):
     """Returns one aggregated mask for all slices.
 
     Parameters
@@ -114,12 +115,15 @@ def mask_by_flags(slice_, flags=[], name="mask"):
     # init mask array with first slice
     slices = Slices(cube, mask_var, dim)
     one_slice = slices.next()
+    new_mask = mask_by_flags(one_slice, flags, name=mask_var)
 
     for nr, s in enumerate(Slices(cube, mask_var, di)):
         logging.debug("Aggregate slice number: {}".format(nr))
 
         mask = mask_by_flags(s, flags, name=mask_var)
+        new_mask = new_mask | mask
 
+    return new_mask
 
 
 def masking_cube(cube, mask, dim='date'):

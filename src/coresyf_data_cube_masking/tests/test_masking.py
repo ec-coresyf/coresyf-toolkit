@@ -107,13 +107,13 @@ class TestMaskAggregation(unittest.TestCase):
         self.cube_file = cube_file()
 
     def test_aggregate_eight_mask(self):
-        """test if aggregated mask has 8 elemens == false"""
+        """Test if aggregated mask has 8 elemens == false"""
         test = [[True, True, True],
                 [True, False, True],
                 [True, True, True]]
         with Dataset(self.cube_file, "w", format="NETCDF4") as cube:
             fill_test_cube(cube)
-            aggregated = masking.aggregate_mask(cube, flags=[], dim="date")
+            aggregated = masking.aggregated_mask(cube, flags=[], dim="date")
         self.assertTrue(np.array_equal(aggregated, test))
 
 
