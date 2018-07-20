@@ -14,7 +14,7 @@ class CoReSyFDataCubeMasking(CoReSyFTool):
         target = bindings['Ttarget']
 
         in_cube = Dataset(input, 'r', format="NETCDF4")
-        mask = masking.aggregate_mask(in_cube, flags, dim="date", mask_var="mask")
+        mask = masking.aggregated_mask(in_cube, flags, dim="date", mask_var="mask")
 
         out_cube = Dataset(target, "w", format="NETCDF4")
 
