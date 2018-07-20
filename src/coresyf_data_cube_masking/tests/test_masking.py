@@ -101,13 +101,17 @@ class TestFlagsMasking(unittest.TestCase):
             },
         }
 
-    def test_flags_invalid(self):
+    def test_invaid_flags(self):
         """Test if elements with flag value 10 are invaid in variable."""
+        test = [[True, True, True],
+                [True, False, True],
+                [True, True, True]]
+
         mask = masking.mask_by_flags(
             self.test_slice,
             flags=[self.flag_value, ],
             name="mask")
-        self.assertTrue(mask[1, 1])
+        np.testing.assert_array_equal(mask, test)
 
 
 class TestMaskAggregation(unittest.TestCase):
