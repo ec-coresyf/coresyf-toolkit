@@ -86,18 +86,18 @@ class TestFlagsMasking(unittest.TestCase):
 
         self.flag_value = 10
 
-        data = np.ones((3, 3), dtype=int)
         mask = np.zeros((3, 3), dtype=bool)
-        variable = np.ma.array(data, mask=mask)
 
-        data_mask = np.zeros((3, 3), dtype=int)
-        data_mask[1, 1] = self.flag_value
+        mask = np.array([
+            [10, 10, 10],
+            [10, 20, 10],
+            [10, 10, 10]
+        ])
 
         self.test_slice = {
             "dim_ids": 1,
             "variables": {
-                "data": variable,
-                "mask": data_mask
+                "mask": mask
             },
         }
 
