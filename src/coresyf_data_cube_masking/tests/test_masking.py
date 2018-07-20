@@ -31,6 +31,7 @@ def fill_test_cube(test_ds):
     test_ds.createDimension("lon", 3)
 
     data_var = test_ds.createVariable("data", "i4", ("date", "lat", "lon"))
+    mask_var = test_ds.createVariable("mask", "i4", ("date", "lat", "lon"))
 
     # data
     data = np.array([
@@ -40,20 +41,21 @@ def fill_test_cube(test_ds):
     ])
 
     mask = np.array([
-        [False, False, False],
-        [False, False, False],
-        [False, False, False]
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
     ])
 
     # create slices with one maked element
     sliece = 0  # slice index
     for ix, iy in np.ndindex(data.shape):
-        if (ix == 2) and (iy == 2):
-            mask[ix, iy] = False
+        if (ix == 1) and (iy == 1):
+            mask[ix, iy] = 20
         else:
-            mask[ix, iy] = True
+            mask[ix, iy] = 10
 
-        data_var[idx, :, :] = np.ma.array(data, mask=mask)
+        data_var[sliece, :, :] = data
+        mask_var[sliece, :, :] = mask
         sliece += sliece
 
 
