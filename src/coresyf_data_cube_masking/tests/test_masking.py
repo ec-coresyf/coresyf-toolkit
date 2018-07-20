@@ -160,8 +160,6 @@ class TestMaskingCube(unittest.TestCase):
                 compbinations = itertools.combinations(masks, 2)
 
                 for compbination in compbinations:
-                    # print compbination[1]
-                    # print compbination[0]
                     self.assertTrue(
                         np.array_equal(compbination[1], compbination[0])
                     )
