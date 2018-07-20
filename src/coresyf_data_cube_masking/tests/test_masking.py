@@ -139,9 +139,11 @@ class TestMaskingCube(unittest.TestCase):
     """Test masking cube function"""
     def setUp(self):
         self.cube_file = cube_file()
-        self.cube_mask = [[True, True, True],
-                          [True, False, True],
-                          [True, True, True]]
+        self.cube_mask = np.array([
+            [True, True, True],
+            [True, False, True],
+            [True, True, True]
+        ])
 
     def test_all_same_mask(self):
         """Test if all slices in cube have same mask."""
