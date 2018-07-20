@@ -67,7 +67,8 @@ class TestGetSlice(unittest.TestCase):
         cube = cube_file()
         with Dataset(cube, "w", format="NETCDF4") as cube:
             fill_test_cube(cube)
-            data = masking.get_slice(cube, 0)["variables"]["data"]
+            slice_ = masking.Slices(cube, "data").next()
+            data = slice_["variables"]["data"]
         self.assertTrue(np.allclose(self.origin, data))
 
 

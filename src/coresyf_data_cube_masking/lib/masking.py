@@ -14,7 +14,10 @@ import numpy as np
 
 
 def Slices(cube, var_name, dim="date"):
-    """Create interator for `dim` dimension by using `get_slice` function.
+    """
+    Generator object to iterate for `var_name` over slices in cube in `dim` direction.
+
+    Retunrs a dictionary with slice for `var_name` and dimmension index.
 
     Attention!
     The `dim` deimension to iterate over must by on the first position in
@@ -24,13 +27,16 @@ def Slices(cube, var_name, dim="date"):
     ----------
     cube : netCDF4 Dataset handle
         Open cube file handle.
+    var_name: string
+        Variable to return data for.
     dim : type
         Dimension to interate.
 
     Returns
     -------
-    interator
-        Interate over `dim` dimension.
+    nasted dictionary
+        Keys are `dim`, variables. Variables is a nasted dictionary
+        holding with key `var_name` and data. Data are masked numpy array.
 
     """
 
@@ -44,43 +50,10 @@ def Slices(cube, var_name, dim="date"):
 
     for dim_ids in range(0, stop):
 
-        var = cube[var_name]
-        data = var[dim_ids, :, :]
+        data = cube[var_name][dim_ids, :, :]
 
-        # TODO: Fix dict constructor  call
-        slice_ = dict(var_name=data)
-
-        yield dict("dim_ids"=dim_ids, slice_)
-
-def get_slice(cube, dim_ids):
-    """Returns slice dictionary at index `dim_ids` from a three dimensional cube.
-
-    Parameters
-    ----------
-    cube : netCDF file handle
-        File handle to read from.
-
-    dim_ids : int
-        Slice to select from `dim`.
-
-    Returns
-    -------
-    dict
-        Dictionary with key == variable names and values numpy arrays.
-
-    """
-
-    slice_ = {
-        "dim_ids": dim_ids,
-        "variables": {},
-    }
-    for name, var in cube.variables.items():
-        if var.ndim == 3:
-            # TODO: handle IndexError
-            data = var[dim_ids, :, :]
-            slice_["variables"][name] = data
-
-    return slice_
+        slice_ = dict([(var_name, data)])
+        yield dict(dim_ids=dim_ids, variables=slice_)
 
 
 def mask_by_flags(slice_, flags=[], name="mask"):
@@ -119,7 +92,6 @@ def mask_by_flags(slice_, flags=[], name="mask"):
     return mask
 
 
-def aggregate_mask(cube, flags, dim="date", mask_var="mask"):
     """Returns one aggregated mask for all slices.
 
     Parameters
@@ -139,18 +111,15 @@ def aggregate_mask(cube, flags, dim="date", mask_var="mask"):
         Aggregated mask for cube.
     """
 
-    # first slice
-    slices = Slices(cube, dim)
-    random_slice = slices.next()
-    aggregate_mask = mask_by_flags(random_slice, flags, name=mask_var)
+    # init mask array with first slice
+    slices = Slices(cube, mask_var, dim)
+    one_slice = slices.next()
 
-    for nr, s in enumerate(Slices(cube, dim)):
+    for nr, s in enumerate(Slices(cube, mask_var, di)):
         logging.debug("Aggregate slice number: {}".format(nr))
 
         mask = mask_by_flags(s, flags, name=mask_var)
-        aggregate_mask = aggregate_mask | mask
 
-    return aggregate_mask
 
 
 def masking_cube(cube, mask, dim='date'):
