@@ -126,7 +126,7 @@ def aggregated_mask(cube, flags, dim="date", mask_var="mask"):
     return new_mask
 
 
-def masking_cube(cube, mask, dim='date'):
+def masking_cube(in_cube, out_cube, mask, dim='date'):
     """Change variable mask in `cube` to aggregated version given by `mask`.
 
     Set variabe used for time Slices by `dim` parameter. This musst by a
@@ -154,4 +154,24 @@ def masking_cube(cube, mask, dim='date'):
             dim_ids = s["dim_ids"]
             data = s["variables"][v_name]
             data[mask] = -999
-            cube.variables[var_name][dim_ids, :, :] = data
+
+            # create dimension if necessary
+            for dname, the_dim in in_cube.dimensions.iteritems():
+                if dname not in out_cube.dimensions:
+                    out_cube.createDimension(
+                        dname,
+                        len(the_dim) if not the_dim.isunlimited() else None
+                    )
+            print varin.datatype
+            print varin.dimensions
+
+            if v_name not in out_cube.variables:
+                outVar = out_cube.createVariable(
+                    v_name,
+                    varin.datatype,
+                    varin.dimensions,
+                    fill_value=-999)
+
+                outVar.setncatts({k: varin.getncattr(k) for k in varin.ncattrs()})
+
+            outVar[dim_ids, :, :] = data
