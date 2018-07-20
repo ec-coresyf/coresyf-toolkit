@@ -8,7 +8,7 @@
             "identifier": "Ssource",
             "name": "source",
             "description": "Sets source to <filepath>",
-            "type": "GeoTIFF"
+            "type": "Raster"
         }
      ],
      "parameters": [
@@ -39,7 +39,14 @@
             "type": "string",
             "description": "Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File' or 'External Auxiliary File'",
             "options": ["Latest Auxiliary File", "Product Auxiliary File", "External Auxiliary File"],
-            "default": "'Product Auxiliary File'"
+            "default": "Product Auxiliary File"
+        },
+        {
+            "identifier": "Ppolarisations",
+            "name": "Selected Polarisations",
+            "type": "string",
+            "description": "The list of Selected Polarisations to be processed.",
+            "default": ""
         },
         {
             "identifier": "PcreateBetaBand",
@@ -118,7 +125,7 @@
             "description": "Sets parameter 'filter' to <string>",
             "options": ["None", "Boxcar", "Median", "Frost", "Gamma Map", "Lee", "Refined Lee", "Lee Sigma", "IDAN"],
             "type": "string",
-            "default": "'Lee Sigma'"
+            "default": "Lee Sigma"
         },
         {
             "identifier": "PfilterSizeX",

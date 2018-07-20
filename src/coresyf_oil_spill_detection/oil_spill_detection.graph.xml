@@ -7,7 +7,6 @@
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
-      <externalAuxFile/>
       <invertGeometry>${invertGeometry}</invertGeometry>
       <landMask>${landMask}</landMask>
       <useSRTM>${useSRTM}</useSRTM>
@@ -20,6 +19,7 @@
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
+      <externalAuxFile/>
       <auxFile>${auxFile}</auxFile>
       <outputImageInComplex>${outputImageInComplex}</outputImageInComplex>
       <outputImageScaleInDb>${outputImageScaleInDb}</outputImageScaleInDb>
@@ -29,6 +29,7 @@
       <outputSigmaBand>${outputSigmaBand}</outputSigmaBand>
       <outputGammaBand>${outputGammaBand}</outputGammaBand>
       <outputBetaBand>${outputBetaBand}</outputBetaBand>
+      
     </parameters>
   </node>
   <node id="Ellipsoid-Correction-RD">
@@ -108,7 +109,6 @@
       <sourceProduct refid="Oil-Spill-Detection"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
       <minClusterSizeInKm2>${minClusterSizeInKm2}</minClusterSizeInKm2>
     </parameters>
   </node>
