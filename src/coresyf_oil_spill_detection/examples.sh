@@ -1,4 +1,4 @@
-ASA_WSM_1PXPDE20021117_104431_000000672011_00180_03741_0009.N1="http://example.org"
+calibrated_product.tif="http://example.org"
 #PASSING EXECUTION
 #Example of a passing execution
-./run ASA_WSM_1PXPDE20021117_104431_000000672011_00180_03741_0009.N1 --Ttarget myoutput_oil.tif
+./run --Ssource calibrated_product.tif --Ttarget myoutput_oil.tif
