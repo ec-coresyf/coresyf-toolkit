@@ -189,9 +189,7 @@ def masking_cube(in_cube, out_cube, mask, dim='date'):
             if v_name == mask.name:
                 outVar[:, :] = data
             elif data.ndim == 1:
-                # TODO: data variable is empty?
                 outVar[:] = data
             else:
-                print mask.values
                 data[mask.values] = -999
                 outVar[dim_ids, :, :] = data
