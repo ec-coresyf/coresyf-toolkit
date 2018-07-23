@@ -50,7 +50,10 @@ def Slices(cube, var_name, dim="date"):
 
     for dim_ids in range(0, stop):
 
-        data = cube[var_name][dim_ids, :, :]
+        if cube[var_name].ndim == 3:
+            data = cube[var_name][dim_ids, :, :]
+        else:
+            data = cube[var_name][:] # e.g date variabe
 
         slice_ = dict([(var_name, data)])
         yield dict(dim_ids=dim_ids, variables=slice_)
@@ -175,3 +178,13 @@ def masking_cube(in_cube, out_cube, mask, dim='date'):
                 outVar.setncatts({k: varin.getncattr(k) for k in varin.ncattrs()})
 
             outVar[dim_ids, :, :] = data
+            # masking only variables with data records
+            dim_ids = s["dim_ids"]
+            data = s["variables"][v_name]
+
+            elif data.ndim == 1:
+                outVar[:] = data
+            else:
+                print mask.values
+                data[mask.values] = -999
+                outVar[dim_ids, :, :] = data
