@@ -146,7 +146,10 @@ def create_stack(template_file, ds_path, variables):
         stack.createDimension("lon", len(temp_dim_lon))
 
         # create variable in variables in stack file
-        stack.createVariable(dim_stacking, "i4", (dim_stacking,))
+
+        date = stack.createVariable(dim_stacking, "i8", (dim_stacking,))
+        date.units = "days since 1-01-01 00:00:00 UTC"
+        date.calendar = "gregorian"
 
         temp_var_lat = template.variables["lat"]
         temp_var_lon = template.variables["lon"]
@@ -209,6 +212,7 @@ def stacking(inputs, variables, output):
             for name in variables:
                 in_var = input.variables[name]
                 stack.variables[name][index, :, :] = in_var[:]
+                stack.variables["date"][index] = input__[1]
 
     stack.close()
 
