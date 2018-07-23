@@ -178,7 +178,9 @@ def masking_cube(in_cube, out_cube, mask, dim='date'):
                     v_name,
                     dtype,
                     dims,
-                    fill_value=-999)
+                    fill_value=-999,
+                    zlib=True
+                    )
 
                 outVar.setncatts({k: varin.getncattr(k) for k in varin.ncattrs()})
 
