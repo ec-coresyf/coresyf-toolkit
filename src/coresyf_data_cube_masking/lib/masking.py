@@ -11,6 +11,7 @@ This produces a clean data cube with Missing vlaues filled by fix values.
 
 import logging
 import numpy as np
+import collections
 
 
 def Slices(cube, var_name, dim="date"):
@@ -126,7 +127,8 @@ def aggregated_mask(cube, flags, dim="date", mask_var="mask"):
         mask = mask_by_flags(s, flags, name=mask_var)
         new_mask = new_mask | mask
 
-    return new_mask
+    Mask = collections.namedtuple('Mask', ['name', 'values'])
+    return Mask(mask_var, values=new_mask)
 
 
 def masking_cube(in_cube, out_cube, mask, dim='date'):
@@ -139,8 +141,8 @@ def masking_cube(in_cube, out_cube, mask, dim='date'):
     ----------
     cube : netCDF4 Dataset handle
         File handle to read from.
-    mask : numpy array
-        Mask to applie on cube.
+    mask : Mask tuple with Mask.name and Mask.values
+        Mask to apply on each cube variabe.
     dim : string
         Dimension direction to interate.
 
@@ -154,10 +156,6 @@ def masking_cube(in_cube, out_cube, mask, dim='date'):
 
         for s in Slices(in_cube, v_name, dim):
 
-            dim_ids = s["dim_ids"]
-            data = s["variables"][v_name]
-            data[mask] = -999
-
             # create dimension if necessary
             for dname, the_dim in in_cube.dimensions.iteritems():
                 if dname not in out_cube.dimensions:
@@ -165,24 +163,33 @@ def masking_cube(in_cube, out_cube, mask, dim='date'):
                         dname,
                         len(the_dim) if not the_dim.isunlimited() else None
                     )
-            print varin.datatype
-            print varin.dimensions
 
             if v_name not in out_cube.variables:
+
+                if v_name == mask.name:
+                    dtype = varin.datatype
+                    dims = ('lat', 'lon')
+
+                else:
+                    dtype = varin.datatype
+                    dims = varin.dimensions
+
                 outVar = out_cube.createVariable(
                     v_name,
-                    varin.datatype,
-                    varin.dimensions,
+                    dtype,
+                    dims,
                     fill_value=-999)
 
                 outVar.setncatts({k: varin.getncattr(k) for k in varin.ncattrs()})
 
-            outVar[dim_ids, :, :] = data
             # masking only variables with data records
             dim_ids = s["dim_ids"]
             data = s["variables"][v_name]
 
+            if v_name == mask.name:
+                outVar[:, :] = data
             elif data.ndim == 1:
+                # TODO: data variable is empty?
                 outVar[:] = data
             else:
                 print mask.values

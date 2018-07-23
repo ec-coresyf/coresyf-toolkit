@@ -2,6 +2,7 @@
 # ! /usr/bin/env python2
 """This module collects tests for masking."""
 
+import collections
 import itertools
 import numpy as np
 import os
@@ -132,7 +133,7 @@ class TestMaskAggregation(unittest.TestCase):
                 flags=[self.flag_value],
                 dim="date"
             )
-        np.testing.assert_array_equal(aggregated, test)
+        np.testing.assert_array_equal(aggregated.values, test)
 
 
 class TestMaskingCube(unittest.TestCase):
@@ -140,15 +141,17 @@ class TestMaskingCube(unittest.TestCase):
     def setUp(self):
         self.in_file = cube_file()
         self.out_file = cube_file()
-        self.cube_mask = np.array([
+        cube_mask = np.array([
             [True, True, True],
             [True, False, True],
             [True, True, True]
         ])
+        Mask = collections.namedtuple('Mask', ['name', 'values'])
+        self.cube_mask = Mask('mask', values=cube_mask)
 
     def test_all_same_mask(self):
         """Test if all slices in cube have same mask."""
-        in_cube = Dataset(self.in_file, "w",format="NETCDF4")
+        in_cube = Dataset(self.in_file, "w", format="NETCDF4")
         out_cube = Dataset(self.out_file, "w", format="NETCDF4")
 
         fill_test_cube(in_cube)
