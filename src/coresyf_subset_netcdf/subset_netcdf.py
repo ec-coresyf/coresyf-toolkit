@@ -23,6 +23,7 @@ import pprint
 def get_inputs(source, pattern="*.nc"):
     return sorted(source.glob(pattern))
 
+
 def wkt2bounds(wkt_str):
     geom = wkt.loads(wkt_str)
     return " ".join(map(str, geom.bounds))
@@ -70,7 +71,7 @@ def build_command(source,
         'HFA': ".img"
     }
     extention = extentions[target_format]
-    target_name = str(source.stem) + extention
+    target_name = "{}_{}{}".format(source.stem, band, extention)
     target_file = Path(target_folder / target_name)
     target_str = str(target_file)
 
