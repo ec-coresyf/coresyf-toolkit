@@ -11,20 +11,17 @@
 # - loop over all input files in folder
 # - research how many decimal places the SST values are
 
-import glob
 import os
 import subprocess
 
 from pathlib2 import Path
 from shapely import wkt
 
-def get_inputs(source, pattern="*.nc"):
-    path = os.path.join(
-        source_folder,
-        pattern
-    )
-    return glob.glob(path)
+import pprint
 
+
+def get_inputs(source, pattern="*.nc"):
+    return sorted(source.glob(pattern))
 
 def wkt2bounds(wkt_str):
     geom = wkt.loads(wkt_str)
@@ -32,7 +29,7 @@ def wkt2bounds(wkt_str):
 
 
 def build_command(source,
-                  target,
+                  target_folder,
                   band,
                   bounds,
                   bounds_srs="EPSG:4326",
@@ -44,11 +41,11 @@ def build_command(source,
 
     Inputs
     ------
-    source: string
+    source: PurePath
         Source file path
 
-    target: string
-        Target file path
+    target_folder: PurePath
+        Target folder path
 
     band: string
         Name of band to clip
@@ -65,21 +62,33 @@ def build_command(source,
     target_format: string
         Output format
     """
+    # source file
+    source_str = str(source)
+
+    # target file
+    extentions = {
+        'HFA': ".img"
+    }
+    extention = extentions[target_format]
+    target_name = str(source.stem) + extention
+    target_file = Path(target_folder / target_name)
+    target_str = str(target_file)
 
     command = (
         'gdalwarp '
         '-t_srs {0} '
         '-te {1} '
         '-of {2} '
+        '-overwrite '
         'NETCDF:"{4}":{3} '
         '-co COMPRESS=YES '
-        '{5}').format(
+        '"{5}"').format(
             bounds_srs,
             bounds,
             target_format,
             band,
-            source,
-            target)
+            source_str,
+            target_str)
 
     return command
 
@@ -87,36 +96,26 @@ def build_command(source,
 if __name__ == '__main__':
     print "run"
 
+    source_folder = Path("C:/Users/hmrcgen/Projects/coresyf/data/C_origin_cube/2011_global_NetCDF")
 
+    target_folder = Path("C:/Users/hmrcgen/Projects/coresyf/data/tmp")
 
-    # source_folder = os.path.join(
-    #     "..",
-    #     "data",
-    #     "C_origin_cube",
-    #     "2011_global_NetCDF"
-    # )
+    clip_polygon = "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))"
+
+    print source_folder
+
+    inputs = get_inputs(source_folder)
+
+    parameters = {
+        'source': inputs[0],
+        'target_folder': target_folder,
+        "bounds": wkt2bounds(clip_polygon),
+        "band": "analysed_sst",
+    }
     #
-    # target_folder = os.path.join(
-    #     "..",
-    #     "data",
-    #     "tmp"
-    # )
-    #
-    # clip_polygon = "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))"
-    #
-    # inputs = get_inputs(source_folder)
-    # source = inputs[0]
-    # name = os.path.basename(source)
-    #
-    # parameters = {
-    #     'source': source,
-    #     'target': os.path.join(target_folder, name),
-    #     "bounds": wkt2bounds(clip_polygon),
-    #     "band": "analysed_sst",
-    # }
-    #
-    # command = build_command(**parameters)
-    # print command
+    command = build_command(**parameters)
+    print command
+
     # # output = subprocess.check_call(
     # #              command,
     # #              stderr=subprocess.STDOUT,
