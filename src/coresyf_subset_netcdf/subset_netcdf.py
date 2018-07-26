@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     source_folder = Path("C:/Users/hmrcgen/Projects/coresyf/data/C_origin_cube/2011_global_NetCDF")
 
-    target_folder = Path("C:/Users/hmrcgen/Projects/coresyf/data/tmp")
+    target_folder = Path("C:/Users/hmrcgen/Projects/coresyf/data/tmp/2011")
 
     clip_polygon = "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))"
 
