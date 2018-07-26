@@ -103,23 +103,28 @@ if __name__ == '__main__':
 
     clip_polygon = "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))"
 
-    print source_folder
-
     inputs = get_inputs(source_folder)
 
     parameters = {
-        'source': inputs[0],
+        'source': "",
         'target_folder': target_folder,
         "bounds": wkt2bounds(clip_polygon),
-        "band": "analysed_sst",
+        "band": "",
     }
-    #
-    command = build_command(**parameters)
-    print command
 
-    # # output = subprocess.check_call(
-    # #              command,
-    # #              stderr=subprocess.STDOUT,
-    # #              shell=True,
-    # #              universal_newlines=True
-    # # )
+    bands = ["analysed_sst", "mask"]
+
+    for input in inputs:
+        parameters["source"] = input
+
+        for band in bands:
+            parameters["band"] = band
+            command = build_command(**parameters)
+            print command
+
+            output = subprocess.check_call(
+                command,
+                stderr=subprocess.STDOUT,
+                shell=True,
+                universal_newlines=True
+            )
