@@ -16,6 +16,7 @@ import os
 import subprocess
 import sys
 
+from itertools import product
 from pathlib2 import Path
 from shapely import wkt
 from shapely.errors import WKTReadingError
@@ -227,3 +228,10 @@ if __name__ == '__main__':
         print('Found {0} files and start processing...'.format(len(inputs), source_folder))
     else:
         sys.exit('No files found! Pleace check the  "{0}" folder'.format(source_folder))
+
+    commands = []
+    for input, band in product(inputs, bands):
+        parameters["source"] = input
+        parameters["band"] = band
+        command = build_command(**parameters)
+        commands.append(command)
