@@ -159,16 +159,14 @@ if __name__ == '__main__':
         description="""
         This tool subset NetCDF files by a list of variables.
 
-        Optinal those subset can also by cliped by an area
+        Optinal the subsets can also by cliped by an area
         defined as BBOX or Well-known text (WKT) POLYGON.
 
         Existing files will by overwrite.
         """,
         epilog="""Examples:
 
-        subset_netcdf -b mask analysed_sst -p /\
-        "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))" /\
-        NetCDF_folder/ target_folder/
+        subset_netcdf -b mask analysed_sst -p "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))" NetCDF_folder/ target_folder/
 
         subset_netcdf -b analysed_sst -c -64 33 -6 67 NetCDF_folder/ target_folder/
 
