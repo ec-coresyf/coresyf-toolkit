@@ -11,6 +11,7 @@
 # - loop over all input files in folder
 # - research how many decimal places the SST values are
 
+import argparse
 import os
 import subprocess
 
@@ -93,38 +94,92 @@ def build_command(source,
 
     return command
 
+# CLI
+
+
+
+
+class valid_bbox(argparse.Action):
+    """Bounding Box validation
+    Check if bbox input follow the standard format:
+    bbox = min Longitude , min Latitude , max Longitude , max Latitude
+    """
+    def __call__(self, parser, namespace, values, option_string=None):
+        prospective_bbox = values
+        min_Lon = prospective_bbox[0]
+        min_Lat = prospective_bbox[1]
+        max_Lon = prospective_bbox[2]
+        max_Lat = prospective_bbox[3]
+
+        if not (min_Lon < max_Lon) and not (min_Lat < max_Lat):
+            raise argparse.ArgumentTypeError(
+                "bbox:{0} is not a valid bounding box!".format(prospective_bbox)
+            )
+        else:
+            setattr(namespace, self.dest, prospective_bbox)
+
+
+class readable_dir(argparse.Action):
+    """Check if folder is existing and readable."""
+    def __call__(self, parser, namespace, values, option_string=None):
+        prospective_dir = values
+        if not os.path.isdir(prospective_dir):
+            raise argparse.ArgumentTypeError("readable_dir:{0} is not a valid path".format(prospective_dir))
+        if os.access(prospective_dir, os.R_OK):
+            setattr(namespace, self.dest, prospective_dir)
+        else:
+            raise argparse.ArgumentTypeError("readable_dir:{0} is not a readable dir".format(prospective_dir))
+
 
 if __name__ == '__main__':
-    print "run"
+    parser = argparse.ArgumentParser(
+        prog="subset_netcdf",
+        description="""
+            This tool subset NetCDF files by a list of variables.
+            Optinal those subset can also by cliped by an area defined as BBOX
+            or Well-known text (WKT) POLYGON.
+        """
+    )
+    parser.add_argument(
+        '-b',
+        '--bands',
+        nargs='+',
+        help='List of band names to subset.',
+        required=True)
 
-    source_folder = Path("C:/Users/hmrcgen/Projects/coresyf/data/C_origin_cube/2011_global_NetCDF")
+    parser.add_argument(
+        '-c',
+        '--bbox',
+        nargs=4,
+        action=valid_bbox,
+        help="Area to subset as Bounding Box.",
+        metavar=('xmin', 'ymin', 'xmax', 'ymax'))
 
-    target_folder = Path("C:/Users/hmrcgen/Projects/coresyf/data/tmp/2011")
+    parser.add_argument(
+        '-p',
+        '--polygon',
+        help="Area to subset defined as polygon in WKT.",
+        metavar='POLYGON')
 
-    clip_polygon = "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))"
+    parser.add_argument(
+        'source',
+        action=readable_dir,
+        help='Folder to read NetCDF files from.')
 
-    inputs = get_inputs(source_folder)
+    parser.add_argument(
+        'target',
+        action=readable_dir,
+        help='Folder to write subset files in.')
 
-    parameters = {
-        'source': "",
-        'target_folder': target_folder,
-        "bounds": wkt2bounds(clip_polygon),
-        "band": "",
-    }
+    args = parser.parse_args()
+    print args
 
-    bands = ["analysed_sst", "mask"]
+    source_folder = Path(args.source)
 
-    for input in inputs:
-        parameters["source"] = input
+    target_folder = Path(args.target)
 
-        for band in bands:
-            parameters["band"] = band
-            command = build_command(**parameters)
-            print command
-
-            output = subprocess.check_call(
-                command,
-                stderr=subprocess.STDOUT,
-                shell=True,
-                universal_newlines=True
-            )
+    # clip_polygon = "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))"
+    if args.polygon:
+        bounds = wkt2bounds(args.polygon)
+    else:
+        bounds = args.bbox
