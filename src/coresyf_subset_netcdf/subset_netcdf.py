@@ -235,3 +235,13 @@ if __name__ == '__main__':
         parameters["band"] = band
         command = build_command(**parameters)
         commands.append(command)
+
+    for i, command in enumerate(commands, 1):
+        print("\n Call command number {0} from {1}".format(i, len(commands)))
+        print(command)
+        output = subprocess.check_call(
+            command,
+            stderr=subprocess.STDOUT,
+            shell=True,
+            universal_newlines=True
+        )
