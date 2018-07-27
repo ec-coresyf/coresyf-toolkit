@@ -17,8 +17,8 @@ import subprocess
 
 from pathlib2 import Path
 from shapely import wkt
-from shapely.geometry.polygon import Polygon
 from shapely.errors import WKTReadingError
+from shapely.geometry.polygon import Polygon
 
 import pprint
 
