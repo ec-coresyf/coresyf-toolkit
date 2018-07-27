@@ -14,6 +14,7 @@
 import argparse
 import os
 import subprocess
+import sys
 
 from pathlib2 import Path
 from shapely import wkt
@@ -206,7 +207,23 @@ if __name__ == '__main__':
 
     if args.polygon:
         bounds = wkt2bounds(args.polygon)
-    elif arg.bbox:
+    elif args.bbox:
         bounds = args.bbox
     else:
         bounds = None
+
+    bands = args.bands
+
+    parameters = {
+        "source": None,
+        "target_folder": target_folder,
+        "bounds": bounds,
+        "band": bands,
+    }
+
+    inputs = get_inputs(source_folder)
+    if inputs:
+        print('Lookup "{0}"'.format(source_folder))
+        print('Found {0} files and start processing...'.format(len(inputs), source_folder))
+    else:
+        sys.exit('No files found! Pleace check the  "{0}" folder'.format(source_folder))
