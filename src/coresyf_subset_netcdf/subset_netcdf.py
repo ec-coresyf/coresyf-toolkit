@@ -17,6 +17,8 @@ import subprocess
 
 from pathlib2 import Path
 from shapely import wkt
+from shapely.geometry.polygon import Polygon
+from shapely.errors import WKTReadingError
 
 import pprint
 
@@ -97,6 +99,24 @@ def build_command(source,
 # CLI
 
 
+class valid_polygon(argparse.Action):
+    """Polygon validation
+    Check if polygon input follow the WKT standard format and is of type POLYGON.
+    """
+    def __call__(self, parser, namespace, values, option_string=None):
+        prospective_polygon = values
+        try:
+            geom = wkt.loads(prospective_polygon)
+        except WKTReadingError:
+            raise argparse.ArgumentTypeError(
+                "polygon: {0} WKT definition is unvalid!".format(prospective_polygon)
+            )
+        if not isinstance(geom, Polygon):
+            raise argparse.ArgumentTypeError(
+                "polygon: Is is not a Polygon!"
+            )
+        else:
+            setattr(namespace, self.dest, prospective_polygon)
 
 
 class valid_bbox(argparse.Action):
@@ -158,8 +178,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '-p',
         '--polygon',
+        action=valid_polygon,
         help="Area to subset defined as polygon in WKT.",
-        metavar='POLYGON')
+        metavar='WKT POLYGON')
 
     parser.add_argument(
         'source',
@@ -178,7 +199,6 @@ if __name__ == '__main__':
 
     target_folder = Path(args.target)
 
-    # clip_polygon = "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))"
     if args.polygon:
         bounds = wkt2bounds(args.polygon)
     else:
