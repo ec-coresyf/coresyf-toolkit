@@ -202,10 +202,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     source_folder = Path(args.source)
-
     target_folder = Path(args.target)
 
     if args.polygon:
         bounds = wkt2bounds(args.polygon)
-    else:
+    elif arg.bbox:
         bounds = args.bbox
+    else:
+        bounds = None
