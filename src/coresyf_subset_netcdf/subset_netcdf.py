@@ -155,10 +155,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog="subset_netcdf",
         description="""
-            This tool subset NetCDF files by a list of variables.
-            Optinal those subset can also by cliped by an area defined as BBOX
-            or Well-known text (WKT) POLYGON.
-        """
+        This tool subset NetCDF files by a list of variables.
+        Optinal those subset can also by cliped by an area
+        defined as BBOX or Well-known text (WKT) POLYGON.""",
+        epilog="""Examples:
+
+        subset_netcdf -b mask, analysed_sst -p "POLYGON ((-64 66.7, -6 66.7, -6 33, -64 33, -64 66.7, -64 66.7))" NetCDF_folder/ target_folder/
+
+        subset_netcdf -b analysed_sst -c -64 33 -6 67 NetCDF_folder/ target_folder/
+
+        """,
+        formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument(
         '-b',
@@ -193,7 +200,6 @@ if __name__ == '__main__':
         help='Folder to write subset files in.')
 
     args = parser.parse_args()
-    print args
 
     source_folder = Path(args.source)
 
