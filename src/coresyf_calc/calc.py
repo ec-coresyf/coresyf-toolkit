@@ -15,14 +15,28 @@ import rasterio
 """
 
 
-def get_expression(offest, exp=None, scal=False):
+def get_expression(offset=0, exp=None, scale=None):
     """
     - if offset is one number use expression = y = x + offset
     - if custom equation, use this for calucation (same as gdal calc)
     - use only one band per file
     - scal data of scal factor is given
     """
-    pass
+
+    if (exp and not offset and not scale):
+        return exp
+    elif (exp and offset and not scale):
+        return "(({0}) + {1})".format(exp, offset)
+    elif (exp and offset and scale):
+        return "(({0}) + {1})*{2}".format(exp, offset, scale)
+    elif (exp and not offset and scale):
+        return "(({0}))*{1}".format(exp, scale)
+    elif (not exp and offset and scale):
+        return "(A + {0})*{1}".format(offset, scale)
+    elif (not exp and not offset and scale):
+        return "(A * {0})".format(offset, scale)
+    elif (not exp and offset and mot scale):
+        return "(A + {0})".format(scale)
 
 
 def build_command(input, output, exp, no_data_value=None):
