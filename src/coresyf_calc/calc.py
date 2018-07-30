@@ -17,17 +17,11 @@ def get_expression(offset=0, exp=None, scale=None):
 
     if (exp and not offset and not scale):
         return exp
-    elif (exp and offset and not scale):
-        return "(({0}) + {1})".format(exp, offset)
-    elif (exp and offset and scale):
-        return "(({0}) + {1})*{2}".format(exp, offset, scale)
-    elif (exp and not offset and scale):
-        return "(({0}))*{1}".format(exp, scale)
     elif (not exp and offset and scale):
-        return "(A + {0})*{1}".format(offset, scale)
+        return "(A * {0}) + {1}".format(scale, offset)
     elif (not exp and not offset and scale):
-        return "(A * {0})".format(offset, scale)
-    elif (not exp and offset and mot scale):
+        return "(A * {0})".format(scale, offset)
+    elif (not exp and offset and not scale):
         return "(A + {0})".format(scale)
 
 
