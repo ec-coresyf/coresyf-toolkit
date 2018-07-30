@@ -62,6 +62,18 @@ def build_target_path(input, target):
     else:
         return target
 
+
+def call_commands(commands):
+    for i, command in enumerate(commands, 1):
+        print("\n Call command number {0} from {1}".format(i, len(commands)))
+        print(command)
+        output = subprocess.check_call(
+            command,
+            stderr=subprocess.STDOUT,
+            shell=True,
+            universal_newlines=True
+        )
+
 """
 - one input to one target file with offset appleyed
 - one accumulated file from multible files
