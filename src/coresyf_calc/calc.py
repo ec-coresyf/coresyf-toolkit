@@ -84,8 +84,16 @@ def call_commands(commands):
 
 
 if __name__ == '__main__':
+    input_folder = Path("test_data/imgs")
     one_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst.img")
     out_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst_scaled.img")
+    offset = 273.15
+    scale = 0.01
+
+    # multible files to one file
+    # equation has to be have tow values a and #
+    inputs = get_inputs(input_folder)
+
     if len(inputs) > 1:
         if not target.is_file():
             exp = "A"
