@@ -33,14 +33,21 @@ def build_command(input, target, exp, no_data_value=None):
         with rasterio.open(str(input)) as ds:
             no_data_value = ds.nodata  # set explicit no_data value
 
+    if 'B' in exp:
+        input_raster = '-A "{}" -B "{}" '.format(input, target)
+    else:
+        input_raster = '-A "{}" '.format(input)
+
     command = (
-        'gdal_calc'
-        '-A {}'
-        '--outfile={}'
-        '--calc={expression}'
-        '--NoDataValue {no_data}'
+        'gdal_calc.py '
+        '{}'
+        '--outfile="{}" '
+        '--calc="{expression}" '
+        '--NoDataValue="{no_data}" '
+        '--type="Float32"'
+        '--overwrite '
     ).format(
-        input,
+        input_raster,
         target,
         expression=exp,
         no_data=no_data_value
@@ -67,3 +74,18 @@ def build_target_path(input, target):
 if __name__ == '__main__':
     one_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst.img")
     out_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst_scaled.img")
+    if len(inputs) > 1:
+        if not target.is_file():
+            exp = "A"
+        else:
+            exp = "(A + B)"
+    else:
+        # one file to one file
+        exp = get_expression(offset=offset, scale=scale)
+        print exp
+
+    command = build_command(str(one_file), str(out_file), exp)
+    print command
+
+    # call commands with subprocess
+    call_commands(command)
