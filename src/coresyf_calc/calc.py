@@ -6,13 +6,10 @@ import rasterio
 
 """This module provide simple raster calucation functionality"""
 
-"""input
-- read from one file or multible files/folder
-- offest as inteagar
-- optional cutom equation expression to apply
-- scalfactor
 
-"""
+def get_inputs(input_folder, pattern="*.img"):
+    """Return sorted list of input files matching pattern in folder"""
+    return sorted(source.glob(pattern))
 
 
 def get_expression(offset=0, exp=None, scale=None):
