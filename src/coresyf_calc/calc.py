@@ -9,7 +9,7 @@ import rasterio
 
 def get_inputs(input_folder, pattern="*.img"):
     """Return sorted list of input files matching pattern in folder"""
-    return sorted(source.glob(pattern))
+    return sorted(input_folder.glob(pattern))
 
 
 def get_expression(offset=0, exp=None, scale=None):
