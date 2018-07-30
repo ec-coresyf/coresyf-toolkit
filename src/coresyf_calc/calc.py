@@ -31,7 +31,7 @@ def get_expression(offset=0, exp=None, scale=None):
         return "(A + {0})".format(scale)
 
 
-def build_command(input, output, exp, no_data_value=None):
+def build_command(input, target, exp, no_data_value=None):
     """build command for gdal_calc
     Set no data value explicitly from input file if not given as parameter.
     """
@@ -47,18 +47,25 @@ def build_command(input, output, exp, no_data_value=None):
         '--NoDataValue {no_data}'
     ).format(
         input,
-        output,
+        target,
         expression=exp,
         no_data=no_data_value
     )
     return command
 
 
-"""output
-- one input to one output file with offset appleyed
+def build_target_path(input, target):
+    """Build target"""
+    if target.is_dir():
+        target_path = Path(target / input)
+    else:
+        return target
+
+"""
+- one input to one target file with offset appleyed
 - one accumulated file from multible files
 - wait until all files are calculdated
-- use output format from input format
+- use target format from input format
 - set creation option like comrpession
 """
 
