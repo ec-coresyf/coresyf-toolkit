@@ -8,7 +8,7 @@ from pathlib2 import Path
 """input
 - read from one file or multible files/folder
 - offest as inteagar
-- optional cutom equation function to apply
+- optional cutom equation expression to apply
 - scalfactor
 """
 
