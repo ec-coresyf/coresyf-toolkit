@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pathlib2 import Path
+
 """This module provide simple raster calucation functionality"""
 
 """input
@@ -23,3 +25,7 @@
 - one accumulated file from multible files
 - wait until all files are calculdated
 """
+
+
+if __name__ == '__main__':
+    one_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst.img")
