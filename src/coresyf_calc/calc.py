@@ -72,7 +72,4 @@ def build_target_path(input, target):
 
 if __name__ == '__main__':
     one_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst.img")
-    print("Open {}".format(one_file))
-    ds = rasterio.open(str(one_file))
-    print(dir(ds))
-    print(ds.nodata)
+    out_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst_scaled.img")
