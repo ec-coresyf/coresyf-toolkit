@@ -16,12 +16,7 @@ import rasterio
 
 
 def get_expression(offset=0, exp=None, scale=None):
-    """
-    - if offset is one number use expression = y = x + offset
-    - if custom equation, use this for calucation (same as gdal calc)
-    - use only one band per file
-    - scal data of scal factor is given
-    """
+    """Get the right expression by differend parameter combinations"""
 
     if (exp and not offset and not scale):
         return exp
