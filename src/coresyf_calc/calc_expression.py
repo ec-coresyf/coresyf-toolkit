@@ -27,6 +27,11 @@ def create_temp_copy(path):
     return temp_path
 
 
+def build_target_path(input, target_folder):
+    """Build target like target_folder/input"""
+    return Path(target_folder / input.name)
+
+
 def get_expression(offset=0, exp=None, scale=None):
     """Get the right expression by differend parameter combinations"""
 
@@ -178,9 +183,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     sources = [Path(s) for s in args.source]
+
+    target = Path(args.target)
+    if target.is_dir():
+        target_folder = target
+
     offset = args.offset
     scale = args.scale
-    target = args.target
     exp = args.exp
     accumulate = args.accumulate
 
@@ -190,8 +199,12 @@ if __name__ == '__main__':
     else:
         for i, raster in enumerate(sources, 1):
             print("Process {} of {}".format(i, len(sources)))
+
+            if target_folder:
+                target = build_target_path(raster, target_folder)
+
             if not exp:
-                out = call_command(use_scale_offset(source, target, scale=scale, offset=offset))
+                out = call_command(use_scale_offset(raster, target, scale=scale, offset=offset))
             else:
-                out = call_command(use_custom_expression(source, target, exp=exp))
+                out = call_command(use_custom_expression(raster, target, exp=exp))
             print(out)
