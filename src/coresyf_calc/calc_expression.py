@@ -139,28 +139,40 @@ if __name__ == '__main__':
     parser.add_argument(
         'source',
         nargs='+',
-        help='File path oder list of pathes')
+        help='Input file path oder list of pathes')
 
     parser.add_argument(
         'target',
-        help='File path')
+        help='Target file path')
+
+    parser.add_argument(
+        '-s',
+        '--scale',
+        default=1,
+        type=float,
+        help='Factor to scale the data')
+
+    parser.add_argument(
+        '-x',
+        '--offset',
+        default=0,
+        type=float,
+        help='Value to add afer scaling')
+
+    parser.add_argument(
+        '-e',
+        '--exp',
+        default=None,
+        type=float,
+        help='Expression') #TODO: explian input arguments
 
     args = parser.parse_args()
 
-    source_folder = Path("test_data/imgs")
-    one_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst.img")
-    out_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst_scaled.img")
-    offset = 273.15
-    scale = 0.01
-
-    print args
-
-    parse input parameter and save in list
-    parse output as one file path
-
-    source = source_folder
-    target = out_file
-    exp = None
+    # source = Path(args.source)
+    source = [Path(s) for s in args.source]
+    offset = args.offset
+    scale = args.scale
+    target = args.target
 
     commands = []
     if source > 1:
