@@ -103,7 +103,7 @@ def accumulat_files(inputs, target):
 def use_scale_offset(input, target, scale, offset):
     # one file: scal offset only
     exp = get_expression(offset=offset, scale=scale)
-    command = build_command(str(one_file), str(out_file), exp)
+    return build_command(str(one_file), str(out_file), exp)
 
 
 def use_custom_expression(input, target, exp):
@@ -180,9 +180,9 @@ if __name__ == '__main__':
         commands = accumulat_files(sources, target)
     else:
         if not exp:
-            use_scale_offset(source, target, scale=scale, offset=offset)
+            commands = use_scale_offset(source, target, scale=scale, offset=offset)
         else:
-            use_custom_expression(source, target, exp=exp)
+            commands = use_custom_expression(source, target, exp=exp)
 
     print commands
     call_commands(commands)
