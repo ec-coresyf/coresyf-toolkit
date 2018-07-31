@@ -29,12 +29,14 @@ def get_expression(offset=0, exp=None, scale=None):
     if (exp and not offset and not scale):
         return exp
     elif (not exp and not offset and scale):
-        return "(A * {0})".format(scale, offset)
+        return "(A * {0})".format(scale)
     elif (not exp and offset and not scale):
-        return "(A + {0})".format(scale)
+        return "(A + {0})".format(offset)
+    else:
+        return "(A * {0}) + {1}".format(scale, offset)
 
 
-def build_command(input, target, exp, no_data_value=None):
+def build_command(input, target, exp, no_data_value=None, previous=None):
     """build command for gdal_calc
     Set no data value explicitly from input file if not given as parameter.
     """
@@ -44,8 +46,8 @@ def build_command(input, target, exp, no_data_value=None):
 
     input_raster = '-A "{}" '.format(input)
 
-    if exp and 'B' in exp :
-        input_raster = '-A "{}" -B "{}" '.format(input, target)
+    if exp and 'B' in exp:
+        input_raster = '-A "{}" -B "{}" '.format(input, previous)
 
     command = (
         'gdal_calc.py '
