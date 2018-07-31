@@ -3,6 +3,7 @@
 
 from pathlib2 import Path
 import rasterio
+import subprocess
 
 """This module provide simple raster calucation functionality"""
 
@@ -89,23 +90,39 @@ if __name__ == '__main__':
     offset = 273.15
     scale = 0.01
 
-    # multible files to one file
-    # equation has to be have tow values a and #
-    inputs = get_inputs(input_folder)
-        inputs = get_inputs(folder=input_)
+    # parse input parameter and save in list
+    # parse output as one file path
 
+    input_ = input_folder
+    target = out_file
+    exp = None
+
+    if input_.is_dir():
+        inputs = get_inputs(folder=input_)
+    else:
+        inputs = [input_,]
+
+    commands = []
     if len(inputs) > 1:
+        # multible files to one file
         if not target.is_file():
-            exp = "A"
+            exp = "A"  # create copy in tempfolder
+            command = build_command(str(one_file), str(out_file), exp)
         else:
             exp = "(A + B)"
-    else:
-        # one file to one file
+            # use tempfolder file as B
+            command = build_command(str(one_file), str(out_file), exp)
+    elif not exp:
+        # one file: scal offset only
         exp = get_expression(offset=offset, scale=scale)
-        print exp
+        command = build_command(str(one_file), str(out_file), exp)
+    else:
+        # one file: custom expression
+        exp = get_expression(exp)
+        command = build_command(str(one_file), str(out_file), exp)
 
-    command = build_command(str(one_file), str(out_file), exp)
-    print command
-
+    commands.append(command)
+    print commands[0]
+    # call_commands(commands)
     # call commands with subprocess
-    call_commands(command)
+    # call_commands(command)
