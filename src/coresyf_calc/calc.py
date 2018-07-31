@@ -8,6 +8,14 @@ import tempfile
 import shutil
 import os
 
+""" TODO:
+- one input to one target file with offset appleyed
+- one accumulated file from multible files
+- wait until all files are calculdated
+- use target format from input format
+- set creation option like comrpession
+"""
+
 """This module provide simple raster calucation functionality"""
 
 
@@ -112,15 +120,6 @@ def call_commands(commands):
             shell=True,
             universal_newlines=True
         )
-
-
-"""
-- one input to one target file with offset appleyed
-- one accumulated file from multible files
-- wait until all files are calculdated
-- use target format from input format
-- set creation option like comrpession
-"""
 
 
 if __name__ == '__main__':
