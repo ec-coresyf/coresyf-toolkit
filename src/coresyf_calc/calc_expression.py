@@ -81,7 +81,7 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
     return command
 
 
-def accumulat_files(inputs, target):
+def accumulate_files(inputs, target):
     """
     This accumulates all input files to one target file.
 
@@ -169,6 +169,12 @@ if __name__ == '__main__':
         type=float,
         help='Expression')  # TODO: explian input arguments
 
+    parser.add_argument(
+        '-a',
+        '--accumulate',
+        action='store_true',
+        help='Accumulate by y=(A + B) with A = current file and B privoius result.')
+
     args = parser.parse_args()
 
     sources = [Path(s) for s in args.source]
@@ -176,14 +182,16 @@ if __name__ == '__main__':
     scale = args.scale
     target = args.target
     exp = args.exp
+    accumulate = args.accumulate
 
     commands = []
-    if len(sources) > 1:
-        accumulat_files(sources, target)
+    if accumulate:
+        accumulate_files(sources, target)
     else:
-        source = sources[0]
-        if not exp:
-            out = call_command(use_scale_offset(source, target, scale=scale, offset=offset))
-        else:
-            out = call_command(use_custom_expression(source, target, exp=exp))
-        print(out)
+        for i, raster in enumerate(sources, 1):
+            print("Process {} of {}".format(i, len(sources)))
+            if not exp:
+                out = call_command(use_scale_offset(source, target, scale=scale, offset=offset))
+            else:
+                out = call_command(use_custom_expression(source, target, exp=exp))
+            print(out)
