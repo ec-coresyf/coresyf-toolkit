@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pathlib2 import Path
+import argparse
+import os
 import rasterio
+import shutil
 import subprocess
 import tempfile
-import shutil
-import os
+
+from pathlib2 import Path
 
 """ TODO:
 - one input to one target file with offset appleyed
@@ -53,9 +55,9 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
             no_data_value = ds.nodata  # set explicit no_data value
 
     if exp and 'B' in exp:
-        input_raster = '-A "{}" -B "{}" '.format(input, previous)
+        sourceraster = '-A "{}" -B "{}" '.format(input, previous)
     else:
-        input_raster = '-A "{}" '.format(input)
+        sourceraster = '-A "{}" '.format(input)
 
     command = (
         'gdal_calc.py '
@@ -67,7 +69,7 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
         '--format="HFA" '
         '--overwrite '
     ).format(
-        input_raster,
+        sourceraster,
         target,
         expression=exp,
         no_data=no_data_value
@@ -123,34 +125,56 @@ def call_commands(commands):
 
 
 if __name__ == '__main__':
-    input_folder = Path("test_data/imgs")
+    parser = argparse.ArgumentParser(
+        prog="calc_expression",
+        description="""
+        This tool use expression to caluclate target from .
+
+        """,
+        epilog="""Examples:
+        """,
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+
+    parser.add_argument(
+        'source',
+        nargs='+',
+        help='File path oder list of pathes')
+
+    parser.add_argument(
+        'target',
+        help='File path')
+
+    args = parser.parse_args()
+
+    source_folder = Path("test_data/imgs")
     one_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst.img")
     out_file = Path("test_data/20110102-IFR-L4_GHRSST-SSTfnd-ODYSSEA-GLOB_010-v2.0-fv1.0_analysed_sst_scaled.img")
     offset = 273.15
     scale = 0.01
 
+    print args
+
     # parse input parameter and save in list
     # parse output as one file path
 
-    input_ = input_folder
-    target = out_file
-    exp = None
-
-    if input_.is_dir():
-        inputs = get_inputs(folder=input_)
-    else:
-        inputs = [input_, ]
-
-    commands = []
-    if inputs:
-        commands = accumulat_files(inputs, target)
-    else:
-        if not exp:
-            use_scale_offset(input, target, scale=scale, offset=offset)
-        else:
-            use_custom_expression(input, target, exp=exp)
-
-    print commands[0]
+    # source = source_folder
+    # target = out_file
+    # exp = None
+    #
+    # if isinstance(source, list):
+    #     sources = source
+    #
+    # commands = []
+    # if sources:
+    #     commands = accumulat_files(source, target)
+    # else:
+    #     if not exp:
+    #         use_scale_offset(source, target, scale=scale, offset=offset)
+    #     else:
+    #         use_custom_expression(source, target, exp=exp)
+    #
+    # print commands[0]
     # call_commands(commands)
     # call commands with subprocess
     # call_commands(command)
