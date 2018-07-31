@@ -7,9 +7,9 @@ import rasterio
 """This module provide simple raster calucation functionality"""
 
 
-def get_inputs(input_folder, pattern="*.img"):
+def get_inputs(folder, pattern="*.img"):
     """Return sorted list of input files matching pattern in folder"""
-    return sorted(input_folder.glob(pattern))
+    return sorted(folder.glob(pattern))
 
 
 def get_expression(offset=0, exp=None, scale=None):
@@ -93,6 +93,7 @@ if __name__ == '__main__':
     # multible files to one file
     # equation has to be have tow values a and #
     inputs = get_inputs(input_folder)
+        inputs = get_inputs(folder=input_)
 
     if len(inputs) > 1:
         if not target.is_file():
