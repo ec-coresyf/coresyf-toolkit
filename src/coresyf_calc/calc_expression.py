@@ -89,7 +89,6 @@ def accumulat_files(inputs, target):
     privoius result is used. It returns a list of commands.
     """
 
-
     pre_file = None
     for raster in inputs:
         if not pre_file:
