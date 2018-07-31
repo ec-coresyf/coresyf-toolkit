@@ -63,23 +63,20 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
 
     # TODO: set creation option like comrpession
 
-    command = (
-        'gdal_calc.py '
-        '{}'
-        '--outfile="{}" '
-        '--calc="{expression}" '
-        '--NoDataValue="{no_data}" '
-        '--type="Float32" '
-        '--format="HFA" '
-        '--overwrite '
-    ).format(
+    command = "".join([
         sys.executable,
+        ' ',
         which('gdal_calc.py'),
+        ' ',
         sourceraster,
-        target,
-        expression=exp,
-        no_data=no_data_value
-    )
+        ' ',
+        '--outfile="{}" '.format(target),
+        '--calc="{}" '.format(exp),
+        '--NoDataValue="{}" '.format(no_data_value),
+        '--type="Float32" ',
+        '--format="HFA" ',
+        '--overwrite ',
+    ])
     return command
 
 
