@@ -155,26 +155,24 @@ if __name__ == '__main__':
 
     print args
 
-    # parse input parameter and save in list
-    # parse output as one file path
+    parse input parameter and save in list
+    parse output as one file path
 
-    # source = source_folder
-    # target = out_file
-    # exp = None
-    #
-    # if isinstance(source, list):
-    #     sources = source
-    #
-    # commands = []
-    # if sources:
-    #     commands = accumulat_files(source, target)
-    # else:
-    #     if not exp:
-    #         use_scale_offset(source, target, scale=scale, offset=offset)
-    #     else:
-    #         use_custom_expression(source, target, exp=exp)
-    #
-    # print commands[0]
-    # call_commands(commands)
-    # call commands with subprocess
-    # call_commands(command)
+    source = source_folder
+    target = out_file
+    exp = None
+
+    commands = []
+    if source > 1:
+        sources = source
+        commands = accumulat_files(sources, target)
+    else:
+        if not exp:
+            use_scale_offset(source, target, scale=scale, offset=offset)
+        else:
+            use_custom_expression(source, target, exp=exp)
+
+    print commands
+    call_commands(commands)
+    call commands with subprocess
+    call_commands(command)
