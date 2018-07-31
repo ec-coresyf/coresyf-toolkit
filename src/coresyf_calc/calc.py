@@ -17,8 +17,6 @@ def get_expression(offset=0, exp=None, scale=None):
 
     if (exp and not offset and not scale):
         return exp
-    elif (not exp and offset and scale):
-        return "(A * {0}) + {1}".format(scale, offset)
     elif (not exp and not offset and scale):
         return "(A * {0})".format(scale, offset)
     elif (not exp and offset and not scale):
