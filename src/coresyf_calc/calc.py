@@ -4,6 +4,9 @@
 from pathlib2 import Path
 import rasterio
 import subprocess
+import tempfile
+import shutil
+import os
 
 """This module provide simple raster calucation functionality"""
 
@@ -11,6 +14,13 @@ import subprocess
 def get_inputs(folder, pattern="*.img"):
     """Return sorted list of input files matching pattern in folder"""
     return sorted(folder.glob(pattern))
+
+
+def create_temp_copy(path):
+    temp_dir = tempfile.gettempdir()
+    temp_path = Path(temp_dir) / 'previous_file.img'
+    shutil.copy2(str(path), str(temp_path))
+    return temp_path
 
 
 def get_expression(offset=0, exp=None, scale=None):
@@ -55,12 +65,41 @@ def build_command(input, target, exp, no_data_value=None):
     return command
 
 
-def build_target_path(input, target):
-    """Build target"""
-    if target.is_dir():
-        target_path = Path(target / input)
-    else:
-        return target
+def accumulat_files(inputs, target):
+    """
+    This accumulates all input files to one target file.
+
+    Simple expression like target = (A + B) with A is current input and B is the
+    privoius result is used.
+
+    Returns a list of commands to accumulated all files from input.
+    """
+
+    # accumulated multible files to one file
+
+    commands = []
+    pre_file = None
+    for raster in inputs:
+        if not pre_file:
+            # first run has no privoius file, just copy
+            pre_file = create_temp_copy(str(raster))  # first run only copy input
+        else:
+            exp = "(A + B)"  # use pre_file file as B
+            command = build_command(str(raster), str(target), exp, previous=pre_file)
+            commands.append(command)
+    return commands
+
+
+def use_scale_offset(input, target, scale, offset):
+    # one file: scal offset only
+    exp = get_expression(offset=offset, scale=scale)
+    command = build_command(str(one_file), str(out_file), exp)
+
+
+def use_custom_expression(input, target, exp):
+    """Use custom expression with input and target file."""
+    exp = get_expression(exp)
+    return build_command(str(input), str(target), exp)
 
 
 def call_commands(commands):
@@ -73,6 +112,7 @@ def call_commands(commands):
             shell=True,
             universal_newlines=True
         )
+
 
 """
 - one input to one target file with offset appleyed
@@ -100,26 +140,16 @@ if __name__ == '__main__':
     if input_.is_dir():
         inputs = get_inputs(folder=input_)
     else:
-        inputs = [input_,]
+        inputs = [input_, ]
 
     commands = []
-    if len(inputs) > 1:
-        # multible files to one file
-        if not target.is_file():
-            exp = "A"  # create copy in tempfolder
-            command = build_command(str(one_file), str(out_file), exp)
-        else:
-            exp = "(A + B)"
-            # use tempfolder file as B
-            command = build_command(str(one_file), str(out_file), exp)
-    elif not exp:
-        # one file: scal offset only
-        exp = get_expression(offset=offset, scale=scale)
-        command = build_command(str(one_file), str(out_file), exp)
+    if inputs:
+        commands = accumulat_files(inputs, target)
     else:
-        # one file: custom expression
-        exp = get_expression(exp)
-        command = build_command(str(one_file), str(out_file), exp)
+        if not exp:
+            use_scale_offset(input, target, scale=scale, offset=offset)
+        else:
+            use_custom_expression(input, target, exp=exp)
 
     commands.append(command)
     print commands[0]
