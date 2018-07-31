@@ -33,10 +33,10 @@ def build_command(input, target, exp, no_data_value=None):
         with rasterio.open(str(input)) as ds:
             no_data_value = ds.nodata  # set explicit no_data value
 
-    if 'B' in exp:
+    input_raster = '-A "{}" '.format(input)
+
+    if exp and 'B' in exp :
         input_raster = '-A "{}" -B "{}" '.format(input, target)
-    else:
-        input_raster = '-A "{}" '.format(input)
 
     command = (
         'gdal_calc.py '
