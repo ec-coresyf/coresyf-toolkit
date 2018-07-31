@@ -44,10 +44,10 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
         with rasterio.open(str(input)) as ds:
             no_data_value = ds.nodata  # set explicit no_data value
 
-    input_raster = '-A "{}" '.format(input)
-
     if exp and 'B' in exp:
         input_raster = '-A "{}" -B "{}" '.format(input, previous)
+    else:
+        input_raster = '-A "{}" '.format(input)
 
     command = (
         'gdal_calc.py '
@@ -72,9 +72,7 @@ def accumulat_files(inputs, target):
     This accumulates all input files to one target file.
 
     Simple expression like target = (A + B) with A is current input and B is the
-    privoius result is used.
-
-    Returns a list of commands to accumulated all files from input.
+    privoius result is used. It returns a list of commands.
     """
 
     # accumulated multible files to one file
