@@ -89,7 +89,6 @@ def accumulat_files(inputs, target):
     """
 
 
-    commands = []
     pre_file = None
     for raster in inputs:
         if not pre_file:
@@ -98,8 +97,7 @@ def accumulat_files(inputs, target):
         else:
             exp = "(A + B)"  # use pre_file file as B
             command = build_command(str(raster), str(target), exp, previous=pre_file)
-            commands.append(command)
-    return commands
+            call_command(command)
 
 
 def use_scale_offset(input, target, scale, offset):
@@ -115,17 +113,14 @@ def use_custom_expression(input, target, exp):
     return build_command(str(input), str(target), exp)
 
 
-def call_commands(commands):
-    """Call command is list with subprocess"""
-    for i, command in enumerate(commands, 1):
-        print("\n Call command number {0} from {1}".format(i, len(commands)))
-        print(command)
-        output = subprocess.check_call(
-            command,
-            stderr=subprocess.STDOUT,
-            shell=True,
-            universal_newlines=True
-        )
+def call_command(command):
+    output = subprocess.check_call(
+        command,
+        stderr=subprocess.STDOUT,
+        shell=True,
+        universal_newlines=True
+    )
+    return output
 
 
 if __name__ == '__main__':
@@ -180,12 +175,11 @@ if __name__ == '__main__':
 
     commands = []
     if len(sources) > 1:
-        commands = accumulat_files(sources, target)
+        accumulat_files(sources, target)
     else:
         source = sources[0]
         if not exp:
-            commands.append(use_scale_offset(source, target, scale=scale, offset=offset))
+            out = call_command(use_scale_offset(source, target, scale=scale, offset=offset))
         else:
-            commands.append(use_custom_expression(source, target, exp=exp))
-
-    call_commands(commands)
+            out = call_command(use_custom_expression(source, target, exp=exp))
+        print(out)
