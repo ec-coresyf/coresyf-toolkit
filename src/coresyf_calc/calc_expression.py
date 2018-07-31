@@ -10,13 +10,6 @@ import tempfile
 
 from pathlib2 import Path
 
-""" TODO:
-- one input to one target file with offset appleyed
-- one accumulated file from multible files
-- wait until all files are calculdated
-- use target format from input format
-- set creation option like comrpession
-"""
 
 """This module provide simple raster calucation functionality"""
 
@@ -59,6 +52,8 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
     else:
         sourceraster = '-A "{}" '.format(input)
 
+    # TODO: set creation option like comrpession
+
     command = (
         'gdal_calc.py '
         '{}'
@@ -85,7 +80,6 @@ def accumulat_files(inputs, target):
     privoius result is used. It returns a list of commands.
     """
 
-    # accumulated multible files to one file
 
     commands = []
     pre_file = None
@@ -101,18 +95,20 @@ def accumulat_files(inputs, target):
 
 
 def use_scale_offset(input, target, scale, offset):
+    """Scale and offset data"""
     # one file: scal offset only
     exp = get_expression(offset=offset, scale=scale)
     return build_command(str(input), str(target), exp)
 
 
 def use_custom_expression(input, target, exp):
-    """Use custom expression with input and target file."""
+    """Caluclate data with custom expression"""
     exp = get_expression(exp)
     return build_command(str(input), str(target), exp)
 
 
 def call_commands(commands):
+    """Call command is list with subprocess"""
     for i, command in enumerate(commands, 1):
         print("\n Call command number {0} from {1}".format(i, len(commands)))
         print(command)
@@ -157,18 +153,17 @@ if __name__ == '__main__':
         '--offset',
         default=0,
         type=float,
-        help='Value to add afer scaling')
+        help='Value to add after scaling')
 
     parser.add_argument(
         '-e',
         '--exp',
         default=None,
         type=float,
-        help='Expression') #TODO: explian input arguments
+        help='Expression')  # TODO: explian input arguments
 
     args = parser.parse_args()
 
-    # source = Path(args.source)
     sources = [Path(s) for s in args.source]
     offset = args.offset
     scale = args.scale
@@ -180,13 +175,9 @@ if __name__ == '__main__':
         commands = accumulat_files(sources, target)
     else:
         source = sources[0]
-        print exp
         if not exp:
-            commands = use_scale_offset(source, target, scale=scale, offset=offset)
+            commands.append(use_scale_offset(source, target, scale=scale, offset=offset))
         else:
-            commands = use_custom_expression(source, target, exp=exp)
+            commands.append(use_custom_expression(source, target, exp=exp))
 
-    print commands
-    # call_commands(commands)
-    # call commands with subprocess
-    # call_commands(command)
+    call_commands(commands)
