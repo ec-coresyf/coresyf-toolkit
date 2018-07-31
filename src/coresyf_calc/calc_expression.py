@@ -90,9 +90,11 @@ def accumulat_files(inputs, target):
     """
 
     pre_file = None
-    for raster in inputs:
+    for i, raster in enumerate(inputs):
+        print("Calculate {} from {} files.".format(i, len(inputs)))
         if not pre_file:
             # first run has no privoius file, just copy
+            print("Just copy the first file.")
             pre_file = create_temp_copy(str(raster))  # first run only copy input
         else:
             exp = "(A + B)"  # use pre_file file as B
