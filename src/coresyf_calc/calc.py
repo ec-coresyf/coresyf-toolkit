@@ -153,7 +153,6 @@ if __name__ == '__main__':
         else:
             use_custom_expression(input, target, exp=exp)
 
-    commands.append(command)
     print commands[0]
     # call_commands(commands)
     # call commands with subprocess
