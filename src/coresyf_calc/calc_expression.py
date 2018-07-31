@@ -39,6 +39,15 @@ def get_expression(offset=0, exp=None, scale=None):
         return "(A * {0}) + {1}".format(scale, offset)
 
 
+def which(pgm):
+    """Search for pgm in PATH"""
+    path = os.getenv('PATH')
+    for p in path.split(os.path.pathsep):
+        p = os.path.join(p, pgm)
+        if os.path.exists(p) and os.access(p, os.X_OK):
+            return p
+
+
 def build_command(input, target, exp, no_data_value=None, previous=None):
     """build command for gdal_calc
     Set no data value explicitly from input file if not given as parameter.
@@ -64,6 +73,7 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
         '--format="HFA" '
         '--overwrite '
     ).format(
+        which('gdal_calc.py'),
         sourceraster,
         target,
         expression=exp,
