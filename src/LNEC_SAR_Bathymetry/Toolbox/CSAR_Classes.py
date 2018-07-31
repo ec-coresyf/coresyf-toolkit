@@ -94,6 +94,7 @@ class GridPointsData:
 		self.DiscriminationFlag = DiscriminationFlag	
 		self.Tp = Tp
 		self.bathymetry = bathymetry
+		
 
 	def pickle(self,fname):	
 		with open(fname, 'wb') as f:

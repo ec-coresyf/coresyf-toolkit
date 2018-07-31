@@ -42,7 +42,6 @@ fun3 () {
 for filename in Spectrum*.out; do fun3 "$filename" & done
 wait
 
-
 ##*****************************************
 ## 4) Depth Inversion (parallel)
 ##*****************************************

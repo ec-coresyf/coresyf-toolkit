@@ -96,6 +96,7 @@ def DiscriminatedGroups(parameters, Points):
 	# Gather points in groups (DW, nDW, SW or other) and affect a method for depth inversion		
 	#----------------------------------------------------------------------------------------
 	Points = np.asarray(Points);
+
 	# look for exception points (Deep Water or shallow water)
 	DWpoints, SWpoints, nDWpoints, Otherpoints, GlobalPoints = [], [], [], [], []
 	for point in Points:	 

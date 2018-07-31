@@ -11,7 +11,7 @@
 =====================================================================================================
 """
 
-import os
+import os,sys
 #
 import shutil, glob
 #
@@ -77,13 +77,13 @@ parameters = CL.InversionParameters(HydroParameters, args.method, args.wave_theo
 # merge all the spectrum data in an array
 ComputationPoints = []
 
-rootname_input = args.input.split('.')[0] if args.input else 'Spectrum'
-
+rootname_input = args.input.split('.')[0]
 FileList = [x for x in os.listdir('./') if x.startswith(rootname_input)]
 
 for fname in FileList:
 	point = UT.Unpickle_File(fname)
 	ComputationPoints.append(point)
+	
 
 #####################
 # domain division
@@ -91,6 +91,8 @@ for fname in FileList:
 
 # divide domain in between exception (deep/shallow water) and real computation points
 ExceptionPoints, ComputationPoints = INV.DiscriminatedGroups(parameters, ComputationPoints)
+
+
 
 # store exception points and dispatch other points
 
@@ -100,13 +102,14 @@ if len(ExceptionPoints.DeepWaterPoints)>0 or len(ExceptionPoints.ShallowWaterPoi
 
 
 # global points
-rootname_output = args.output.split('.')[0] if args.output else 'Spectrum'
-ext_output = '.' + args.output.split('.')[-1] if args.output else '.sub'
+rootname_output = args.output.split('.')[0] 
+ext_output = '.' + args.output.split('.')[-1] 
+
 if len(ComputationPoints)>0:
 	for i, point in enumerate(ComputationPoints):
-		fname = rootname_output + str(i) + ext_output
+		fname = rootname_output + ext_output
 		data = CL.InversionData(parameters, point) 
 		data.pickle(fname)
 
-#clean computation files
-[os.remove(L) for L in glob.glob('*.out')]
+##clean computation files
+#[os.remove(L) for L in glob.glob('*.out')]
