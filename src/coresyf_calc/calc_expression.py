@@ -185,6 +185,6 @@ if __name__ == '__main__':
             commands = use_custom_expression(source, target, exp=exp)
 
     print commands
-    call_commands(commands)
-    call commands with subprocess
-    call_commands(command)
+    # call_commands(commands)
+    # call commands with subprocess
+    # call_commands(command)
