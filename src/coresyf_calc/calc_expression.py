@@ -7,6 +7,7 @@ import rasterio
 import shutil
 import subprocess
 import tempfile
+import sys
 
 from pathlib2 import Path
 
@@ -98,6 +99,8 @@ def accumulat_files(inputs, target):
             exp = "(A + B)"  # use pre_file file as B
             command = build_command(str(raster), str(target), exp, previous=pre_file)
             call_command(command)
+            os.remove(str(pre_file))  # remove pre_file afer processing
+            pre_file = create_temp_copy(str(target))
 
 
 def use_scale_offset(input, target, scale, offset):
