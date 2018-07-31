@@ -42,7 +42,8 @@ def build_command(input, target, exp, no_data_value=None):
         '--outfile="{}" '
         '--calc="{expression}" '
         '--NoDataValue="{no_data}" '
-        '--type="Float32"'
+        '--type="Float32" '
+        '--format="HFA" '
         '--overwrite '
     ).format(
         input_raster,
