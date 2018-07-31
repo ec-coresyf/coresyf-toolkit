@@ -103,7 +103,7 @@ def accumulat_files(inputs, target):
 def use_scale_offset(input, target, scale, offset):
     # one file: scal offset only
     exp = get_expression(offset=offset, scale=scale)
-    return build_command(str(one_file), str(out_file), exp)
+    return build_command(str(input), str(target), exp)
 
 
 def use_custom_expression(input, target, exp):
@@ -169,16 +169,18 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # source = Path(args.source)
-    source = [Path(s) for s in args.source]
+    sources = [Path(s) for s in args.source]
     offset = args.offset
     scale = args.scale
     target = args.target
+    exp = args.exp
 
     commands = []
-    if source > 1:
-        sources = source
+    if len(sources) > 1:
         commands = accumulat_files(sources, target)
     else:
+        source = sources[0]
+        print exp
         if not exp:
             commands = use_scale_offset(source, target, scale=scale, offset=offset)
         else:
