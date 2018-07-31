@@ -73,6 +73,7 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
         '--format="HFA" '
         '--overwrite '
     ).format(
+        sys.executable,
         which('gdal_calc.py'),
         sourceraster,
         target,
