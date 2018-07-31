@@ -1,0 +1,35 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Land-Sea-Mask">
+    <operator>Land-Sea-Mask</operator>
+    <sources>
+      <sourceProduct>${sourceProduct}</sourceProduct>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands/>
+      <invertGeometry>${invertGeometry}</invertGeometry>
+      <landMask>${landMask}</landMask>
+      <useSRTM>${useSRTM}</useSRTM>
+    </parameters>
+  </node>
+  <node id="Oil-Spill-Detection">
+    <operator>Oil-Spill-Detection</operator>
+    <sources>
+      <sourceProduct refid="Land-Sea-Mask"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands/>
+      <backgroundWindowSize>${backgroundWindowSize}</backgroundWindowSize>
+      <k>${k}</k>
+    </parameters>
+  </node>
+  <node id="Oil-Spill-Clustering">
+    <operator>Oil-Spill-Clustering</operator>
+    <sources>
+      <sourceProduct refid="Oil-Spill-Detection"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <minClusterSizeInKm2>${minClusterSizeInKm2}</minClusterSizeInKm2>
+    </parameters>
+  </node>
+</graph>

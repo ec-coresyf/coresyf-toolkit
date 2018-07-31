@@ -1,0 +1,66 @@
+{
+    "name": "CoReSyF-Oil-Spill-Detection",
+    "type": "OilSpillDetection", 
+    "operation": {"graph": "oil_spill_detection.graph.xml"},
+    "description": "CoReSyF Oil Spill Detection Tool",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        }
+     ],
+     "parameters": [
+        {
+            "identifier": "PinvertGeometry",
+            "name": "invertGeometry",
+            "description": "Sets invertGeometry to <boolean>",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PlandMask",
+            "name": "landMask",
+            "description": "sets landMaks to <boolean>",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "identifier": "PuseSRTM",
+            "name": "useSRTM",
+            "description": "Set useSRTM to <boolean>",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PbackgroundWindowSize",
+            "name": "BackgroundWindowSize",
+            "description": "Background Window Size",
+            "type": "int",
+            "default": 13
+        },
+        {
+            "identifier": "Pk",
+            "name": "Threshold Shift",
+            "description": "Threshold shift from background mean",
+            "type": "float",
+            "default": 2.0
+        },
+        {
+            "identifier": "PminClusterSizeInKm2",
+            "name": "Minimum Cluster Size",
+            "description": "Minimum Cluster Size in square Kilometers",
+            "type": "float",
+            "default": 0.1
+        }
+        ],
+        "outputs": [
+          {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "GeoTIFF"
+          }
+       ]
+}
