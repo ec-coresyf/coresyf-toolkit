@@ -92,16 +92,17 @@ def get_inputs(folder, data="", mask="", extension=".img"):
             mask_inputs.append(tuple([date, input]))
 
     # match data and mask by date
-    matched_inputs = [
-        (data[0], data[1], mask[1])
+    Pair = namedtuple('InputPair', 'date, data, mask')
+    matched_pairs = [
+        Pair(date=data[0], data=data[1], mask=mask[1])
         for data in data_inputs
         for mask in mask_inputs
         if data[0] == mask[0]
     ]
 
-    sorted_inputs = sorted(matched_inputs, key=lambda item: item[0], reverse=True)
+    sorted_pairs = sorted(matched_pairs, key=lambda pair: pair.date, reverse=True)
 
-    return sorted_inputs
+    return sorted_pairs
 
 
 def create_stack(template_file, ds_path, variables):
