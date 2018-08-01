@@ -11,3 +11,5 @@ tool_examples/
 src/coresyf_image_crop/tests/test_data/Aveiro_resampled.tif
 
 build/
+
+dev.py
