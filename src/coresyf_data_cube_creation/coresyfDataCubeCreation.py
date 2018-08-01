@@ -68,49 +68,29 @@ def get_inputs(folder, data="", mask="", extension=".img"):
     # get list of all files with extension
     inputs = Path(folder).glob("*{}".format(extension))
 
-    search_path = os.path.join(folder, extension)
-    inputs_iter = glob.iglob(search_path)
-    inputs = sorted(inputs_iter)  # sort by file name
+    # get acquisition date
+    dated_inputs = []
+    for input in inputs:
+        name = input.name
+        parts = name.replace("_", "-").split("-")
 
-    if inputs:
-        logging.info("Fount {} inputs in {}.".format(len(inputs), folder))
-        return inputs
-    else:
-        msg = "No files found in {}! Search extension are {}."
-        raise IOError(msg.format(folder, search_path))
+        for p in parts:
+            try:
+                date = parse(p)
+                break  # stop searching after first found
+            except ValueError:
+                pass
+        dated_inputs.append(tuple([date, input]))
 
+    data_inputs = []
+    mask_inputs = []
+    for date, input in dated_inputs:
+        if data in str(input):
+            data_inputs.append(tuple([date, input]))
+        elif mask in str(input):
+            mask_inputs.append(tuple([date, input]))
 
-def sorted_inputs(paths, key="date_created"):
-    """Return one by date sorted list of paths as tuples like (path, date).
-    Key parameter is used to find attribut in netCDF to sort by.
-
-    Returns
-    -------
-
-    list of tuple
-        Sorted list of tuples holding input files path as string and date as integar e.g. (path, date).
-        List ist sorted afer date. Date is integar in dayes based on January 1 of year 1
-        (see date.toordinal() for more info).
-
-    """
-    inputs = []
-
-    # get date
-    for i, path in enumerate(paths):
-        try:
-            dataset = Dataset(path, "r", format="NETCDF4")
-        except IOError as e:
-            raise e
-        else:
-            with dataset:
-                try:
-                    date_attr = dataset.getncattr(key)
-                except AttributeError as e:
-                    logging.warning("No date_created attribut found in input dataset, file name order to sort.")
-                    logging.debug(e)
-                    date = i
-                else:
-                    date = dateutil.parser.parse(date_attr).toordinal()
+    # sort by datetime
 
         item = (path, date)
         inputs.append(item)
