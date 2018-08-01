@@ -38,7 +38,8 @@ from coresyftools.tool import CoReSyFTool
 
 
 def get_inputs(folder, data="", mask="", extension=".img"):
-    """Find inputs files by names and extention.
+    """Find inputs files in folder by names and extention.
+    Inputs are matched by date parsed from file name.
 
     Parameters
     ----------
@@ -53,13 +54,13 @@ def get_inputs(folder, data="", mask="", extension=".img"):
         Data file name
 
     extension: str
-        Image file type extension
+        File type extension
         Default: ".img"
 
     Returns
     -------
-    inputs: iterator
-        List of tuple file pahtes like (data_oath, maks_path)
+    inputs: list
+        List contains date and matched mask and data file path as tuple.
 
     Example
     -------
@@ -90,13 +91,17 @@ def get_inputs(folder, data="", mask="", extension=".img"):
         elif mask in str(input):
             mask_inputs.append(tuple([date, input]))
 
-    # sort by datetime
+    # match data and mask by date
+    matched_inputs = [
+        (data[0], data[1], mask[1])
+        for data in data_inputs
+        for mask in mask_inputs
+        if data[0] == mask[0]
+    ]
 
-        item = (path, date)
-        inputs.append(item)
+    sorted_inputs = sorted(matched_inputs, key=lambda item: item[0], reverse=True)
 
-    # sort list after date attribut
-    return sorted(inputs, key=lambda item: item[1], reverse=True)
+    return sorted_inputs
 
 
 def create_stack(template_file, ds_path, variables):
