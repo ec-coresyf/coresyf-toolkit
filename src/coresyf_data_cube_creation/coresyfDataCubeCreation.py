@@ -26,6 +26,9 @@ import os
 import sys
 
 
+
+from dateutil.parser import parse
+from pathlib2 import Path
 from collections import namedtuple
 
 # import third party modules
@@ -34,7 +37,7 @@ from netCDF4 import Dataset
 from coresyftools.tool import CoReSyFTool
 
 
-def get_inputs(folder, data="", mask="", extension="*.nc"):
+def get_inputs(folder, data="", mask="", extension=".img"):
     """Find inputs files by names and extention.
 
     Parameters
@@ -62,6 +65,8 @@ def get_inputs(folder, data="", mask="", extension="*.nc"):
     -------
     > get_inputs("data/")
     """
+    # get list of all files with extension
+    inputs = Path(folder).glob("*{}".format(extension))
 
     search_path = os.path.join(folder, extension)
     inputs_iter = glob.iglob(search_path)
