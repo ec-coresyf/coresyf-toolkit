@@ -154,6 +154,13 @@ if __name__ == '__main__':
         help='Target file path')
 
     parser.add_argument(
+        '-p',
+        '--pattern',
+        default="*.img",
+        type=str,
+        help='Pattern to search for input files if source is a directory. Like "*analysed_sst.img"')
+
+    parser.add_argument(
         '-s',
         '--scale',
         default=1,
@@ -182,11 +189,22 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    sources = [Path(s) for s in args.source]
+    pattern = args.pattern
+
+    if len(args.source) == 1:
+        source = Path(args.source[0])
+        if source.is_dir():
+            sources = list(source.glob(pattern))
+        else:
+            sources = [source]
+    else:
+        sources = [Path(s) for s in args.source]
 
     target = Path(args.target)
     if target.is_dir():
         target_folder = target
+    else:
+        target_folder = None
 
     offset = args.offset
     scale = args.scale
