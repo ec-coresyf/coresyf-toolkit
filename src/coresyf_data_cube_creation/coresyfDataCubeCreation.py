@@ -213,13 +213,15 @@ class CoReSyFDataCubeCreation(CoReSyFTool):
     def run(self, bindings):
 
         # parse Parameters
-        input_folder = bindings['Ssource']
+        folder = bindings['Ssource']
+        data_name = bindings['Ddata_name']
+        mask_name = bindings['Mmask_name']
+        extension = bindings['.img']
         variables = tuple(bindings['var'].split(','))
         output = bindings['Ttarget']
 
         try:
-            inputs = get_inputs(input_folder, extension="*.nc")
-            inputs = sorted_inputs(inputs)
+            inputs = get_inputs(folder, data=data_name, mask=mask_name, extension=extension)
         except IOError as e:
             logging.error("No inputs found.".format(output))
             logging.debug((os.strerror(e.errno)))
