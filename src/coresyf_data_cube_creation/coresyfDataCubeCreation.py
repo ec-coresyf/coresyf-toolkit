@@ -24,6 +24,7 @@ import logging
 import numpy as np
 import os
 import sys
+import rasterio
 
 
 
@@ -111,7 +112,7 @@ def create_stack(template_file, ds_path, variables):
     Parameters
     ----------
 
-    template: open netCDF4 handle
+    template: img path
 
     ds_path: string
         Destination Path for stack file.
@@ -131,41 +132,43 @@ def create_stack(template_file, ds_path, variables):
     except IOError:
         raise
     else:
-        template = Dataset(template_file, "r")
-        # use first input dataset as template
+        with rasterio.open(template_file) as template:
 
-        temp_dim_lat = template.dimensions["lat"]
-        temp_dim_lon = template.dimensions["lon"]
+            start_x = template.transform[2]
+            stop_x = start_x + (template.width * template.transform[0])
+            stop_y = template._transform[3]
+            start_y = template._transform[3] - (template.height * template.transform[0])
+
+            temp_dim_lat = np.linspace(start_x, stop_x, template.width)
+            temp_dim_lon = np.linspace(start_y, stop_y, template.height)
+        # use first input dataset as template
 
         # create dimmensions
         stack.createDimension(dim_stacking, None)
         stack.createDimension("lat", len(temp_dim_lat))
         stack.createDimension("lon", len(temp_dim_lon))
 
-        # create variable in variables in stack file
-
+        # # create variable in variables in stack file
+        #
         date = stack.createVariable(dim_stacking, "i8", (dim_stacking,))
         date.units = "days since 1-01-01 00:00:00 UTC"
         date.calendar = "gregorian"
 
-        temp_var_lat = template.variables["lat"]
-        temp_var_lon = template.variables["lon"]
+        stack_lat = stack.createVariable("lat", temp_dim_lat.dtype, ("lat",))
+        stack_lon = stack.createVariable("lon", temp_dim_lon.dtype, ("lon",))
 
-        stack_lat = stack.createVariable("lat", temp_var_lat.datatype, ("lat",))
-        stack_lon = stack.createVariable("lon", temp_var_lon.datatype, ("lon",))
+        stack_lat[:] = temp_dim_lat
+        stack_lon[:] = temp_dim_lon
 
-        stack_lat[:] = temp_var_lat[:]
-        stack_lon[:] = temp_var_lon[:]
-
-        # create data Variables
-        for name in variables:
-            var = template.variables[name]
-            stack_var = stack.createVariable(name, var.datatype, ("date", "lat", "lon"), zlib=True)
-
-            # copy meta data for this variables
-            stack_var.setncatts({k: var.getncattr(k) for k in var.ncattrs()})
-
-        template.close()
+        # # create data Variables
+        # for name in variables:
+        #     var = template.variables[name]
+        #     stack_var = stack.createVariable(name, var.datatype, ("date", "lat", "lon"), zlib=True)
+        #
+        #     # copy meta data for this variables
+        #     stack_var.setncatts({k: var.getncattr(k) for k in var.ncattrs()})
+        #
+        # template.close()
         return stack
 
 
