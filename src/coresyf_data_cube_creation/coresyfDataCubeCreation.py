@@ -34,30 +34,36 @@ from netCDF4 import Dataset
 from coresyftools.tool import CoReSyFTool
 
 
-def get_inputs(folder, pattern="*.nc"):
-    """This searching for input files in folder matching pattern parameter
-    returns list of path.
+def get_inputs(folder, data="", mask="", extension="*.nc"):
+    """Find inputs files by names and extention.
 
     Parameters
     ----------
 
     folder: str
-        Path of folder to search in.
+        Path of folder to search in
 
-    pattern: regex string
-        Pattern for file of interests as regex string.
+    data: str
+        Data file name
+
+    mask: str
+        Data file name
+
+    extension: str
+        Image file type extension
+        Default: ".img"
 
     Returns
     -------
     inputs: iterator
-        List of file in the folder matching the pattern.
+        List of tuple file pahtes like (data_oath, maks_path)
 
     Example
     -------
-    > search_for_files("data/")
+    > get_inputs("data/")
     """
 
-    search_path = os.path.join(folder, pattern)
+    search_path = os.path.join(folder, extension)
     inputs_iter = glob.iglob(search_path)
     inputs = sorted(inputs_iter)  # sort by file name
 
@@ -65,7 +71,7 @@ def get_inputs(folder, pattern="*.nc"):
         logging.info("Fount {} inputs in {}.".format(len(inputs), folder))
         return inputs
     else:
-        msg = "No files found in {}! Search pattern are {}."
+        msg = "No files found in {}! Search extension are {}."
         raise IOError(msg.format(folder, search_path))
 
 
@@ -227,7 +233,7 @@ class CoReSyFDataCubeCreation(CoReSyFTool):
         output = bindings['Ttarget']
 
         try:
-            inputs = get_inputs(input_folder, pattern="*.nc")
+            inputs = get_inputs(input_folder, extension="*.nc")
             inputs = sorted_inputs(inputs)
         except IOError as e:
             logging.error("No inputs found.".format(output))
