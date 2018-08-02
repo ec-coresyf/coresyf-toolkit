@@ -23,14 +23,15 @@ import itertools
 import logging
 import numpy as np
 import os
-import sys
 import rasterio as rio
+import sys
+import time
 
 
 
+from collections import namedtuple
 from dateutil.parser import parse
 from pathlib2 import Path
-from collections import namedtuple
 
 # import third party modules
 from netCDF4 import Dataset
