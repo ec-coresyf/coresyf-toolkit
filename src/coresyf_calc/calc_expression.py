@@ -43,7 +43,6 @@ It was created by Julius Schroeder, during his internship at the MaREI Centre fo
 
 #Step 1) Import required python modules
 
-
 import argparse     # Gives usage instructions and tool details via the command line interface
 import os           # Enables a suite of miscellaneous operating system interfaces (extra to the sys module) which expands the range of system functionalities you can use)
 import rasterio     # Enables a set of raster processing functionalities (which are based on GDAL functions)
@@ -56,34 +55,44 @@ from pathlib2 import Path   # Enables a set of object-based path functionalities
 
 #Step 2) Define a set of functions to be called upon
 
-
 def get_inputs(folder, pattern="*.img"):
-    """Return sorted list of input files matching pattern in folder"""
+    """
+    Identifies which files will be processed.
+    Examines the source folder, identifying those files with the matching
+    defined Pattern (-p), and returns a list of input files, sorted by filename
+    """
     return sorted(folder.glob(pattern))
 
 
 def create_temp_copy(path):
+    """Creates a copy of a file in the temp directory"""
     temp_dir = tempfile.gettempdir()
-    temp_path = Path(temp_dir) / 'previous_file.img'
+    temp_path = Path(temp_dir) / 'previous_file.img' # / can be used instead of join function
     shutil.copy2(str(path), str(temp_path))
     return temp_path
 
 
 def build_target_path(input, target_folder):
-    """Build target-like target_folder/input"""
+    """
+    Sets the output (target) folder and filename.
+    Takes the target directory path, and the input filename, and puts them together
+    """
     return Path(target_folder / input.name)
 
 
 def get_expression(offset=0, exp=None, scale=None):
-    """Get the right expression by differend parameter combinations"""
+    """
+    Iterates through the optional arguments defined and decides the correct formula to apply.
+    the script checks which optional arguments have been given, then determines the course of action on the basis of which arguments (-e, offset and/or scale) have been defined by the user.
+    """
 
-    if (exp and not offset and not scale):
+    if (exp and not offset and not scale):      # when -e is set and the others are not set do this
         return exp
-    elif (not exp and not offset and scale):
+    elif (not exp and not offset and scale):    # when -e & offset are not set and offset is, do this
         return "(A * {0})".format(scale)
-    elif (not exp and offset and not scale):
+    elif (not exp and offset and not scale):    # when -e & scale are not set scale is, do this
         return "(A + {0})".format(offset)
-    else:
+    else:                                       # when only the offset is set, do this
         return "(A * {0}) + {1}".format(scale, offset)
 
 
@@ -173,8 +182,9 @@ def call_command(command):
     )
     return output
 
+#Step 3) Run the programme
 
-if __name__ == '__main__':
+if __name__ == '__main__':          #a piece of script which allows you to import the functions contained into other new python script.
     parser = argparse.ArgumentParser(
         prog="calc_expression",
         description="""
