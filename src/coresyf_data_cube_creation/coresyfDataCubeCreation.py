@@ -175,6 +175,14 @@ def create_stack(template_pair, ds_path, variables, dtype='float32'):
             fill_value=no_data
         )
 
+    # set meta data
+    stack.description = "3D data cube of {}".format(" and ".join(variables))
+    stack.history = "Created " + time.ctime(time.time())
+    stack.crs = "WGS 84"
+    stack.epsg = "EPSG:4326"
+    stack_lat.units = "degrees north"
+    stack_lon.units = "degrees east"
+
     return stack
 
 
