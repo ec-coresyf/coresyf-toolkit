@@ -107,7 +107,7 @@ def get_inputs(folder, data="", mask="", extension=".img"):
     return sorted_pairs
 
 
-def create_stack(template_pair, ds_path, variables, dtype = 'float32'):
+def create_stack(template_pair, ds_path, variables, dtype='float32'):
     """This open a NetCDF4 file and creates basic stack structure.
 
     Parameters
@@ -159,8 +159,8 @@ def create_stack(template_pair, ds_path, variables, dtype = 'float32'):
     date.units = "days since 1-01-01 00:00:00 UTC"
     date.calendar = "gregorian"
 
-    stack_lat = stack.createVariable("lat", temp_dim_lat.dtype, ("lat",))
-    stack_lon = stack.createVariable("lon", temp_dim_lon.dtype, ("lon",))
+    stack_lat = stack.createVariable("lat", dtype, ("lat",))
+    stack_lon = stack.createVariable("lon", dtype, ("lon",))
 
     stack_lat[:] = temp_dim_lat
     stack_lon[:] = temp_dim_lon
