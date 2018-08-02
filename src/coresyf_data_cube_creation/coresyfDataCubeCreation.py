@@ -24,7 +24,7 @@ import logging
 import numpy as np
 import os
 import sys
-import rasterio
+import rasterio as rio
 
 
 
@@ -106,7 +106,7 @@ def get_inputs(folder, data="", mask="", extension=".img"):
     return sorted_pairs
 
 
-def create_stack(template_file, ds_path, variables):
+def create_stack(template_pair, ds_path, variables, dtype = 'float32'):
     """This open a NetCDF4 file and creates basic stack structure.
 
     Parameters
@@ -131,45 +131,50 @@ def create_stack(template_file, ds_path, variables):
         stack = Dataset(ds_path, 'w', format="NETCDF4")
     except IOError:
         raise
-    else:
-        with rasterio.open(template_file) as template:
 
-            start_x = template.transform[2]
-            stop_x = start_x + (template.width * template.transform[0])
-            stop_y = template._transform[3]
-            start_y = template._transform[3] - (template.height * template.transform[0])
+    data_path = str(template_pair.data)
+    mask_path = str(template_pair.mask)
+    with rio.open(data_path) as data, rio.open(mask_path) as mask:
 
-            temp_dim_lat = np.linspace(start_x, stop_x, template.width)
-            temp_dim_lon = np.linspace(start_y, stop_y, template.height)
-        # use first input dataset as template
+        # get coordinates
+        start_x = data.transform[2]
+        stop_x = start_x + (data.width * data.transform[0])
+        stop_y = data._transform[3]
+        start_y = data._transform[3] - (data.height * data.transform[0])
 
-        # create dimmensions
-        stack.createDimension(dim_stacking, None)
-        stack.createDimension("lat", len(temp_dim_lat))
-        stack.createDimension("lon", len(temp_dim_lon))
+        temp_dim_lat = np.linspace(start_x, stop_x, data.width)
+        temp_dim_lon = np.linspace(start_y, stop_y, data.height)
 
-        # # create variable in variables in stack file
-        #
-        date = stack.createVariable(dim_stacking, "i8", (dim_stacking,))
-        date.units = "days since 1-01-01 00:00:00 UTC"
-        date.calendar = "gregorian"
+        # get meta data
+        no_data = data.nodata
 
-        stack_lat = stack.createVariable("lat", temp_dim_lat.dtype, ("lat",))
-        stack_lon = stack.createVariable("lon", temp_dim_lon.dtype, ("lon",))
+    # create dimmensions
+    stack.createDimension(dim_stacking, None)
+    stack.createDimension("lat", len(temp_dim_lat))
+    stack.createDimension("lon", len(temp_dim_lon))
 
-        stack_lat[:] = temp_dim_lat
-        stack_lon[:] = temp_dim_lon
+    # create date variable in order to create stack
+    date = stack.createVariable(dim_stacking, "i8", (dim_stacking,))
+    date.units = "days since 1-01-01 00:00:00 UTC"
+    date.calendar = "gregorian"
 
-        # # create data Variables
-        # for name in variables:
-        #     var = template.variables[name]
-        #     stack_var = stack.createVariable(name, var.datatype, ("date", "lat", "lon"), zlib=True)
-        #
-        #     # copy meta data for this variables
-        #     stack_var.setncatts({k: var.getncattr(k) for k in var.ncattrs()})
-        #
-        # template.close()
-        return stack
+    stack_lat = stack.createVariable("lat", temp_dim_lat.dtype, ("lat",))
+    stack_lon = stack.createVariable("lon", temp_dim_lon.dtype, ("lon",))
+
+    stack_lat[:] = temp_dim_lat
+    stack_lon[:] = temp_dim_lon
+
+    # create variables
+    for name in variables:
+        stack_var = stack.createVariable(
+            name,
+            datatype=dtype,
+            dimensions=("date", "lat", "lon"),
+            zlib=True,
+            fill_value=no_data
+        )
+
+    return stack
 
 
 def stacking(inputs, variables, output):
