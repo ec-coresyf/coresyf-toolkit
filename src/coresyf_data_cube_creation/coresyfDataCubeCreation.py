@@ -34,7 +34,7 @@ from dateutil.parser import parse
 from pathlib2 import Path
 
 # import third party modules
-from netCDF4 import Dataset
+from netCDF4 import Dataset, date2num
 
 from coresyftools.tool import CoReSyFTool
 
@@ -140,11 +140,16 @@ def create_stack(template_pair, ds_path, variables, dtype='float32'):
         # get coordinates
         start_x = data.transform[2]
         stop_x = start_x + (data.width * data.transform[0])
+        print start_x, stop_x
+
         stop_y = data._transform[3]
         start_y = data._transform[3] - (data.height * data.transform[0])
+        print start_y, stop_y
 
-        temp_dim_lat = np.linspace(start_x, stop_x, data.width)
-        temp_dim_lon = np.linspace(start_y, stop_y, data.height)
+
+
+        temp_dim_lat = np.linspace(start_y, stop_y, data.width)
+        temp_dim_lon = np.linspace(start_x, stop_x, data.height)
 
         # get meta data
         no_data = data.nodata
@@ -170,7 +175,7 @@ def create_stack(template_pair, ds_path, variables, dtype='float32'):
         stack_var = stack.createVariable(
             name,
             datatype=dtype,
-            dimensions=("date", "lat", "lon"),
+            dimensions=("date", "lon", "lat"),
             zlib=True,
             fill_value=no_data
         )
@@ -193,10 +198,10 @@ def stacking(inputs, variables, output):
     ----------
 
     inputs: list of tuple
-        List of tuples holding input files and date e.g. (path, date).
+        List of tuples holding input files and date e.g. (date, data1, data2).
 
     variables: list
-        Variables to stack. Must be same as variables in the input files.
+        Variables to stack. Define data an mask variable from input.
 
     output: string
         Path to the 3D file.
@@ -211,22 +216,25 @@ def stacking(inputs, variables, output):
 
     logging.info('Create {} file.'.format(output))
     try:
-        stack = create_stack(inputs[0][0], output, variables)
+        # create new stack by using input as template
+        stack = create_stack(inputs[0], output, variables)
     except EnvironmentError as e:
         logging.error("Can't create {}".format(output))
         logging.debug((os.strerror(e.errno)))
         raise e
 
-    for index, input__ in enumerate(inputs):
+    for index, pair in enumerate(inputs):
 
-        input_path = input__[0]  # unpack input tuple
-        logging.info('Extracting data from {}'.format(input_path))
+        date, data, mask = pair  # unpack input tuple
+        logging.info('Extracting data from {}'.format(data))
 
-        with Dataset(input_path, "r") as input:
-            for name in variables:
-                in_var = input.variables[name]
-                stack.variables[name][index, :, :] = in_var[:]
-                stack.variables["date"][index] = input__[1]
+        with rio.open(str(data)) as data, rio.open(str(mask)) as mask:
+            stack_data = stack.variables[variables[0]]
+            stack_mask = stack.variables[variables[1]]
+
+            stack_data[index, :, :] = data.read(1)
+            stack_mask[index, :, :] = mask.read(1)
+            stack.variables["date"][index] = date2num(date, "days since 1-01-01 00:00:00 UTC", 'gregorian')
 
     stack.close()
 
