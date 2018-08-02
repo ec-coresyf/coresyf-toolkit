@@ -1,18 +1,60 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+This python script Python script to provide simple raster calculation functionality.
+The inputs required can be:
+    1) 1 raster image file, or
+    2) A list of raster image files, or
+    3) A folder containing at least 1 (or more) raster image files.
 
-import argparse
-import os
-import rasterio
-import shutil
-import subprocess
-import tempfile
-import sys
+This script uses GDAL expressions/formula (e.g y= A + 230, where A is a raster array) which can be applied to every element, i.e. pixel, in your raster image.
 
-from pathlib2 import Path
+Note:
+1) This workflow assumes that the filename contains a date, in the form YYYYMMDD (e.g. 20180802).
+
+In terms of outputs,
+A single output file will be generated for each file input.
+    1) The filename of the output file in the target folder will be the same as the input filename. You need to create a target folder and allocate it as the target location (otherwise the script will not work). This is particularly relevant when the script is processing a list of files contained in a folder (option 3 above).
+    2) Helptext will be produced by using the scriptname and "-h" (i.e. python calc_expression.py -h) which contains lots of information on usage, and how to use it most effectively.
+
+Arguments:
+positional arguments (i.e. the order you write them in is CRITICAL):
+  source                Input file path, or list of paths, or input folder path
+  target                Target file path, or target folder to be populated with generated files
+
+optional arguments:
+  -h,   --help
+                    Show a detailed help message in the command line interface, and exit
+  -p,   --pattern
+                    Designate a filename pattern to search for, in the case where an input folder path contains a range of files (such as mask files and measurement files). For example, if a folder contains a number of files with the string "analysed_SST" in their filename, the script will only process those files with "analysed_SST" in their filename.
+  -s,   --scale
+                    Factor to scale the data, i.e. a float number by which all pixels are multiplied. For example for storage reasons temperature in Kelvin is often stored as an integer (e.g.27415 as opposed to 274.15), so we multiply the data by a scaling factor of 0.01 to get it to the correct value.
+  -x,   --offset
+                    Define a value to add after scaling. For example, if we wanted to convert Kelvin to degrees Celsius, we could subtract 273.15 from the scaled Kelvin value to get the Celsius value
+  -e,   --exp
+                    Define a simple expression (formula) to apply to your data. This formula is  applied to the input pixel values to get the target values. For example, Pixel value = a, we want the value b to be produced. The Expression we use is "b = 2a + 123"
+  -a, --accumulate
+                    This lovely little piece of script allows you to cumulatively sum all the raster images in a source folder, and produce a single file in the target folder. For example if you have a set of five 1/0 mask files, with different mask extents in a source folder, the script will sum all of them together. This produces a single mask file in the target folder with values of 1,2,3,4 and 5.
+
+This script was written using Python 2.7.
+
+It was created by Julius Schroeder, during his internship at the MaREI Centre for Marine and Renewable Energy, ERI, UCC, in July 2018. This was done as part of work under the H2020-CoReSyF initiatives Research Applications package.
+"""
+
+#Step 1) Import required python modules
 
 
-"""This module provide simple raster calucation functionality"""
+import argparse     # Gives usage instructions and tool details via the command line interface
+import os           # Enables a suite of miscellaneous operating system interfaces (extra to the sys module) which expands the range of system functionalities you can use)
+import rasterio     # Enables a set of raster processing functionalities (which are based on GDAL functions)
+import shutil       # Enables a suite of file management capabilities
+import subprocess   # Enables the python script here to call an external programme to do some work
+import sys          # Enables a suite of system-specific functions and parameters (to help run things)
+import tempfile     # Creates temporary files and dictionaries (e.g. hold information from a previous image)
+from pathlib2 import Path   # Enables a set of object-based path functionalities, i.e. setting file paths and being able to manipulate them.
+
+
+#Step 2) Define a set of functions to be called upon
 
 
 def get_inputs(folder, pattern="*.img"):
@@ -28,7 +70,7 @@ def create_temp_copy(path):
 
 
 def build_target_path(input, target_folder):
-    """Build target like target_folder/input"""
+    """Build target-like target_folder/input"""
     return Path(target_folder / input.name)
 
 
@@ -136,8 +178,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog="calc_expression",
         description="""
-        This tool use expression to caluclate target from .
+        This script uses GDAL expressions/formula (e.g y= A + 230, where A is a raster array) which can be applied to every element, i.e. pixel, in your raster image.
 
+        This workflow assumes that the filename contains a date, in the form YYYYMMDD (e.g. 20180802).
+
+        The filename of the output file in the target folder will be the same as the input filename. You need to create a target folder and allocate it as the target location (otherwise the script will not work). This is particularly relevant when the script is processing a list of files contained in a folder (option 3 above).
         """,
         epilog="""Examples:
         """,
@@ -147,45 +192,51 @@ if __name__ == '__main__':
     parser.add_argument(
         'source',
         nargs='+',
-        help='Input file path oder list of pathes')
+        help='Input file path, or list of paths, or input folder path'
+    )
 
     parser.add_argument(
         'target',
-        help='Target file path')
+        help='Target file path, or target folder to be populated with generated files'
+    )
 
     parser.add_argument(
         '-p',
         '--pattern',
         default="*.img",
         type=str,
-        help='Pattern to search for input files if source is a directory. Like "*analysed_sst.img"')
+        help='A filename pattern to search for, in the case where an input folder path contains a range of files (such as mask files and measurement files). For example, if a folder contains a number of files with the string "analysed_SST" in their filename, the script will only process those files with "analysed_SST" in their filename.'
+    )
 
     parser.add_argument(
         '-s',
         '--scale',
         default=1,
         type=float,
-        help='Factor to scale the data')
+        help='Factor to scale the data, i.e. a float number by which all pixels are multiplied. For example for storage reasons temperature in Kelvin is often stored as an integer (e.g.27415 as opposed to 274.15), so we multiply the data by a scaling factor of 0.01 to get it to the correct value.'
+    )
 
     parser.add_argument(
         '-x',
         '--offset',
         default=0,
         type=float,
-        help='Value to add after scaling')
+        help='Value to add after scaling. For example, if we wanted to convert Kelvin to degrees Celsius, we could subtract 273.15 from the scaled Kelvin value to get the Celsius value'
+    )
 
     parser.add_argument(
         '-e',
         '--exp',
         default=None,
         type=float,
-        help='Expression')  # TODO: explian input arguments
+        help='Expression. Formula which is applied to the input pixel values to get the target values. For example, Pixel value = a, we want the value b to be produced. The Expression we use is "b = 2a + 123"')  # TODO: explian input arguments
 
     parser.add_argument(
         '-a',
         '--accumulate',
         action='store_true',
-        help='Accumulate by y=(A + B) with A = current file and B privoius result.')
+        help='Accumulate by y=(A + B) when A = current file and B is the previous file, or result of a previous addition. This awesome tool allows you to cumulatively sum all the raster images in a source folder, and produce a single file in the target folder. For example if you have a set of five 1/0 mask files, with different mask extents in a source folder, the script will sum all of them together. This produces a single mask file in the target folder with values of 1,2,3,4 and 5.'
+        )
 
     args = parser.parse_args()
 
