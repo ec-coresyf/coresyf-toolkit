@@ -148,8 +148,8 @@ def create_stack(template_pair, ds_path, variables, dtype='float32'):
 
 
 
-        temp_dim_lat = np.linspace(start_y, stop_y, data.width)
-        temp_dim_lon = np.linspace(start_x, stop_x, data.height)
+        temp_dim_lat = np.linspace(start_y, stop_y, data.height)
+        temp_dim_lon = np.linspace(start_x, stop_x, data.width)
 
         # get meta data
         no_data = data.nodata
@@ -175,7 +175,7 @@ def create_stack(template_pair, ds_path, variables, dtype='float32'):
         stack_var = stack.createVariable(
             name,
             datatype=dtype,
-            dimensions=("date", "lon", "lat"),
+            dimensions=("date", "lat", "lon"),
             zlib=True,
             fill_value=no_data
         )
@@ -234,6 +234,8 @@ def stacking(inputs, variables, output):
 
             stack_data[index, :, :] = data.read(1)
             stack_mask[index, :, :] = mask.read(1)
+            stack_data[index, :, :] = np.flip(data_values, 0)
+            stack_mask[index, :, :] = np.flip(mask_values, 0)
             stack.variables["date"][index] = date2num(date, "days since 1-01-01 00:00:00 UTC", 'gregorian')
 
     stack.close()
