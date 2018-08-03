@@ -97,7 +97,9 @@ def get_expression(offset=0, exp=None, scale=None):
 
 
 def which(pgm):
-    """Search for pgm in PATH"""
+    """Search for pgm (a python programme executable) in the PATH
+    The PATH is a variable in the Operating system within which this .py script runs. It is included to ensure the python script here can run on any computer, as the path between this file and Python.exe can differe between computers.)"""
+
     path = os.getenv('PATH')
     for p in path.split(os.path.pathsep):
         p = os.path.join(p, pgm)
@@ -106,8 +108,10 @@ def which(pgm):
 
 
 def build_command(input, target, exp, no_data_value=None, previous=None):
-    """build command for gdal_calc
-    Set no data value explicitly from input file if not given as parameter.
+    """Creates a string containing all gdal calc instructions and parameters
+
+    This enables a calculation to be run using gdal_calc.
+    Nnote you need to remember to set the value representing no data, as if not, it will by default use the value currently in the input raster image.
     """
     if not no_data_value:
         with rasterio.open(str(input)) as ds:
@@ -117,8 +121,6 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
         sourceraster = '-A "{}" -B "{}" '.format(input, previous)
     else:
         sourceraster = '-A "{}" '.format(input)
-
-    # TODO: set creation option like comrpession
 
     command = "".join([
         sys.executable,
@@ -139,10 +141,11 @@ def build_command(input, target, exp, no_data_value=None, previous=None):
 
 def accumulate_files(inputs, target):
     """
-    This accumulates all input files to one target file.
+    This instruction accumulates all input files to one target file.
 
-    Simple expression like target = (A + B) with A is current input and B is the
-    privoius result is used. It returns a list of commands.
+    The lovely little piece of script allows you to cumulatively sum all the raster images in a source folder, and produce a single file in the target folder. For example if you have a set of five 1/0 mask files, with different mask extents in a source folder, the script will sum all of them together. This produces a single mask file in the target folder with values of 1,2,3,4 and 5.
+
+    This uses a simple expression/formula  ( target = (A + B) with A is current input and B is the previous result) is used. The script builds the instructions, and then implements (calls) it.
     """
 
     pre_file = None
@@ -161,19 +164,28 @@ def accumulate_files(inputs, target):
 
 
 def use_scale_offset(input, target, scale, offset):
-    """Scale and offset data"""
+    """Scale and offset data
+
+    When you choose to add values into the offset, or scale options, this set of code builds these into a command/instruction with an integrated expression/formula to be implemented.
+    """
     # one file: scal offset only
     exp = get_expression(offset=offset, scale=scale)
     return build_command(str(input), str(target), exp)
 
 
 def use_custom_expression(input, target, exp):
-    """Caluclate data with custom expression"""
+    """Calculate data using a custom formula
+
+    When you choose to add a simple custom expression, this set of code builds these into a command/instruction with an integrated expression/formula to be implemented.
+    """
     exp = get_expression(exp)
     return build_command(str(input), str(target), exp)
 
 
 def call_command(command):
+    """
+    Implements the instruction (given as a string) to run the calculation
+    """
     output = subprocess.check_call(
         command,
         stderr=subprocess.STDOUT,
@@ -267,6 +279,7 @@ if __name__ == '__main__':          #a piece of script which allows you to impor
     else:
         target_folder = None
 
+    # offset, scale, exp, and accumulate input parameters are converted into class properties for implementation by the command instructions using args.
     offset = args.offset
     scale = args.scale
     exp = args.exp
@@ -276,14 +289,25 @@ if __name__ == '__main__':          #a piece of script which allows you to impor
     if accumulate:
         accumulate_files(sources, target)
     else:
-        for i, raster in enumerate(sources, 1):
+        for i, raster in enumerate(sources, 1): # enumerate = to go through the list of input files one by one
             print("Process {} of {}".format(i, len(sources)))
 
             if target_folder:
                 target = build_target_path(raster, target_folder)
 
-            if not exp:
-                out = call_command(use_scale_offset(raster, target, scale=scale, offset=offset))
-            else:
-                out = call_command(use_custom_expression(raster, target, exp=exp))
+            if not exp: # implemented when we only have the scale and offset arguments
+                scale_offset_command = use_scale_offset(
+                    raster,
+                    target,
+                    scale, 
+                    offset
+                )
+                out = call_command(scale_offset_command)
+            else:   # implemented when we only have the expression/formula argument
+                expression_command = use_custom_expression(
+                    raster,
+                    target,
+                    exp
+                )
+                out = call_command(expression_command)
             print(out)
