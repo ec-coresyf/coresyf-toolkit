@@ -2,28 +2,43 @@
     "name": "CoReSyFDataCubeCreation",
     "type": "DataCubeCreation",
     "description":
-        "This tool extract spatial data from a bunch of netCDF files in a folder by bounding box and creates a stacked 3D data cube of grid data.",
+        "This tool reads raster files from a folder to create a three dimensional data structure, called data cube. The three dimensions are latitude, longitude and date. The raster files are stacked along the date dimension. This means that every slice corresponded to the raster file of one record. The raster file values will extract and saved as variables for every slice. To separate raster files witch containing data values from mask values, the use has to define the part of the file names to distinguish the files by setting <data_name> and <mask_name>. Optional an <extension> parameter can by set to define the type of raster file to be read from.
+        ",
     "inputs": [
         {
             "identifier": "Ssource",
             "name": "source",
-            "description": "Path to a folder containing the input NetCDF dataset files.",
+            "description": "Location as string, of a folder who contained all input raster files",
             "type": "string"
           }
     ],
     "parameters": [
         {
-            "identifier": "var",
-            "name": "variables",
-            "description": "Variables to extract from dataset. String of names separated by comma.",
+            "identifier": "data_name",
+            "name": "data_name",
+            "description": "String to select data files by file name from source folder.",
             "type": "string"
+        },
+        {
+            "identifier": "mask_name",
+            "name": "mask_name",
+            "description": "String to select mask files by file name from source folder.",
+            "type": "string",
+            "default": "mask"
+        },
+        {
+            "identifier": "extension",
+            "name": "extension",
+            "description": "Defined the file type witch should be selected.",
+            "type": "string",
+            "default": ".img"
         }
     ],
     "outputs": [
         {
             "identifier": "Ttarget",
             "name": "target",
-            "description": "Target path for the data cube file.",
+            "description": "Location to write data cube as netCDF file.",
             "type": "string"
         }
     ]
