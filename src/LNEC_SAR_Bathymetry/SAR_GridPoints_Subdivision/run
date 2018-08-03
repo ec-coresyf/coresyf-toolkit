@@ -107,7 +107,7 @@ ext_output = '.' + args.output.split('.')[-1]
 
 if len(ComputationPoints)>0:
 	for i, point in enumerate(ComputationPoints):
-		fname = rootname_output + ext_output
+		fname = args.output
 		data = CL.InversionData(parameters, point) 
 		data.pickle(fname)
 
