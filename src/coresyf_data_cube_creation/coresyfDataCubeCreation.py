@@ -1,22 +1,35 @@
+#!/usr/bin/env python
 # coding: utf-8
-# ! python2
-"""This module collects function to creates 3D data cube of grid data.
 
-The data cube is a 3D data structure grid with following axes:
+"""This creates a three dimensional data structure called a "datacube" in netCDF format.
 
-    1. time
-    2. columns
-    3. rows
+This script reads raster files from a folder defined by the <source> parameter.
+To separate raster files witch containing data values from mask values,
+the user has to define the part of the file names by setting <data_name> and <mask_name>.
+Optionally, an <extension> parameter can by set to define the file type to be read.
 
-The 3D data structure is a NetCDF file. Each slice of this axes is array of data for one day.
-The grid structure is defined by columns and rows with additional dimensions.
+To find pairs of data and mask files the script detects the date of record for
+every file. For this, the file name must contains the date in the form
+of YYYYMMDD (i.e. 20110103).
+At first the date information is used to match pairs of same-date data and mask files.
+This date is then used to sort the component images along the axis of time.
+
+The datacube structure has three dimensions (axes):
+    latitude
+    longitude
+    time
+
+The raster files are stacked along the date dimension. This means that every slice
+corresponded to one data and one mask raster file. The values of both files are
+extracted and saved as variables for every slice.
 """
 
 __author__ = "Julius Schroeder"
 __version__ = "0.0.1"
-__copyright__ = "Copyright 2018, MaREI Centre for Marine and Renewable Energy"
+__copyright__ = "Copyright 2018, MaREI Centre for Marine and Renewable Energy, Environmental Research Institute, University College Cork"
 
 # import python modules
+
 import dateutil.parser
 import glob
 import itertools
@@ -26,9 +39,6 @@ import os
 import rasterio as rio
 import sys
 import time
-
-
-
 from collections import namedtuple
 from dateutil.parser import parse
 from pathlib2 import Path
@@ -53,7 +63,7 @@ def get_inputs(folder, data="", mask="", extension=".img"):
         Data file name
 
     mask: str
-        Data file name
+        Mask file name
 
     extension: str
         File type extension
@@ -108,7 +118,7 @@ def get_inputs(folder, data="", mask="", extension=".img"):
 
 
 def create_stack(template_pair, ds_path, variables, dtype='float32'):
-    """This open a NetCDF4 file and creates basic stack structure.
+    """This opens a NetCDF4 file and creates the 3-D stack structure.
 
     Parameters
     ----------
@@ -120,8 +130,8 @@ def create_stack(template_pair, ds_path, variables, dtype='float32'):
 
     Returns
     -------
-    stack: file object
-        Stack as open file handle.
+    stack: netCDF file object
+        i.e. the datacube stack structure, as an open file handle (i.e. the object is linked to an open file which can be written into, as opposed to having to open and close it repeatedly).
 
     """
 
@@ -192,7 +202,7 @@ def create_stack(template_pair, ds_path, variables, dtype='float32'):
 
 
 def stacking(inputs, variables, output):
-    """This loob over inputs, extract data, write slices to file.
+    """This loops over inputs, extracts data, and writes slices to file.
 
     Parameters
     ----------
@@ -201,17 +211,11 @@ def stacking(inputs, variables, output):
         List of tuples holding input files and date e.g. (date, data1, data2).
 
     variables: list
-        Variables to stack. Define data an mask variable from input.
+        Variables to incorporate into the stack.
+        It defines the data and mask variables from input.
 
     output: string
-        Path to the 3D file.
-
-    Side effect
-    -------
-    Create 3D stack file from inputs file.
-
-    Example
-    -------
+        This is the filepath to the output netCDF file.
     """
 
     logging.info('Create {} file.'.format(output))
@@ -232,8 +236,9 @@ def stacking(inputs, variables, output):
             stack_data = stack.variables[variables[0]]
             stack_mask = stack.variables[variables[1]]
 
-            stack_data[index, :, :] = data.read(1)
-            stack_mask[index, :, :] = mask.read(1)
+            data_values = data.read(1)
+            mask_values = mask.read(1)
+
             stack_data[index, :, :] = np.flip(data_values, 0)
             stack_mask[index, :, :] = np.flip(mask_values, 0)
             stack.variables["date"][index] = date2num(date, "days since 1-01-01 00:00:00 UTC", 'gregorian')
@@ -242,16 +247,19 @@ def stacking(inputs, variables, output):
 
 
 class CoReSyFDataCubeCreation(CoReSyFTool):
-
+"""
+This class contains a data cube creation method wich is called when the CoReSyFDataCubeCreation() class is called. It has been specifically designed to enable the data cube creation tool to be integrated into the Co-ReSyF platform.
+"""
     def run(self, bindings):
-
+        """A method which reads the input parameters, creates a data structure and populates the data structure with data and mask data.
+        """
         # parse Parameters
         folder = bindings['Ssource']
-        data_name = bindings['Ddata_name']
-        mask_name = bindings['Mmask_name']
-        extension = bindings['.img']
-        variables = tuple(bindings['var'].split(','))
+        data_name = bindings['data_name']
+        mask_name = bindings['mask_name']
+        extension = bindings['extension']
         output = bindings['Ttarget']
+
 
         try:
             inputs = get_inputs(folder, data=data_name, mask=mask_name, extension=extension)
@@ -260,8 +268,9 @@ class CoReSyFDataCubeCreation(CoReSyFTool):
             logging.debug((os.strerror(e.errno)))
             sys.exit()
 
+        variable_names = (data_name, mask_name)
         try:
-            stacking(inputs, variables, output)
+            stacking(inputs, variable_names, output)
         except Exception as e:
             raise e
             sys.exit()
