@@ -1,0 +1,23 @@
+{
+    "name": "Coresyf_OHMA_Separability_Calculator",
+    "type": "OHMA_Separability_Calculator",
+    "description": 
+        "Tool to calculate measures of separability (Jeffries Mathusita Index, and Divergence), and determine the minumum and average separability values, from an excel sheet containing the relevant mean vector, and covariance matrix data. 2 outputs are generated, a text file containing the Average and Minimum Separability measures for all cluster outputs for which a signature file has been generated, and a second, per-input file separability summary detailing the pairwise separability calculations for each cluster described in the signature (.xlxs) file.",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Filepath of the input .xlxs files containing the per-cluster mean vector and covariance matrix data",
+            "type": "text"
+        }
+    ],
+    "parameters": [],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Filepath of the output textfiles which contain the overall minimum and maximum separability measures, for a range of cluster output options, and the more detailed textfile with the pairwise calculations between a cluster-output's clusters.",
+            "type": "text"
+        }
+    ]
+}
