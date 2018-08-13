@@ -1,0 +1,5 @@
+from coresyf_OHMA_Separability_Calculator import CoresyfOHMASeparabilityCalculator # from the .py file, import the Class containing the run method.
+
+if __name__ == '__main__':
+    CoresyfOHMASeparabilityCalculator(__file__,
+                        'coresyf_OHMA_Separability_Calculator.manifest.json').execute()
