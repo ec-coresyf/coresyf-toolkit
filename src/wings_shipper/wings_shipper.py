@@ -18,6 +18,10 @@ from wings_api.data import ManageData
 @click.option('--wdomain', help='Wings domain to use')
 @click.option('--wuser', help='Username for wings domain')
 @click.option('--wpass', help='Password for username')
+def run_deploy_application(ipath, wurl, wdomain, wuser, wpass):
+    deploy_application(ipath, wurl, wdomain, wuser, wpass)
+
+
 def deploy_application(ipath, wurl, wdomain, wuser, wpass):
     """The wrapper function to deploy the wings app"""
     try:
@@ -260,4 +264,4 @@ class WingsShipper(object):
 
 
 if __name__ == '__main__':
-    deploy_application()
+    run_deploy_application()
