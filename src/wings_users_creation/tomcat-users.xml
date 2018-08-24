@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<tomcat-users xmlns="http://tomcat.apache.org/xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd" version="1.0">
+  <!--
+  NOTE:  By default, no user is included in the "manager-gui" role required
+  to operate the "/manager/html" web application.  If you wish to use this app,
+  you must define such a user - the username and password are arbitrary.
+-->
+  <!--
+  NOTE:  The sample user and role entries below are wrapped in a comment
+  and thus are ignored when reading this file. Do not forget to remove
+  <!.. ..> that surrounds them.
+-->
+  <!--
+  <role rolename="tomcat"/>
+  <role rolename="role1"/>
+  <user username="tomcat" password="tomcat" roles="tomcat"/>
+  <user username="both" password="tomcat" roles="tomcat,role1"/>
+  <user username="role1" password="tomcat" roles="role1"/>
+-->
+  <role rolename="admin-gui"/>
+  <role rolename="manager-gui"/>
+  <role rolename="WingsUser"/>
+  <role rolename="WingsAdmin"/>
+  <user username="admin" password="ptp2ta" roles="admin-gui,manager-gui,WingsUser,WingsAdmin"/>
+  <user username="nugg" password="nuggcoresyf2017" roles="WingsUser"/>
+  <user username="rccc" password="avidacosta" roles="WingsUser"/>
+  <user username="tigm" password="tigmtigm" roles="WingsUser"/>
+  <user username="akavanagh" password="#akavanagH!" roles="WingsUser"/>
+  <user username="anobre" password="#anobrE!" roles="WingsUser"/>
+  <user username="clira" password="#clirA!" roles="WingsUser"/>
+  <user username="dhaberlin" password="#dhaberliN!" roles="WingsUser"/>
+  <user username="fcampuzano" password="#fcampuzanO!" roles="WingsUser"/>
+  <user username="rmartins" password="#rmartinS!" roles="WingsUser"/>
+  <user username="tferradosa" password="#tferradosA!" roles="WingsUser"/>
+  <user username="dmendes" password="#dmendeS!" roles="WingsUser"/>
+  <user username="mith" password="mithmith" roles="WingsUser"/>
+  <user username="rory" password="roryrory" roles="WingsUser"/>
+  <user username="username" password="JQZF5V" roles="WingsUser"/>
+  <user username="ndayoub" password="LQ1F5E" roles="WingsUser"/>
+  <user username="hmsnaith" password="KBPWBN" roles="WingsUser"/>
+  <user username="rserra" password="VU2NBQ" roles="WingsUser"/>
+  <user username="c2Vtc2xleSA=" password="R642CC" roles="WingsUser"/>
+  <user username="rscarrott" password="EFAOXT" roles="WingsUser"/>
+  <user username="aazevedo" password="48A01B" roles="WingsUser"/>
+  <user username="fsancho" password="2ZB1PO" roles="WingsUser"/>
+  <user username="fclira" password="7F9VTZ" roles="WingsUser"/>
+  <user username="cHZpbGFyIA==" password="59XTRT" roles="WingsUser"/>
+  <user username="dGZlcnJhZG9zYSA=" password="WAWTV2" roles="WingsUser"/>
+  <user username="YW5vYnJlIA==" password="36ZYWM" roles="WingsUser"/>
+  <user username="cmptYXJ0aW5zIA==" password="6PBGCD" roles="WingsUser"/>
+  <user username="nunogro" password="JDZQC4" roles="WingsUser"/>
+  <user username="rirr" password="XFCZ0Q" roles="WingsUser"/>
+  <user username="nucc" password="1RX56H" roles="WingsUser"/>
+  <user username="eboissier-coresyf" password="EOEW5N" roles="WingsUser"/>
+  <user username="pcipollini" password="MSVH17" roles="WingsUser"/>
+  <user username="cvincent" password="3OYOHM" roles="WingsUser"/>
+  <user username="fbirrien" password="NNVYG5" roles="WingsUser"/>
+  <user username="amoura" password="GHHBUS" roles="WingsUser"/>
+  <user username="hcaumont" password="J0B5SW" roles="WingsUser"/>
+  <user username="etuohy" password="N3AXVT" roles="WingsUser"/>
+  <user username="mall" password="Y0DQF8" roles="WingsUser"/>
+  <user username="campuzanofj" password="7R4NNJ" roles="WingsUser"/>
+  <user username="herve" password="P07CS7" roles="WingsUser"/>
+  <user username="mhennen" password="1UW1BZ" roles="WingsUser"/>
+  <user username="ppinto" password="RUVQ3C" roles="WingsUser"/>
+  <user username="llamas" password="4XOYID" roles="WingsUser"/>
+  <user username="rdennehy" password="VLB548" roles="WingsUser"/>
+  <user username="jschroder" password="0TCY0M" roles="WingsUser"/>
+  <user username="kpanda" password="S73GRK" roles="WingsUser"/>
+  <user username="crossi" password="KQ5HI6" roles="WingsUser"/>
+</tomcat-users>
+
