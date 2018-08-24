@@ -1,0 +1,14 @@
+CoReSyFLand-Sea-Mask
+CoReSyFSubset
+CoReSyFAdaptiveThresholding     
+CoReSyFObjectDiscrimination                                              
+create_dummy_raster                     
+CoReSyFSpeckleFilter               
+SAR_Calibration_with_ECRD_SpeckleFilter  
+SAR_Calibration_with_ECGG_SpeckleFilter  
+CoReSyF-Oil-Spill-Detection
+CoReSyFImageMask  
+CoReSyFRasterToPolygon 
+CoresyfTiling 
+CoresyfImageCrop 
+CoresyfImageReclassification  
