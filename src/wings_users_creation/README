@@ -1,0 +1,24 @@
+Command
+---------------------------------------------------
+python message.py youruserlist.txt yourxmlfile.xml --send_email
+
+
+
+youruserlist.txt Composition
+---------------------------------------------------
+username email
+ex:
+Ricardo ricardo@gmail.com
+Diogo diogo@hotmail.com
+
+message.py
+---------------------------------------------------
+Email server is hardcoded to gmail
+Need to change your sender email and respective password
+You can also change the subject and message of the email, all of this in the writeEmail
+This script won't add duplicate usernames to the XML
+
+NOTE: Remove the "--send_email" flag if you do not want to send emails. 
+
+
+IMPORTANT: you may need to change the permissions of your sender email to allow access to less safe aplications
