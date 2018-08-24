@@ -36,6 +36,4 @@ jschroder Julius-Schroeder@posteo.de
 kpanda koushik.panda@elecnor.es
 crossi cesare.rossi@terradue.com
 usertest marianavploureiro@gmail.com
-tigm tiago.mendes@deimos.com.pt
-riaa ricardo.alberto@deimos.com.pt
 mith miguel.terra@deimos.com.pt
