@@ -18,8 +18,7 @@
   <user username="role1" password="tomcat" roles="role1"/>
 -->
 
-  <user username="rccc" password="avidacosta" roles="WingsUser"/>
-  <user username="mith" password="mithmith" roles="WingsUser"/>
+  <user username="REPLACE_BY_VALID_USERNAME" password="REPLACE_BY_VALID_USER_PASSWORD" roles="WingsUser"/>
 
 </tomcat-users>
 

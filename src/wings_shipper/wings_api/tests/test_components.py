@@ -4,6 +4,9 @@ from ..data import ManageData
 import json
 
 
+PASSWORD = ''
+
+
 class ApplicationsTestCase(unittest.TestCase):
     '''
         Application API test case
@@ -14,7 +17,7 @@ class ApplicationsTestCase(unittest.TestCase):
     def setUp(self):
         self.component_instance = ManageComponents(
             'http://wings:8080/wings', 'admin', 'blank')
-        self.component_instance.login('ptp2ta')
+        self.component_instance.login(PASSWORD)
 
     def test_can_get_type_id(self):
         """Tests if it is possible to retrieve the correct component id in three scenarios:
@@ -125,7 +128,7 @@ class ApplicationsTestCase(unittest.TestCase):
         # We need to create a data type
         data_instance = ManageData(
             'http://wings:8080/wings', 'admin', 'blank')
-        data_instance.login('ptp2ta')
+        data_instance.login(PASSWORD)
         data_instance.new_data_type('Raster')
 
         # We need to create the components first

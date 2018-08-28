@@ -5,7 +5,7 @@ simply by specifying:
 * the path to the wings domain (containing the workflows and tools definition)
 * the file containg the list of tools to be deployed (*NOTE:* this step is required because for unknown reasons the tools
 are not correctly defined during the domain import).
-* the list of Wings users to deploy  
+* the tomcat XML file with the list of Wings users to deploy  
 
 ## Usage
 1. Invoke the `wings_domain_import.py` script
