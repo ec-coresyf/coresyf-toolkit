@@ -59,12 +59,6 @@
             "collection": true,
             "description": "List with output file names (subsets#.out) for FFT determination (to be used by Wings)",
             "type": "LnecTile"
-        },
-        {
-            "identifier": "param",
-            "name": "param",
-            "description": "Parameters file for Wings (.ini file)",
-            "type": "ConfigFile"
         }
     ]
 }

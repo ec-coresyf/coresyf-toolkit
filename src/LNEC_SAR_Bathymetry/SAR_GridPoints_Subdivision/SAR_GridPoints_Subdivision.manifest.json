@@ -42,13 +42,6 @@
             "name": "output",
             "description": "Output transfer file (exception.out & Computation#.out)",
             "type": "LnecTile"
-        },
-        {
-            "default": "Config_Inversion.ini",
-            "identifier": "param",
-            "name": "param",
-            "description": "Parameters file for Wings (.ini file)",
-            "type": "ConfigFile"
         }
     ]
 }

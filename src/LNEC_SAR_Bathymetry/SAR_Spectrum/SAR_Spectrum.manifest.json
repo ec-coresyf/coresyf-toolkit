@@ -43,12 +43,6 @@
             "collection": false,
             "description": "Output transfer file (spectrum#.out)",
             "type": "LnecTile"
-        },
-        {
-            "identifier": "param",
-            "name": "param",
-            "description": "Parameters file for Wings (.ini file)",
-            "type": "ConfigFile"
         }
     ]
 }
