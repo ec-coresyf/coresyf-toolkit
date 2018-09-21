@@ -1,0 +1,188 @@
+{
+    "name": "coresyf_vessel_detection",
+    "type": "application",
+    "description": "CoReSyF vessel detection gpt",
+    "operation": {"graph": "vessel_detection.graph.xml"},
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "PgeoRegion",
+            "name": "auxiliary file",
+            "type": "string",
+            "description": "The subset region in geographical coordinates using WKT-format: POLYGON((<lon1> <lat1>, <lon2> <lat2>, ..., <lon1> <lat1>))",
+            "default": "'POLYGON ((-180 -90, -180 90, 180 90, 180 -90, -180 -90))'"
+        },
+        {
+            "identifier": "PauxFile",
+            "name": "auxiliary file",
+            "type": "string",
+            "description": "Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File' or 'External Auxiliary File'",
+            "options": ["Latest Auxiliary File", "Product Auxiliary File", "External Auxiliary File"],
+            "default": "'Product Auxiliary File'"
+        },
+        {
+            "identifier": "PcreateBetaBand",
+            "name": "create beta band",
+            "type": "boolean",
+            "description": "Create beta0 virtual band.",
+            "default": false
+        },
+        {
+            "identifier": "PcreateGammaBand",
+            "name": "create gamma band",
+            "type": "boolean",
+            "description": "Create gamma0 virtual band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputBetaBand",
+            "name": "output beta band",
+            "type": "boolean",
+            "description": "Output beta0 band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputGammaBand",
+            "name": "output gamma band",
+            "type": "boolean",
+            "description": "Output gamma0 band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputImageInComplex",
+            "name": "output image in complex",
+            "type": "boolean",
+            "description": "Output image in complex.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputImageScaleInDb",
+            "name": "output image scale in db",
+            "type": "boolean",
+            "description": "Output image scale.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputSigmaBand",
+            "name": "output sigma band",
+            "type": "boolean",
+            "description": "Output sigma0 band.",
+            "default": true
+        },
+        {
+            "identifier": "PimgResamplingMethod",
+            "name": "imgResamplingMethod",
+            "description": "Image Resampling Method. Value must be one of NEAREST_NEIGHBOUR', 'BILINEAR_INTERPOLATION', 'CUBIC_CONVOLUTION'",
+            "type": "string",
+            "options": ["NEAREST_NEIGHBOUR", "BILINEAR_INTERPOLATION", "CUBIC_CONVOLUTION"],
+            "default": "BILINEAR_INTERPOLATION"
+        },
+        {
+            "identifier": "Pfilter",
+            "name": "Filter",
+            "description": "Sets parameter 'filter' to <string>",
+            "options": ["None", "Boxcar", "Median", "Frost", "Gamma Map", "Lee", "Refined Lee", "Lee Sigma", "IDAN"],
+            "type": "string",
+            "default": "'Lee Sigma'"
+        },
+        {
+            "identifier": "PfilterSizeX",
+            "name": "FilterSizeX",
+            "description": "The Kernel x dimension",
+            "type": "int",
+            "default": 3
+        },
+        {
+            "identifier": "PfilterSizeY",
+            "name": "FilterSizeY",
+            "description": "The Kernel y dimension",
+            "type": "int",
+            "default": 3
+        },
+        {
+            "identifier": "PinvertGeometry",
+            "name": "invertGeometry",
+            "description": "Sets invertGeometry to <boolean>",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PlandMask",
+            "name": "landMask",
+            "description": "sets landMaks to <boolean>",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "identifier": "PuseSRTM",
+            "name": "useSRTM",
+            "description": "Set useSRTM to <boolean>",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "identifier": "PbackgroundWindowSizeInMeter",
+            "name": "Background Window Size in Meters",
+            "description": "Background window size",
+            "type": "float",
+            "default": 800.0
+        },
+        {
+            "identifier": "PestimateBackground",
+            "name": "Estimate Background",
+            "description": "Rough estimation of background threshold for quicker processing",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PguardWindowSizeInMeter",
+            "name": "Guard Window Size in Meters",
+            "description": "Guard window size",
+            "type": "float",
+            "default": 500.0
+        },
+        {
+            "identifier": "Ppfa",
+            "name": "Probability of False Alarm",
+            "description": "Probability of false alarm",
+            "type": "float",
+            "default": 6.5
+        },
+        {
+            "identifier": "PtargetWindowSizeInMeter",
+            "name": "Target Window Size In Meters",
+            "description": "Target window size",
+            "type": "int",
+            "default": 50
+        },
+        {
+            "identifier": "PmaxTargetSizeInMeter",
+            "name": "Max Target Size in meters",
+            "description": "Maximum target size",
+            "type": "float",
+            "default": 600.0
+        },
+        {
+            "identifier": "PminTargetSizeInMeter",
+            "name": "Min Target Size in meters",
+            "description": "Minimum target size",
+            "type": "float",
+            "default": 50.0
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "GeoTIFF"
+        }
+    ]
+}
