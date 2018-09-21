@@ -14,7 +14,7 @@
     "parameters": [
         {
             "identifier": "PgeoRegion",
-            "name": "auxiliary file",
+            "name": "subset region",
             "type": "string",
             "description": "The subset region in geographical coordinates using WKT-format: POLYGON((<lon1> <lat1>, <lon2> <lat2>, ..., <lon1> <lat1>))",
             "default": "'POLYGON ((-180 -90, -180 90, 180 90, 180 -90, -180 -90))'"
