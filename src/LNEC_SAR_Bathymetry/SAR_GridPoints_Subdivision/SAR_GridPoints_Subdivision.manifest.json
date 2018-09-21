@@ -8,7 +8,14 @@
         "collection": true,
         "description": "Input grid point files (spectrum.out) for point subdivision",
         "type": "LnecTile"
-    }],
+     },
+     {
+        "identifier": "bathymetry",
+        "name": "bathymetry",
+        "description": "Bathymetric grid in a txt or npz file or ESRI shapefile",
+        "type": "Grid"
+    }
+  ],
     "parameters": [{
             "default": 16.6,
             "identifier": "Tp",

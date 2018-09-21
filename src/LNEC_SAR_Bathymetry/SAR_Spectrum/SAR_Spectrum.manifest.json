@@ -8,7 +8,14 @@
         "collection": true,
         "description": "Input subset files (subsets#.out) for Spectrum and wavelength estimation",
         "type": "LnecTile"
-    }],
+    },
+    {
+        "identifier": "bathymetry",
+        "name": "bathymetry",
+        "description": "Bathymetric grid in a txt or npz file or ESRI shapefile",
+        "type": "Grid"
+    }
+    ],
     "parameters": [{
             "default": 100,
             "identifier": "offset_profiles",
