@@ -1,10 +1,11 @@
 {
-    "name": "sarPointsSubdivision",
+    "name": "sarPointsSubdivision_noPar",
     "type": "GridPointsSubdivision",
     "description": "Grid points subdivision.",
     "inputs": [{
         "identifier": "input",
         "name": "input",
+        "collection": true,
         "description": "Input grid point files (spectrum.out) for point subdivision",
         "type": "LnecTile"
     }],
@@ -40,6 +41,7 @@
     "outputs": [{
             "identifier": "output",
             "name": "output",
+            "collection": true,
             "description": "Output transfer file (exception.out & Computation#.out)",
             "type": "LnecTile"
         }

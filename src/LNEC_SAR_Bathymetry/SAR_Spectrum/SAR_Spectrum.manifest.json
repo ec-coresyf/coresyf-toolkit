@@ -1,10 +1,11 @@
 {
-    "name": "sarSpectrum",
+    "name": "sarSpectrum_noPar",
     "type": "FFT",
     "description": "Spectrum",
     "inputs": [{
         "identifier": "input",
         "name": "input",
+        "collection": true,
         "description": "Input subset files (subsets#.out) for Spectrum and wavelength estimation",
         "type": "LnecTile"
     }],
@@ -40,7 +41,7 @@
     "outputs": [{
             "identifier": "output",
             "name": "output",
-            "collection": false,
+            "collection": true,
             "description": "Output transfer file (spectrum#.out)",
             "type": "LnecTile"
         }

@@ -150,7 +150,7 @@ def Create_Subset_TransferFile(index, parameters, point, SubsetData, outlist):
     # save data
     Subset.pickle(transfer_file)
     
-def Create_TransferFile(args, point, datatype):
+def Create_TransferFile(args, point, datatype, index_file=-1):
     #----------------------------------------------------------------------------
     # Create transfer file to save : - grid point Spectrum and wavelength
     #                 - grid point information and depth estimate
@@ -168,10 +168,17 @@ def Create_TransferFile(args, point, datatype):
     
     #file name 
     if args.output:
-        transfer_file = args.output
+        if index_file == -1:
+            transfer_file = args.output
+        else:
+            transfer_file = args.output[index_file]
     else:
-        num = re.findall('\d+', args.input)
-        transfer_file = path + fname + str(num[0]) + '.out'
+        if index_file == -1:
+            num = re.findall('\d+', args.input)
+            transfer_file = path + fname + str(num[0]) + '.out'
+        else:
+            num = re.findall('\d+', args.input[index_file])
+            transfer_file = path + fname + str(num[0]) + '.out'
 
     #save data
     point.pickle(transfer_file)

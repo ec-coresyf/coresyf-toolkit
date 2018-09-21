@@ -27,47 +27,47 @@ import Toolbox.CSAR_PostProcessing as POST
 # input output
 ComputingParameterSpectrum, args = SP.InputSpectrumParameters()
 
+for index_file, input_file in enumerate(args.input):
+	# read parameters, point and subset data
+	fname = input_file
+	index = int(filter(str.isdigit, fname))
+	Subset = UT.Unpickle_File(fname)
+	SubsetsParameters, point, Subsets = Subset.parameters, Subset.point, Subset.SubsetData
 
-# read parameters, point and subset data
-fname = args.input
-index = int(filter(str.isdigit, fname))
-Subset = UT.Unpickle_File(fname)
-SubsetsParameters, point, Subsets = Subset.parameters, Subset.point, Subset.SubsetData
+	if args.verbose and index==0:
+		print '|-------------------------------------------|'
+		print '| Compute Spectra and estimate wavelengths  |'
+		print '|-------------------------------------------|'
 
-if args.verbose and index==0:
-	print '|-------------------------------------------|'
-	print '| Compute Spectra and estimate wavelengths  |'
-	print '|-------------------------------------------|'
+	##################################
+	# pb here
+	##################################
 
-##################################
-# pb here
-##################################
+	# compute global subset spectrum
+	Spectrum, OutputSpectrumData = SP.ComputeSpectrum(SubsetsParameters, ComputingParameterSpectrum, Subsets) 
+		
+	# create and store spectra and subsets figure for each grid point 
+	try:
+		POST.Plot_Subset_Spectrum(index, OutputSpectrumData, Spectrum)
+	except:
+		pass
+		
+	#********************************************
+	#  	Grid Point Distribution
+	#********************************************
+	# estimate wave number and determine offshore points
+	wavelength = Spectrum.WaveSpectrum.Wavelength
+	apriori_Bathymetry = point.apriori_bathymetry;
 
-# compute global subset spectrum
-Spectrum, OutputSpectrumData = SP.ComputeSpectrum(SubsetsParameters, ComputingParameterSpectrum, Subsets) 
-	
-# create and store spectra and subsets figure for each grid point 
-try:
-    POST.Plot_Subset_Spectrum(index, OutputSpectrumData, Spectrum)
-except:
-    pass
-	
-#********************************************
-#  	Grid Point Distribution
-#********************************************
-# estimate wave number and determine offshore points
-wavelength = Spectrum.WaveSpectrum.Wavelength
-apriori_Bathymetry = point.apriori_bathymetry;
+	#discriminate grid points (deep water, near deep water, nearshore, other)
+	Flag = INV.DiscriminateGridPoints(apriori_Bathymetry, wavelength)
 
-#discriminate grid points (deep water, near deep water, nearshore, other)
-Flag = INV.DiscriminateGridPoints(apriori_Bathymetry, wavelength)
+	#********************************************
+	#  	Gather and save point information
+	#********************************************
+	#gather point information
+	pt =  CL.GridPointsData(point.IndexEasting, point.IndexNorthing, point.easting, point.northing, apriori_Bathymetry, Spectrum, wavelength, Flag)
 
-#********************************************
-#  	Gather and save point information
-#********************************************
-#gather point information
-pt =  CL.GridPointsData(point.IndexEasting, point.IndexNorthing, point.easting, point.northing, apriori_Bathymetry, Spectrum, wavelength, Flag)
-
-#save point information
-UT.Create_TransferFile(args,pt,'Spectrum')
+	#save point information
+	UT.Create_TransferFile(args,pt,'Spectrum', index_file)
 
