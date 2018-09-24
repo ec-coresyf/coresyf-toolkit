@@ -1,0 +1,5 @@
+#!/usr/bin/python2
+from CoresyfPreProcessing import CoresyfPreProcessing
+
+if __name__ == '__main__':
+    CoresyfPreProcessing(__file__, 'sar_bathymetry_pre_processing.manifest.json').execute()
