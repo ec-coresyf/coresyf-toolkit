@@ -1,0 +1,5 @@
+from coresyf_OHMA_Separability_Decision import CoresyfOHMASeparabilityDecision # from the .py file, import the Class containing the run method.
+
+if __name__ == '__main__':
+    CoresyfOHMASeparabilityDecision(__file__,
+                        'coresyf_OHMA_Separability_Decision.manifest.json').execute()

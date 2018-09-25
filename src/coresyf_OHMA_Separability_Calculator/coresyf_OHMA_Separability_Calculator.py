@@ -281,7 +281,7 @@ def writeAvgMinOutputToTxt(outfilePathName1, finalOutput):
 #  i)  CoReSyFTool class, contains all those lovely functions which enable the tool to operate within the Co-ReSyF system (e.g. accessing the datasets in the cloud, appearing as a discrete tool in the workflow manager etc.)... all those things that someone has done to enable you to run your tool on the platform. Section 3 is an addition to your code to make your tool take on all these wonderful bits and use them (inherit).
 # ii) The CoresyfOHMASeparabilityDecision(CoReSyFTool) then contains a "Run method", which basically tells the system to implement the sequence of procedures/functions (opening files, checking the separability peaks and plateaus, making the decisions etc.), so all implementation codelines get put into the CoresyfOHMASeparabilityDecision(CoReSyFTool) class
 
-class CoresyfOHMASeparabilityDecision(CoReSyFTool):
+class CoresyfOHMASeparabilityCalculator(CoReSyFTool):
     """Contains the instructions to run all the functions contained in the Separability Calculator tool, supported by methods and functions described in the CoReSyFTool class.""" 
 
     def run(self, bindings): # this is a Method - n.b. "self" can stay as is, "bindings" does not need to be defined in your code
