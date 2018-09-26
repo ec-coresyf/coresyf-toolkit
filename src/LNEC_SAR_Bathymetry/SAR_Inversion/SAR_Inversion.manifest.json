@@ -1,26 +1,19 @@
 {
-    "name": "sarInversion_noPar",
+    "name": "sarInversion",
     "type": "Inversion",
     "description": "Inversion",
     "inputs": [{
         "identifier": "input",
         "name": "input",
-        "collection": true,
+        "collection": false,
         "description": "Input computation points files (\"Computation#.out\" pickle files) for depth inversion",
         "type": "LnecTile"
-    },
-    {
-        "identifier": "bathymetry",
-        "name": "bathymetry",
-        "description": "Bathymetric grid in a txt or npz file or ESRI shapefile",
-        "type": "Grid"
-    }
-    ],
+    }],
     "parameters": [],
     "outputs": [{
         "identifier": "output",
         "name": "output",
-        "collection": true,
+        "collection": false,
         "description": "Output transfer file (\"Inversion#.out\" pickle files) with inversion points data",
         "type": "LnecTile"
     }]

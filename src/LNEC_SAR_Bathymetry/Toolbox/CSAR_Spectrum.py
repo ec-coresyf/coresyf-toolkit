@@ -75,10 +75,8 @@ def InputSpectrumParameters():
 	
 	# input/ output files	
 	parser.add_argument('-a', '--param', help='Parameters file for Wings (.ini file)', default = 'Config_Spectrum.ini',required=False)
-	parser.add_argument('-i', '--input', nargs='+', help='Input subset files (subsets#.out) for Spectrum and wavelength estimation', required=True)
-	parser.add_argument('-o', '--output', nargs='+', help='Output transfer files (spectrum#.out)', required=False)
-	
-	parser.add_argument('-b', '--bathymetry', help='Shapefile with bathymetric grid. ', required=False)
+	parser.add_argument('-i', '--input', help='Input subset files (subsets#.out) for Spectrum and wavelength estimation', required=True)
+	parser.add_argument('-o', '--output', help='Output transfer file (spectrum#.out)', required=False)
 	
 	# parameters for direction estimate
 	parser.add_argument('-c', '--coast_orientation', help='Coast normal orientation (nautical convention ex: 270-> West facing)', default=270, required=False)

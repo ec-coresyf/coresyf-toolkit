@@ -1,21 +1,13 @@
 {
-    "name": "sarPointsSubdivision_noPar",
+    "name": "sarPointsSubdivision",
     "type": "GridPointsSubdivision",
     "description": "Grid points subdivision.",
     "inputs": [{
         "identifier": "input",
         "name": "input",
-        "collection": true,
         "description": "Input grid point files (spectrum.out) for point subdivision",
         "type": "LnecTile"
-     },
-     {
-        "identifier": "bathymetry",
-        "name": "bathymetry",
-        "description": "Bathymetric grid in a txt or npz file or ESRI shapefile",
-        "type": "Grid"
-    }
-  ],
+    }],
     "parameters": [{
             "default": 16.6,
             "identifier": "Tp",
@@ -48,7 +40,6 @@
     "outputs": [{
             "identifier": "output",
             "name": "output",
-            "collection": true,
             "description": "Output transfer file (exception.out & Computation#.out)",
             "type": "LnecTile"
         }

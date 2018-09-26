@@ -25,37 +25,33 @@ import Toolbox.CSAR_DepthInversion as INV
 
 # input output
 parser = argparse.ArgumentParser(description='Co-ReSyF: SAR Bathymetry Research Application')
-parser.add_argument('-i', '--input', nargs='+', help='Input computation points files ("Computation#.out" pickle files) for depth inversion', required=True)
-parser.add_argument('-o', '--output', nargs='+', help='Output transfer file ("Inversion#.out" pickle files) with inversion points data', required=False)
-
-parser.add_argument('-b', '--bathymetry', help='Shapefile with bathymetric grid. ', required=False)
-
+parser.add_argument('-i', '--input', help='Input computation points files ("Computation#.out" pickle files) for depth inversion', required=True)
+parser.add_argument('-o', '--output', help='Output transfer file ("Inversion#.out" pickle files) with inversion points data', required=False)
 parser.add_argument('-v', '--verbose', help='Screen comments', action="store_true")
 args = parser.parse_args()
 
-for index_file, input_file in enumerate(args.input):
-	# read parameters and point information
-	fname = input_file
-	index = int(filter(str.isdigit, fname))
-	PointInformation = UT.Unpickle_File(fname)
-	INV_parameters, point = PointInformation.InversionParameters, PointInformation.point
+# read parameters and point information
+fname = args.input
+index = int(filter(str.isdigit, fname))
+PointInformation = UT.Unpickle_File(fname)
+INV_parameters, point = PointInformation.InversionParameters, PointInformation.point
 
-	if index==0 and args.verbose:
-		print '|----------------------------------------|'
-		print '| 	Perform depth inversion		 |'
-		print '|----------------------------------------|'
+if index==0 and args.verbose:
+	print '|----------------------------------------|'
+	print '| 	Perform depth inversion		 |'
+	print '|----------------------------------------|'
 
-	# perform inversion
-	# parameters
-	method = INV_parameters.InversionMethod
-	Tp = float(INV_parameters.HydrodynamicParameters.Tp)
+# perform inversion
+# parameters
+method = INV_parameters.InversionMethod
+Tp = float(INV_parameters.HydrodynamicParameters.Tp)
 
-	#inversion
-	if method == 'direct' and (not np.isnan(Tp)):
-		Point = INV.DirectDepthInversion(point, Tp)
-	else:
-		sys.exit('Inversion method not defined // check that you provided the mandatory input hydrodynamic data')
+#inversion
+if method == 'direct' and (not np.isnan(Tp)):
+	Point = INV.DirectDepthInversion(point, Tp)
+else:
+	sys.exit('Inversion method not defined // check that you provided the mandatory input hydrodynamic data')
 
-	#save point information
-	UT.Create_TransferFile(args, Point, 'Inversion', index_file)
+#save point information
+UT.Create_TransferFile(args,Point,'Inversion')
 
