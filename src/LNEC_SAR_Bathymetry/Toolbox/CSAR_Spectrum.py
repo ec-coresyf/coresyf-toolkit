@@ -78,6 +78,8 @@ def InputSpectrumParameters():
 	parser.add_argument('-i', '--input', nargs='+', help='Input subset files (subsets#.out) for Spectrum and wavelength estimation', required=True)
 	parser.add_argument('-o', '--output', nargs='+', help='Output transfer files (spectrum#.out)', required=False)
 	
+	parser.add_argument('-b', '--bathymetry', help='Shapefile with bathymetric grid. ', required=False)
+	
 	# parameters for direction estimate
 	parser.add_argument('-c', '--coast_orientation', help='Coast normal orientation (nautical convention ex: 270-> West facing)', default=270, required=False)
 	

@@ -27,6 +27,9 @@ import Toolbox.CSAR_DepthInversion as INV
 parser = argparse.ArgumentParser(description='Co-ReSyF: SAR Bathymetry Research Application')
 parser.add_argument('-i', '--input', nargs='+', help='Input computation points files ("Computation#.out" pickle files) for depth inversion', required=True)
 parser.add_argument('-o', '--output', nargs='+', help='Output transfer file ("Inversion#.out" pickle files) with inversion points data', required=False)
+
+parser.add_argument('-b', '--bathymetry', help='Shapefile with bathymetric grid. ', required=False)
+
 parser.add_argument('-v', '--verbose', help='Screen comments', action="store_true")
 args = parser.parse_args()
 

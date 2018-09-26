@@ -39,6 +39,9 @@ parser = argparse.ArgumentParser(description='Co-ReSyF: SAR Bathymetry Research 
 parser.add_argument('-a', '--param', help='Parameters file for Wings (.ini file)', default = 'Config_Inversion.ini',required=False)
 parser.add_argument('-i', '--input', nargs='+', help='Input grid point files (spectrum.out) for point subdivision', required=False)
 parser.add_argument('-o', '--output', nargs='+', help='Output transfer file (exception.out & Computation#.out)', required=False)
+
+parser.add_argument('-b', '--bathymetry', help='Shapefile with bathymetric grid. ', required=False)
+
 #inversion parameters
 parser.add_argument('-l', '--tide', help='Tide level for depth correction', default=0,  required=False)
 parser.add_argument('-T', '--Tp', help='Peak Wave Period (buoys or model data)', default=12,  required=False)

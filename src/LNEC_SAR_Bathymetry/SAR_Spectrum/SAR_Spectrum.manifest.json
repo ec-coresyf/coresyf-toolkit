@@ -38,7 +38,7 @@
             "type": "float"
         },
         {
-            "identifier": "method_spectrum_estimate",
+            "identifier": "method",
             "name": "method_spectrum_estimate",
             "description": "method for spectrum estimate: derived from wave series (subscene) or from radial projection of the subscene spectrum",
             "default": "Radial",
