@@ -302,9 +302,12 @@ class CoresyfOHMASeparabilityCalculator(CoReSyFTool):
     def run(self, bindings):  # this is a Method - n.b. "self" can stay as is, "bindings" does not need to be defined in your code
 
         infile_path = bindings["Ssource"]  # sets the input file
-        outfile_path = bindings["Ttarget"]  # sets the output file
-        if not os.path.exists(outfile_path):
-            os.makedirs(outfile_path)
+        outfile_path = bindings["Ttarget1"]  # sets the output file
+        outfile_path2 = bindings["Ttarget2"]
+        # if not os.path.exists(outfile_path):
+        #     os.makedirs(outfile_path)
+        # if not os.path.exists(outfile_path2):
+        #     os.makedirs(outfile_path2)
         # TODO: change to logging module
         print("Open file from {}.".format(infile_path))
 
@@ -316,17 +319,17 @@ class CoresyfOHMASeparabilityCalculator(CoReSyFTool):
                 "Min_JM": []
             }
 
-        outfileName1 = "2011_SeparabilityOutputs.txt"
-        outfilePathName1 = os.path.join(outfile_path, outfileName1)
-        outfileName2 = "2011_SeparabilityOutputsDetails.txt"
-        outfilePathName2 = os.path.join(outfile_path, outfileName2)
+        # outfileName1 = "2011_SeparabilityOutputs.txt"
+        # outfilePathName1 = os.path.join(outfile_path, outfileName1)
+        # outfileName2 = "2011_SeparabilityOutputsDetails.txt"
+        # outfilePathName2 = os.path.join(outfile_path2, outfileName2)
 
         for infileName in os.listdir(infile_path):
             if infileName.endswith(".xlsx"):
                 infilePathName = os.path.join(infile_path, infileName)
                 workbook = xlrd.open_workbook(infilePathName, on_demand=True)
                 nClusterSep = implementAnalysis(infilePathName, workbook)
-                writeOutputDetailsToTxt(outfilePathName2, nClusterSep)
+                writeOutputDetailsToTxt(outfile_path2, nClusterSep)
 
                 finalOutput["n_ClustersSep"].append(
                     nClusterSep["n_ClustersSep"])
@@ -337,6 +340,6 @@ class CoresyfOHMASeparabilityCalculator(CoReSyFTool):
             else:
                 print("No more files to analyse")
 
-            writeAvgMinOutputToTxt(outfilePathName1, finalOutput)
+            writeAvgMinOutputToTxt(outfile_path, finalOutput)
 
             print("Separability Calculation Completed")

@@ -14,9 +14,15 @@
     "parameters": [],
     "outputs": [   
         {
-            "identifier": "Ttarget",
-            "name": "target",
-            "description": "Filepath of the output textfiles which contain the overall minimum and maximum separability measures, for a range of cluster output options, and the more detailed textfile with the pairwise calculations between a cluster-output's clusters.",
+            "identifier": "Ttarget1",
+            "name": "target1",
+            "description": "Filepath of the output textfile which contains the overall minimum and maximum separability measures, for a range of cluster output options",
+            "type": "text"
+        },
+        {
+            "identifier": "Ttarget2",
+            "name": "target2",
+            "description": "The more detailed textfile with the pairwise calculations between a cluster-output's clusters.",
             "type": "text"
         }
     ]
