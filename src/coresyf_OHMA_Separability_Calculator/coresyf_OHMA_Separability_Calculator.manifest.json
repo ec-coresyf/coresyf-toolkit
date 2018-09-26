@@ -7,7 +7,7 @@
         {
             "identifier": "Ssource",
             "name": "source",
-            "description": "Filepath of the input .xlxs files containing the per-cluster mean vector and covariance matrix data",
+            "description": "Filepath to the zipfile containing a folder with input .xlxs files containing the per-cluster mean vector and covariance matrix data",
             "type": "text"
         }
     ],
