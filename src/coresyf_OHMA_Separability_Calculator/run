@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 from coresyf_OHMA_Separability_Calculator import CoresyfOHMASeparabilityCalculator
 # i.e. from the .py file import the class describing the run method
 
