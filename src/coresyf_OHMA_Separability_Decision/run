@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 from coresyf_OHMA_Separability_Decision import CoresyfOHMASeparabilityDecision # from the .py file, import the Class containing the run method.
 
 if __name__ == '__main__':

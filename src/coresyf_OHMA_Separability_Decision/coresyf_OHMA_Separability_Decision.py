@@ -143,6 +143,11 @@ class CoresyfOHMASeparabilityDecision(CoReSyFTool):
         print opt_cluster # This is the output
  
         print("Open file from {}.".format(outfile_path)) # TODO: change to logging module
+
+        outfile_dir = os.path.split(outfile_path)[0]
+        if outfile_dir and not os.path.isdir(outfile_dir):
+            os.makedirs(outfile_dir)
+        
         out_file = open(outfile_path,"w")
         record_details(out_file, variable_to_write)
         out_file.close()
