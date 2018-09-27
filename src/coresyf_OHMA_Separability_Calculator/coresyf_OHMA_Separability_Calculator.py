@@ -303,11 +303,15 @@ class CoresyfOHMASeparabilityCalculator(CoReSyFTool):
 
         infile_path = bindings["Ssource"]  # sets the input file
         outfile_path = bindings["Ttarget1"]  # sets the output file
-        outfile_path2 = bindings["Ttarget2"]
-        # if not os.path.exists(outfile_path):
-        #     os.makedirs(outfile_path)
-        # if not os.path.exists(outfile_path2):
-        #     os.makedirs(outfile_path2)
+        outfile_path_details = bindings["Ttarget2"]
+
+        outfile_dir = os.path.split(outfile_path)[0]
+        outfile_details_dir = os.path.split(outfile_path_details)[0]
+
+        if outfile_dir and not os.path.isdir(outfile_dir):
+            os.makedirs(outfile_dir)
+        if outfile_details_dir and not os.path.isdir(outfile_details_dir):
+            os.makedirs(outfile_details_dir)
         # TODO: change to logging module
         print("Open file from {}.".format(infile_path))
 
@@ -329,7 +333,7 @@ class CoresyfOHMASeparabilityCalculator(CoReSyFTool):
                 infilePathName = os.path.join(infile_path, infileName)
                 workbook = xlrd.open_workbook(infilePathName, on_demand=True)
                 nClusterSep = implementAnalysis(infilePathName, workbook)
-                writeOutputDetailsToTxt(outfile_path2, nClusterSep)
+                writeOutputDetailsToTxt(outfile_path_details, nClusterSep)
 
                 finalOutput["n_ClustersSep"].append(
                     nClusterSep["n_ClustersSep"])
