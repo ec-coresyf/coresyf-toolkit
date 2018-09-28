@@ -28,7 +28,7 @@ prioritySnap () {
     else
         for n in $snapIds
         do
-            if [ "$iterator" -lt 6 ]
+            if [ "$iterator" -le 6 ]
             then
                 renice -n 0 -p $n
             fi
@@ -60,7 +60,7 @@ priorityGdal () {
     else
         for n in $snapIds
         do
-            if [ "$iterator" -lt 6 ]
+            if [ "$iterator" -le 6 ]
             then
                 renice -n 0 -p $n
             fi
