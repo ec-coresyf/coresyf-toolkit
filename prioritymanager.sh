@@ -8,9 +8,9 @@
 #this function changes the priority of snap processes when they exceed 15 processes
 prioritySnap () {
 
-    snapIds=$(pgrep snap)
+    snapIds=$(pgrep java)
     gdalIds=$(pgrep gdal) #shows all processes by id of this app
-    snapCount=$(pgrep -c snap) 
+    snapCount=$(pgrep -c java) 
     gdalCount=$(pgrep -c gdal) #get the number of processes running of an application
     iterator=0
     
