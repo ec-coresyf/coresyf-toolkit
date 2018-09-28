@@ -1,8 +1,10 @@
 #!/bin/bash
-#this script is suppose to run every minute. the functions in this script change the priority of snap and gdal processes
-#when they exceed 15 and when they are inferior to 15 as well
-#add the following on crontab: * * * * * for i in 0 1 2; do some_job & sleep 30; done; some_job
-#with some_job being this script, in order to run every 30seconds
+#this script is suppose to run every 30seconds. The functions in this script change the priority of java
+#(java because snap and wings use java to run the jobs) and gdal processes. When they exceed 7 processes
+#and when they are inferior or equal to 7 processes their priority are changed, using the nice value.
+#The following was added on crontab(using root): 
+#* * * * * /home/coresyf/prioritymanager/prioritymanager.sh
+#* * * * * ( sleep 30 ; /home/coresyf/prioritymanager/prioritymanager.sh )
 
 
 #this function changes the priority of snap processes when they exceed 15 processes
