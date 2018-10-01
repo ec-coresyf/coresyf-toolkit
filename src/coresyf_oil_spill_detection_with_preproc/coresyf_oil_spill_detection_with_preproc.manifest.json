@@ -1,0 +1,181 @@
+{
+    "name": "coresyf_oil_spill_detection_with_preproc",
+    "type": "application",
+    "description": "CoReSyF oil spill detection with preprocessing for a defined region/subset",
+    "operation": {"graph": "coresyf_oil_spill_detection_with_preproc.graph.xml"},
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Sets source to <filepath>",
+            "type": "Raster"
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "PgeoRegion",
+            "name": "subset region",
+            "type": "string",
+            "description": "The subset region in geographical coordinates using WKT-format: POLYGON((<lon1> <lat1>, <lon2> <lat2>, ..., <lon1> <lat1>))",
+            "default": "'POLYGON ((-180 -90, -180 90, 180 90, 180 -90, -180 -90))'"
+        },
+        {
+            "identifier": "PauxFile",
+            "name": "auxiliary file",
+            "type": "string",
+            "description": "Value must be one of 'Latest Auxiliary File', 'Product Auxiliary File' or 'External Auxiliary File'",
+            "options": ["Latest Auxiliary File", "Product Auxiliary File", "External Auxiliary File"],
+            "default": "'Product Auxiliary File'"
+        },
+        {
+            "identifier": "Ppolarisations",
+            "name": "Selected Polarisations",
+            "type": "string",
+            "description": "The list of Selected Polarisations to be processed.",
+            "default": "''"
+        },
+        {
+            "identifier": "PcreateBetaBand",
+            "name": "create beta band",
+            "type": "boolean",
+            "description": "Create beta0 virtual band.",
+            "default": false
+        },
+        {
+            "identifier": "PcreateGammaBand",
+            "name": "create gamma band",
+            "type": "boolean",
+            "description": "Create gamma0 virtual band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputBetaBand",
+            "name": "output beta band",
+            "type": "boolean",
+            "description": "Output beta0 band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputGammaBand",
+            "name": "output gamma band",
+            "type": "boolean",
+            "description": "Output gamma0 band.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputImageInComplex",
+            "name": "output image in complex",
+            "type": "boolean",
+            "description": "Output image in complex.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputImageScaleInDb",
+            "name": "output image scale in db",
+            "type": "boolean",
+            "description": "Output image scale.",
+            "default": false
+        },
+        {
+            "identifier": "PoutputSigmaBand",
+            "name": "output sigma band",
+            "type": "boolean",
+            "description": "Output sigma0 band.",
+            "default": true
+        },
+        {
+            "identifier": "PimgResamplingMethod",
+            "name": "imgResamplingMethod",
+            "description": "Image Resampling Method. Value must be one of NEAREST_NEIGHBOUR', 'BILINEAR_INTERPOLATION', 'CUBIC_CONVOLUTION'",
+            "type": "string",
+            "options": ["NEAREST_NEIGHBOUR", "BILINEAR_INTERPOLATION", "CUBIC_CONVOLUTION"],
+            "default": "BILINEAR_INTERPOLATION"
+        },
+        {
+            "identifier": "PpixelSpacingInDegree",
+            "name": "pixelSpacingInDegree",
+            "description": "The pixel spacing in degrees. Default value is '0'.",
+            "type": "string",
+            "default": "0"
+        },
+        {
+            "identifier": "PpixelSpacingInMeter",
+            "name": "pixelSpacingInMeter",
+            "description": "The pixel spacing in meters. Default value is '0'.",
+            "type": "string",
+            "default": "0"
+        },
+        {
+            "identifier": "Pfilter",
+            "name": "Filter",
+            "description": "Sets parameter 'filter' to <string>",
+            "options": ["None", "Boxcar", "Median", "Frost", "Gamma Map", "Lee", "Refined Lee", "Lee Sigma", "IDAN"],
+            "type": "string",
+            "default": "'Lee Sigma'"
+        },
+        {
+            "identifier": "PfilterSizeX",
+            "name": "FilterSizeX",
+            "description": "The Kernel x dimension",
+            "type": "int",
+            "default": 3
+        },
+        {
+            "identifier": "PfilterSizeY",
+            "name": "FilterSizeY",
+            "description": "The Kernel y dimension",
+            "type": "int",
+            "default": 3
+        },
+        {
+            "identifier": "PinvertGeometry",
+            "name": "invertGeometry",
+            "description": "Sets invertGeometry to <boolean>",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PlandMask",
+            "name": "landMask",
+            "description": "sets landMaks to <boolean>",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "identifier": "PuseSRTM",
+            "name": "useSRTM",
+            "description": "Set useSRTM to <boolean>",
+            "type": "boolean",
+            "default": false
+        },
+        {
+            "identifier": "PbackgroundWindowSize",
+            "name": "BackgroundWindowSize",
+            "description": "Background Window Size",
+            "type": "int",
+            "default": 13
+        },
+        {
+            "identifier": "Pk",
+            "name": "Threshold Shift",
+            "description": "Threshold shift from background mean",
+            "type": "float",
+            "default": 2.0
+        },
+        {
+            "identifier": "PminClusterSizeInKm2",
+            "name": "Minimum Cluster Size",
+            "description": "Minimum Cluster Size in square Kilometers",
+            "type": "float",
+            "default": 0.1
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Sets the target to <filepath>",
+            "type": "GeoTIFF"
+        }
+    ]
+}
