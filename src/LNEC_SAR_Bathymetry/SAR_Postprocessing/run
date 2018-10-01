@@ -26,6 +26,7 @@ import shutil
 # input output
 parser = argparse.ArgumentParser(description='Co-ReSyF: SAR Bathymetry Research Application')
 parser.add_argument('-i', '--input',nargs='+', help='Input files for grid points with inverted depth (Inversion.out) for bathymetry mapping', required=False)
+parser.add_argument('-e', '--exception', help='Input file names for deep/shallow water points', default='exception.sub', required=False)
 parser.add_argument('-o', '--output',nargs='+', help='Output file names', required=False)
 parser.add_argument('-v', '--verbose', help='Screen comments', action="store_true")
 args = parser.parse_args()
@@ -43,11 +44,11 @@ BathymetryPoints = []
 # get list of filenames () 
 ExceptionList, ExceptionPoints = [], []
 if args.input:
-	List = args.input
-	FileList, ExceptionList = UT.ListDichotomy(List)
+	FileList, ExceptionList = args.input, args.exception 
+	FileList, _ = UT.ListDichotomy(FileList)
 else:
-	FileList = [x for x in os.listdir('./') if x.startswith("Inversion")]
-	ExceptionList = [x for x in os.listdir('./') if x.startswith("ExceptionPoints")] 
+	FileList = [x for x in os.listdir('./') if x.endswith(".inv")]
+	ExceptionList = [x for x in os.listdir('./') if x.startswith("exception")] 
 
 # load Exception Points
 
@@ -88,5 +89,7 @@ for n,point in enumerate(Points):
 OutputFile.close()
 ###################################################
 
+#clean computation files
+[os.remove(L) for L in glob.glob('Spectrum*')], [os.remove(L) for L in glob.glob('*.sub')]
 
 

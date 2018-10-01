@@ -25,7 +25,7 @@ import Toolbox.CSAR_Subsets as SUB
 # input parameters
 #-------------------
 SubsetsParameters, ImageParameters, args, verbose = IP.InputSubsetParameters()
-
+print verbose
 #**********************************
 #
 #  Pre-processing step
@@ -47,13 +47,9 @@ if verbose:
 	print '| 	Read and Process SAR image		 |'
 	print '|------------------------------------------------|'
 coordinates, image, pixelresolution = IP.ReadSARImg(ImageParameters)
-print '>>>>>> TEST <<<<<<'
-print np.nanmean(image)
 FlagFlip = IP.CheckImageOrientation(coordinates)			# check whether preprocessing image flip process affects direction estimate
 data = CL.Subset(0, image, coordinates, pixelresolution, FlagFlip)	# store main data (image, coordinates) as list
-print np.nanmean(data.image)
-print data.image
-print '>>>>>> END <<<<<<<'
+
 if verbose:
 	print 'nb of pixels (x,y)', coordinates.easting.shape[0], coordinates.northing.shape[1]
 	print 'pixel resolution (m)', pixelresolution
@@ -102,12 +98,6 @@ for index, point in enumerate(Points):
 	# Subset definitions
 	#***********************
 	# point indices (related to image pixels)
-        print '>>> TEST 2 <<<<'
-        print index
-        print data.image
-        print np.nanmean(data.image)
-        print dir(point)
-        print '<<< END >>>'
 	Point = np.array([point.IndexEasting, point.IndexNorthing])
 	
 	# gather subset data	

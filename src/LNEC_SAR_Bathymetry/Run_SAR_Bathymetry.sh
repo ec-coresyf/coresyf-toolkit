@@ -15,7 +15,7 @@ echo ""
 #***********************
 # 1) Tiling
 #***********************
-SAR_Tiling/run -a Config_Image.ini -i test_data/Aveiro_20170131T183449_20170131T183514_004096_007148_CDB9_Sigma0_VV_processed.tif -b test_data/grid_EPSG_3763.zip -p contrast slant -d 2000 -w 9 -s 0.5 -T 16.6 -v
+SAR_Tiling/run -a Config_Image.ini -i test_data/Preprocessed_S1B_IW_GRDH_1SDV_20170131T183449_20170131T183514_004096_007148_CDB9_Band_VV.tif -b test_data/grid_EPSG_3763.zip -p contrast slant -d 2000 -w 9 -s 0.5 -T 16.6 -v
 
 ##*****************************************
 ## 2) Spectra estimate (parallel)
@@ -41,7 +41,6 @@ fun3 () {
 }
 for filename in Spectrum*.out; do fun3 "$filename" & done
 wait
-
 
 ##*****************************************
 ## 4) Depth Inversion (parallel)
