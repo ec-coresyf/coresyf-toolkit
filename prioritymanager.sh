@@ -48,9 +48,9 @@ priorityGdal () {
     gdalCount=$(pgrep -c gdal) #get the number of processes running of an application
     iterator=0
     
-    if [ "$snapCount" -gt 6 ]
+    if [ "$gdalCount" -gt 6 ]
     then
-        for n in $snapIds
+        for n in $gdalIds
         do
             if [ "$iterator" -gt 6 ]
             then
@@ -60,7 +60,7 @@ priorityGdal () {
             echo $iterator
         done
     else
-        for n in $snapIds
+        for n in $gdalIds
         do
             if [ "$iterator" -le 6 ]
             then
