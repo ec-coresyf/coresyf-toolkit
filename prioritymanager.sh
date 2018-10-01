@@ -7,18 +7,16 @@
 #* * * * * ( sleep 30 ; /home/coresyf/prioritymanager/prioritymanager.sh )
 
 
-#this function changes the priority of snap processes when they exceed 15 processes
-prioritySnap () {
+#this function changes the priority of snap(java) processes when they exceed 7 processes
+priority () {
 
-    snapIds=$(pgrep java)
-    gdalIds=$(pgrep gdal) #shows all processes by id of this app
-    snapCount=$(pgrep -c java) 
-    gdalCount=$(pgrep -c gdal) #get the number of processes running of an application
+    identifiers=$(pgrep $1) #shows all processes by id of this app
+    count=$(pgrep -c $1) #get the number of processes running of an application
     iterator=0
     
-    if [ "$snapCount" -gt 6 ]
+    if [ "$count" -gt 6 ]
     then
-        for n in $snapIds
+        for n in $identifiers
         do
             if [ "$iterator" -gt 6 ]
             then
@@ -28,39 +26,7 @@ prioritySnap () {
             echo $iterator
         done
     else
-        for n in $snapIds
-        do
-            if [ "$iterator" -le 6 ]
-            then
-                renice -n 0 -p $n
-            fi
-            iterator=$((iterator + 1))
-            echo $iterator
-        done    
-    fi    
-}
-
-priorityGdal () {
-
-    snapIds=$(pgrep snap)
-    gdalIds=$(pgrep gdal) #shows all processes by id of this app
-    snapCount=$(pgrep -c snap) 
-    gdalCount=$(pgrep -c gdal) #get the number of processes running of an application
-    iterator=0
-    
-    if [ "$gdalCount" -gt 6 ]
-    then
-        for n in $gdalIds
-        do
-            if [ "$iterator" -gt 6 ]
-            then
-                renice -n -12 -p $n
-            fi
-            iterator=$((iterator + 1))
-            echo $iterator
-        done
-    else
-        for n in $gdalIds
+        for n in $identifiers
         do
             if [ "$iterator" -le 6 ]
             then
@@ -73,5 +39,5 @@ priorityGdal () {
 }
 
 
-prioritySnap
-priorityGdal
+priority java
+priority gdal
