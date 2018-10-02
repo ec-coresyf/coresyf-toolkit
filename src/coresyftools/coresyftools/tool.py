@@ -143,10 +143,12 @@ class CoReSyFTool(object):
             if not archive.infolist():
                 self.arg_parser.arg_parser.error(
                     "Input zip file '{}' is empty.".format(file_name))
-            archive.extractall(TMP_DIR)
+            tmp_dir = TMP_DIR + '/' + os.path.basename(file_name).split('.')[0]
+            os.makedirs(tmp_dir)
+            archive.extractall(tmp_dir)
             archive.close()
-            extracted_files = [os.path.join(TMP_DIR, f)
-                               for f in os.listdir(TMP_DIR)]
+            extracted_files = [os.path.join(tmp_dir, f)
+                               for f in os.listdir(tmp_dir)]
         return extracted_files
 
     def _prepare_inputs_(self, arguments):

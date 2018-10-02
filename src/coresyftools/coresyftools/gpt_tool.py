@@ -61,8 +61,8 @@ class GPTCoReSyFTool(CoReSyFTool):
                 raise GPTGraphFileNotFound(graph_file)
 
     def run(self, bindings):
-        if len(self.arg_parser.inputs) > 1:
-            raise TooManyInputArgumentsException()
+        #if len(self.arg_parser.inputs) > 1:
+        #    raise TooManyInputArgumentsException()
         if len(self.arg_parser.outputs) > 1:
             raise TooManyOutputArgumentsException()
 
@@ -139,4 +139,4 @@ class GPTCoReSyFTool(CoReSyFTool):
             return source
 
     def _has_no_tif_extension(self, file_name):
-        return os.path.splitext(str(file_name))[-1] !=  '.' + self.TIF_EXT
+        return os.path.splitext(str(file_name))[-1] != '.' + self.TIF_EXT
