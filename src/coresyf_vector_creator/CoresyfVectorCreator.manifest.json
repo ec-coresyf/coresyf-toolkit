@@ -1,0 +1,45 @@
+{
+    "name": "CoresyfVectorCreator",
+    "type": "VectorCreator",
+    "description": 
+        "Tool that uses the GDAL OGR module to create shapefiles. Only the point geometry is supported",
+    "inputs": [
+        {
+            "identifier": "Ssource",
+            "name": "source",
+            "description": "Delimited text file with data fields separated by tab character",
+            "type": "CSV_file"
+        }
+    ],
+    "parameters": [
+        {
+            "identifier": "in_crs",
+            "name": "input_crs",
+            "description": "Spatial reference system EPSG code of the coordinates in the source data_file, some possible codes are: EPSG codes are '4326', '3857'  (default: '4326')",
+            "type": "string",
+            "default": "4326"
+        },
+        {
+            "identifier": "o_format",
+            "name": "output_format",
+            "description": "GDAL vector format for output file, some possible formats are:  'ESRI Shapefile', 'netCDF'  (default: 'ESRI Shapefile')",
+            "type": "string",
+            "default": "ESRI Shapefile"
+        },
+        {
+            "identifier": "o_crs",
+            "name": "output_crs",
+            "description": "Spatial reference system EPSG code of the output vector, some possible codes are: EPSG codes are '4326', '3857'  (default: '4326')",
+            "type": "string",
+            "default": "4326"
+        }
+    ],
+    "outputs": [   
+        {
+            "identifier": "Ttarget",
+            "name": "target",
+            "description": "Output vector file to be created (default: 'output_vector.shp')",
+            "type": "Vector"
+        }
+    ]
+}

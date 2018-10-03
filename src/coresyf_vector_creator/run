@@ -1,0 +1,10 @@
+#!/usr/bin/python2
+import sys
+sys.dont_write_bytecode = True
+
+from coresyf_vector_creator import CoresyfVectorCreator
+
+
+if __name__ == '__main__':
+    CoresyfVectorCreator(__file__,
+                         'CoresyfVectorCreator.manifest.json').execute()
