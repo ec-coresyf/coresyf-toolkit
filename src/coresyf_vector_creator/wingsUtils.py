@@ -27,7 +27,7 @@ The following cases were taken into account:
 
 ------------------------------------------------------------------------------
 @info
-Adapted from: no references 
+Adapted from: no references
 
 
 @version: v.1.0
@@ -50,10 +50,9 @@ TEMP_PATH_IN = os.path.abspath("temp_input") + "/"
 TEMP_PATH_OUT = os.path.abspath("temp_output") + "/"
 
 
-
-#============================================#
+# ============================================#
 # Funtions for preparing INPUT/OUTPUT data   #
-#============================================#
+# ============================================#
 
 def prepareInputData(input_path, extension="", temp_path=TEMP_PATH_IN):
     '''
@@ -66,33 +65,39 @@ def prepareInputData(input_path, extension="", temp_path=TEMP_PATH_IN):
     '''
     input_path = os.path.abspath(input_path)
     wasUnZipped = False
-    
+
     if zipfile.is_zipfile(input_path):   # input is a zipped file
         myzip = zipfile.ZipFile(input_path, 'r')
         if not myzip.infolist():
             raise ("Input Zip file '%s' is empty!" % input_path)
-        myzip.extractall( temp_path )
+        myzip.extractall(temp_path)
         myzip.close()
 
-        input_list = [os.path.join(temp_path, x) for x in os.listdir(temp_path) if x.endswith(extension)] # input file 
-        if input_list: 
+        input_list = [os.path.join(temp_path, x) for x in os.listdir(temp_path)
+                      if x.endswith(extension)]  # input file
+        if input_list:
             input_path = input_list[0]
             wasUnZipped = True
-    
+
     return input_path, wasUnZipped
 
 
 def prepareOutputData(output_path, temp_path=TEMP_PATH_OUT):
     '''
-    Prepare output data and return the output path to be ingested by Co-ReSyf tools.
-    @param[in] output_path -> output file path that was passed as a tool argument (Type: String)
-    @param[in] temp_path -> temporary path to be used for storing all output files (Type: String)
-    @return    output_path -> output path of the file to be ingested by the tool (Type: String)
-               output_zip -> path of the compressed file that will contain all output data (Type: String)
+    Prepare output data and return the output path to be ingested by Co-ReSyf
+    tools.
+    @param[in] output_path -> output file path that was passed as a tool
+                              argument (Type: String)
+    @param[in] temp_path -> temporary path to be used for storing all output
+                            files (Type: String)
+    @return    output_path -> output path of the file to be ingested by the
+                              tool (Type: String)
+               output_zip -> path of the compressed file that will contain all
+               output data (Type: String)
     '''
     output_path = os.path.abspath(output_path)
     output_zip = None
-    extension = os.path.splitext( output_path )[1]
+    extension = os.path.splitext(output_path)[1]
     if not extension or extension == ".zip": 
         if not os.path.exists(temp_path):
             os.makedirs(temp_path)
