@@ -29,7 +29,7 @@
       <outputImageScaleInDb>${outputImageScaleInDb}</outputImageScaleInDb>
       <createGammaBand>${createGammaBand}</createGammaBand>
       <createBetaBand>${createBetaBand}</createBetaBand>
-      <selectedPolarisations/>
+      <selectedPolarisations>${polarisations}</selectedPolarisations>
       <outputSigmaBand>${outputSigmaBand}</outputSigmaBand>
       <outputGammaBand>${PoutputGammaBand}</outputGammaBand>
       <outputBetaBand>${outputBetaBand}</outputBetaBand>
