@@ -13,25 +13,24 @@ def cli():
 
 
 def test_cli_parse_workdir(cli):
-    opts = cli.parse_args(['-w', '../'])
+    opts = cli.parse_args(['-w', './'])
     assert os.path.exists(opts.workdir)
 
 
 def test_cli_parse_reffile(cli):
-    opts = cli.parse_args(['-r', '__file__'])
+    opts = cli.parse_args(['-r', 'tests/data/isempty.tiff'])
     assert os.path.isfile(opts.reffile)
 
-'''
+
 def test_cli_parse_infile(cli):
-    opts = cli.parse_args(['-i', 'data/isempty.tiff'])
+    opts = cli.parse_args(['-i', 'tests/data/isempty.tiff'])
     assert os.path.isfile(opts.infile)
 
 
 def test_cli_parse_shapefile(cli):
-    opts = cli.parse_args(['p', 'data/isempty.tiff'])
+    opts = cli.parse_args(['-p', 'tests/data/isempty.tiff'])
     assert os.path.isfile(opts.pif)
 
-'''
 
 def test_cli_default_debug(cli):
     opts = cli.parse_args([])
