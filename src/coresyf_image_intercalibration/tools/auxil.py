@@ -8,7 +8,7 @@ from numpy.ctypeslib import ndpointer
 import argparse
 import platform
 import ctypes
-import os
+import os.path
 
 if platform.system() == 'Windows':
     lib = ctypes.cdll.LoadLibrary('prov_means.dll')

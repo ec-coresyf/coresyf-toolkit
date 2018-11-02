@@ -64,9 +64,9 @@ def main():
     return
 
 if __name__ == "__main__":
-
+   
     main()
-
+ 
     for handler in logger.handlers:
         handler.close()
         logger.removeFilter(handler)
