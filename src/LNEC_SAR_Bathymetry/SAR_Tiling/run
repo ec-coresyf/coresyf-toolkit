@@ -15,6 +15,8 @@ import os,sys,shutil
 #
 import numpy as np
 #
+import zipfile
+#
 import Toolbox.CSAR_Classes as CL
 import Toolbox.CSAR_Utilities as UT
 import Toolbox.CSAR_ImageProcessing as IP
@@ -81,7 +83,7 @@ if (not flagbathy) and (args.Tp == 0):
 #-------------------------
 # get subset dimensions
 #-------------------------
-dimension = SUB.GetBoxDim(SubsetsParameters, data)	
+dimension = SUB.GetBoxDim(SubsetsParameters, data)
 
 #---------------------------------------------------------------------------
 # parallelised and run the Spectrum/Inversion scripts for each point subset
@@ -104,11 +106,36 @@ for index, point in enumerate(Points):
 	Subsetparameters = CL.SubsetParameters(Point, SubsetsParameters.DomainDimension, SubsetsParameters.FlagPowerofTwo, SubsetsParameters.Shift, SubsetsParameters.BoxNb)
 	
 	# main subset
-        # subset = SUB.GetImageSubset(Subsetparameters, data, dimension)
+	# subset = SUB.GetImageSubset(Subsetparameters, data, dimension)
 
-        # computation subsets (5 or 9 boxes)
-        Subsets = SUB.GetFFTBoxes(Subsetparameters, data, dimension)
+	# computation subsets (5 or 9 boxes)
+	Subsets = SUB.GetFFTBoxes(Subsetparameters, data, dimension)
 	
 	# store data
-	UT.Create_Subset_TransferFile(index, SubsetsParameters, point, Subsets, args.output)
+	UT.Create_Subset_TransferFile(index, SubsetsParameters, point, Subsets)
+
+
+
+# Compressing point subsets - a zip file per process:
+n_processes = int(args.n_processes)
+n_points = Points.shape[0]
+
+if args.output and len(args.output) == n_processes:
+	output_list = args.output
+else:
+	output_list = [os.getcwd() + '/' + 'subsets' + str(n+1) + '.zip' for n in range(n_processes)]
+
+
+def my_func(n_processes, n_points, output_list):
+    n_points_per_process = n_points / n_processes
+    point_index = 1
+    for zip_filepath in output_list:
+        with zipfile.ZipFile(zip_filepath, 'w') as myzip:
+            while point_index <= n_points:
+                subset_file = 'subset' + str(point_index) + '.out'
+                myzip.write(subset_file)
+                point_index = point_index + 1
+                if point_index / n_points_per_process == 0:
+                    myzip.close()
+                    break
 

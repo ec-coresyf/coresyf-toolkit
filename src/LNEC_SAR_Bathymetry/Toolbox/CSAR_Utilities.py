@@ -132,7 +132,7 @@ def Create_Image_Parameters_TransferFile(Subsetparameters, ImageParameters, data
     #filename = path + 'parameters.out'
     #parameters.pickle(filename)
 
-def Create_Subset_TransferFile(index, parameters, point, SubsetData, outlist):
+def Create_Subset_TransferFile(index, parameters, point, SubsetData, outlist=None):
     #-----------------------------------------------------------------------
     # Create transfer file to save grid point subsets data and information
     #------------------------------------------------------------------------

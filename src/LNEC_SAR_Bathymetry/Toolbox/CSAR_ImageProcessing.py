@@ -73,7 +73,7 @@ def InputSubsetParameters():
 	#			http://spatialreference.org/ref/epsg/)', required=True)
 
 	#subscene
-	parser.add_argument('-o', '--output', nargs='+', help='List with output file names (subsets#.out) for FFT determination (to be used by Wings)', required=False)
+	parser.add_argument('-o', '--output', nargs='+', help='List with zipped output file names (subsets#.out) for FFT determination (to be used by Wings)', required=False)
 	parser.add_argument('-d', '--dimension', help='Dimension of the subscenes (meters, ideally 1000-2000m)', default=2000., required=False)
 	parser.add_argument('-w', '--window', help='number of overlapping boxes for FFT computation', default=9, required=False)
 	parser.add_argument('-s', '--shift', help='Overlapping boxes offset parameters for FFT computation. Values between (0.1-0.75). Default=0.5.',default=0.5, required=False)
@@ -83,6 +83,9 @@ def InputSubsetParameters():
 
 	#comments
 	parser.add_argument('-v','--verbose', help="comments and screen outputs", action="store_true")
+
+	# number of parallel processes
+	parser.add_argument('-n', '--n_processes', help='Number of parallel processes. Default=3.', default=3, required=False)
 
 	# store
 	args = parser.parse_args()
