@@ -1,11 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-class IRMAD(object):
-    """IR-MAD Iteratively Re-weighted Multivariate Alteration Detection."""
+import auxil as auxil 
+import numpy as np    
+from scipy import linalg, stats 
+from osgeo import gdal
+from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
+import os, sys,time
 
-    def __init__(self):
-        """The constructor for the IR-MAD class."""
 
-        pass
 
+
+
+def main():
+    pass
+
+
+if __name__ == "__main__":
+   
+    main()

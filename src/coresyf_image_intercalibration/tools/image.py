@@ -22,7 +22,7 @@ def write_raster(outfile, array, transform, projection, driver='GTiff'):
     ds.SetProjection(projection)
     ds = None
 
-def read_raster(infile)
+def read_raster(infile):
     ds = open_raster(infile)
     meta = get_metadata(ds)
     # TODO add read array and unit test
@@ -32,7 +32,7 @@ def open_raster(infile):
     try:
         ds = gdal.Open(infile, gdal.GA_ReadOnly)
     except RuntimeError, e:
-        print('Unable to open %s' % path)
+        print('Unable to open %s' % infile)
         print e
         sys.exit(1)
     return ds

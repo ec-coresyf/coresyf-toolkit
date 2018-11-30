@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """ Utility functions / classes for image intercalibration tool
 
+    Provisional Means Class / library from Mort Canty CRCPython
 """
 import numpy as np
 from numpy.ctypeslib import ndpointer
@@ -70,3 +71,34 @@ def is_valid_file(parser, filename):
     else:
         return filename
 
+
+#=============================#
+# Provisional Means Algorithm #
+#=============================#
+
+class Cpm(object):
+    '''Provisional means algorithm'''
+    def __init__(self,N):
+        self.mn = np.zeros(N)
+        self.cov = np.zeros((N,N))
+        self.sw = 0.0000001
+         
+    def update(self,Xs,Ws=None):
+        n,N = np.shape(Xs)       
+        if Ws is None:
+            Ws = np.ones(n)
+        sw = ctypes.c_double(self.sw)        
+        mn = self.mn
+        cov = self.cov
+        provmeans(Xs,Ws,N,n,ctypes.byref(sw),mn,cov)
+        self.sw = sw.value
+        self.mn = mn
+        self.cov = cov
+          
+    def covariance(self):
+        c = np.mat(self.cov/(self.sw-1.0))
+        d = np.diag(np.diag(c))
+        return c + c.T - d
+    
+    def means(self):
+        return self.mn 
