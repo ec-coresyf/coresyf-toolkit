@@ -22,11 +22,6 @@ def write_raster(outfile, array, transform, projection, driver='GTiff'):
     ds.SetProjection(projection)
     ds = None
 
-def read_raster(infile):
-    ds = open_raster(infile)
-    meta = get_metadata(ds)
-    # TODO add read array and unit test
-
 
 def open_raster(infile):
     try:

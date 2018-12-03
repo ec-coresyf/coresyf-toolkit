@@ -45,9 +45,10 @@ def create_parser():
     parser.add_argument('-i', '--infile',
                         help="Filename of the raster image to be corrected",
                         metavar='FILE', type=lambda x: is_valid_file(parser, x))
-    parser.add_argument('-p', '--pif',
+    parser.add_argument('-s', '--shp',
                         help="Filename of shapefile defining PIFs",
                         metavar='FILE', type=lambda x: is_valid_file(parser, x))
+    parser.add_argument('-b', '--bands',)
     parser.add_argument('--debug', default=False, action='store_true',
                         help="Provide debugging information")
     parser.add_argument('-t', '--type', default='irmad', type=str,
@@ -71,6 +72,9 @@ def is_valid_file(parser, filename):
     else:
         return filename
 
+
+def sanity_check(opts):
+    return True
 
 #=============================#
 # Provisional Means Algorithm #

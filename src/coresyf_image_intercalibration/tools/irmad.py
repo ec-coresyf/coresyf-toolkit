@@ -8,7 +8,7 @@ from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
 import os, sys,time
 
-
+gdal.AllRegister()
 
 
 

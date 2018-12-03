@@ -51,6 +51,7 @@ def do_histogram_match(opts):
 def main():
     parser = create_parser()
     opts = parser.parse_args()
+    sanity_check(opts)
     if opts.debug:
         logger.setLevel(logging.DEBUG)
     if opts.type == 'irmad':

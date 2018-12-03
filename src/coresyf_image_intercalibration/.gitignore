@@ -1,1 +1,3 @@
 *.log
+tests/data/ref_merge.img
+tests/data/tar_merge.img

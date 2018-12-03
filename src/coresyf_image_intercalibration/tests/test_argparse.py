@@ -3,6 +3,7 @@
 """Unit tests for intercal argument parsing"""
 
 from tools.auxil import create_parser
+from tools.auxil import sanity_check
 import os
 import pytest
 
@@ -28,8 +29,8 @@ def test_cli_parse_infile(cli):
 
 
 def test_cli_parse_shapefile(cli):
-    opts = cli.parse_args(['-p', 'tests/data/isempty.tiff'])
-    assert os.path.isfile(opts.pif)
+    opts = cli.parse_args(['-s', 'tests/data/isempty.tiff'])
+    assert os.path.isfile(opts.shp)
 
 
 def test_cli_default_debug(cli):
@@ -58,7 +59,7 @@ def test_cli_infile_notexist(cli):
 
 def test_cli_shapefile_notexist(cli):
     with pytest.raises(SystemExit):
-        cli.parse_args(['-p', 'notexist'])
+        cli.parse_args(['-s', 'notexist'])
 
 
 def test_cli_type_notexist(cli):
@@ -69,3 +70,8 @@ def test_cli_type_notexist(cli):
 def test_cli_debug_is_set(cli):
     opts = cli.parse_args(['--debug'])
     assert opts.debug is True
+
+def test_sanity_irmad(cli):
+	opts = cli.parse_args(['-r', 'tests/data/ref_merge.img',
+						   '-i', 'tests/data/tar_merge.img'])
+	assert sanity_check(opts) is True
