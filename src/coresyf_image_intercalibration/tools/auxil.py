@@ -48,12 +48,16 @@ def create_parser():
     parser.add_argument('-s', '--shp',
                         help="Filename of shapefile defining PIFs",
                         metavar='FILE', type=lambda x: is_valid_file(parser, x))
-    parser.add_argument('-b', '--bands',)
+    parser.add_argument('-b', '--bands',
+                        help="Bands to be corrected e.g. -b 2 3 4",
+                        nargs='+', type='int', dest='list', default=[ 1 ])
+    parser.add_argument('-t', '--type', 
+                        help="Type of calibration - '[irmad]','match','pif'"
+                        choices=['irmad', 'match', 'pif'],
+                        default='irmad', type=str)
     parser.add_argument('--debug', default=False, action='store_true',
                         help="Provide debugging information")
-    parser.add_argument('-t', '--type', default='irmad', type=str,
-                        choices=['irmad', 'match', 'pif'],
-                        help="Type of calibration - '[irmad]','match','pif'")
+    
     return parser
 
 
