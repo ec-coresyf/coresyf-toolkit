@@ -53,8 +53,6 @@ def main():
     opts = parser.parse_args()
     
     print opts
-    if opts.workdir:
-        os.chdir(opts.workdir)
 
     if opts.debug:
         logger.setLevel(logging.DEBUG)
