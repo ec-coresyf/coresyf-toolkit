@@ -49,10 +49,10 @@ def create_parser():
                         help="Filename of shapefile defining PIFs",
                         metavar='FILE', type=lambda x: is_valid_file(parser, x))
     parser.add_argument('-b', '--bands',
-                        help="Bands to be corrected e.g. -b 2 3 4",
-                        nargs='+', type='int', dest='list', default=[ 1 ])
+                        help="Bands to be corrected e.g. -b 2 3 4, default band 1",
+                        nargs='*', type=int, default=[])
     parser.add_argument('-t', '--type', 
-                        help="Type of calibration - '[irmad]','match','pif'"
+                        help="Type of calibration - '[irmad]','match','pif'",
                         choices=['irmad', 'match', 'pif'],
                         default='irmad', type=str)
     parser.add_argument('--debug', default=False, action='store_true',
@@ -78,6 +78,18 @@ def is_valid_file(parser, filename):
 
 
 def sanity_check(opts):
+    ref_ds = open_raster(os.path.join(opts.workdir, reffile))
+        if ref_ds is not None:
+            cols_ref = ref_ds.RasterXSize
+            rows_ref = ref_ds.Raster.YSize
+            bands_ref = ref_ds.RasterCount
+    in_ds = open_raster(os.path.join(opts.workdir, infile))
+        if in_ds is not None:
+            cols_in = in_ds.RasterXSize
+            rows_in = in_ds.Raster.YSize
+            bands_in = in_ds.RasterCount
+    if (rows_ref != rows_in) or (cols_ref != cols_in):
+        return False
     return True
 
 #=============================#
