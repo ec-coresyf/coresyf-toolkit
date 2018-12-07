@@ -3,7 +3,6 @@
 """Unit tests for intercal argument parsing"""
 
 from tools.auxil import create_parser
-from tools.auxil import sanity_check
 import os
 import pytest
 
@@ -80,9 +79,3 @@ def test_cli_band_4_args(cli):
 	opts = cli.parse_args(['--bands','2','3','4','8'])
 	assert opts.bands == [2, 3, 4, 8]	
 
-def test_sanity_check_is_true(cli):
-	opts = cli.parse_args(['-w', 'tests/data/',
-						   '-r', 'ref_merge.img',
-						   '-i', 'tar_merge.img',
-						   '-b', '1','2','3','4'])
-	assert sanity_check(opts) is True
