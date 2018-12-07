@@ -6,7 +6,7 @@
 """
 import numpy as np
 from numpy.ctypeslib import ndpointer
-from scipy.special import betainc
+from betaincder import betainc
 import math
 import argparse
 import platform

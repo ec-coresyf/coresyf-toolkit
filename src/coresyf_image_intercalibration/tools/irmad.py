@@ -18,7 +18,8 @@
 import tools.auxil as auxil
 import tools.image as img
 import numpy as np    
-from scipy import linalg, stats 
+from scipy import linalg, stats
+from scipy.special import betainc
 from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
 import os, sys, time
