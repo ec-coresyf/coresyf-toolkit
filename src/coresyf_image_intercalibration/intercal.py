@@ -12,9 +12,9 @@ of the image to be corrected with the reference image.
     - Note that both raster images must have the same dimensions.
 """
 
-import tools.irmad as mad
-import tools.image as img
-import tools.auxil as aux
+from tools.irmad import radcal
+import tools.image
+import tools.auxil
 from tools.auxil import create_parser
 import os, sys, logging
 
@@ -29,14 +29,17 @@ logger.addHandler(fh)
 
 def do_irmad_radcal(opts):
     # driver for the IR-MAD radcal agorithm
-    logger.info("Performing IR-MAD radcal")
-    # TODO: Add code
-    pass
+    logger.info("Performing IR-MAD Normalization")
+    print("Performing IR-MAD Normalization")
+    radcal(opts)
+    logger.info("Completed IR-MAD PIF calibration")
+    print("Completed IR-MAD PIF calibration")
     return
 
 def do_interp_pifs(opts):
     # driver for the point PIF interpolation algorithm
-    logger.info("Performing PIF interpolation")
+    logger.info("Performing PIF interpolation using shapefile")
+    print("Performing PIF interpolation using shapefile")
     # TODO: Add code
     pass
     return
@@ -44,6 +47,7 @@ def do_interp_pifs(opts):
 def do_histogram_match(opts):
     # driver for the histogram matching algorithm
     logger.info("Performing histogram matching")
+    print("Performing histogram matching")
     # TODO: Add code
     pass
     return
@@ -52,8 +56,6 @@ def main():
     parser = create_parser()
     opts = parser.parse_args()
     
-    print opts
-
     if opts.debug:
         logger.setLevel(logging.DEBUG)
     if opts.type == 'irmad':

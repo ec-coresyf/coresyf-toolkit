@@ -1,0 +1,74 @@
+{
+    "name": "coresyf_image_intercalibration",
+    "type": "ImageProc",
+    "description": "CoReSyF tool to perform relative radiometric calibration." ,
+    "inputs": 
+    [ 
+        {
+            "identifier": "Sreffile",
+            "name": "reffile",
+            "description": "Sets reference image to <filepath>",
+            "type": "Raster" 
+        },
+        { 
+            "identifier": "Sinfile",
+            "name": "infile",
+            "description": "Sets target image to <filepath>",
+            "type": "Raster"
+        },
+        { 
+            "identifier": "Sfsfile",
+            "name": "fsfile",
+            "description": "Sets full scene image to <filepath>",
+            "type": "Raster"
+        }
+    ],
+    "parameters": 
+    [
+        {
+            "identifier": "Pformat",
+            "name": "format",
+            "description": "Image format for output",
+            "type": "str",
+            "default": "GDiff"
+        },
+        {
+            "identifier": "Pshp",
+            "name": "shp",
+            "description": "User provided shape file of PIFs",
+            "type": "str",
+        },
+        {
+            "identifier": "Pbands",
+            "name": "bands",
+            "description": "Image bands to be corrected",
+            "type": "int",
+            "default": "1"
+        },
+        {
+            "identifier": "Pncp",
+            "name": "ncp",
+            "description": "No change threshold",
+            "type": "float",
+            "default": "0.95"
+        },
+        {
+            "identifier": "Pdebug",
+            "name": "debug",
+            "description": "Set debug mode",
+            "type": "bool",
+            "default": "False"
+        }
+    ],
+    "outputs": 
+    [
+        {
+            "identifier": "Tworkdir",
+            "name": "workdir",
+            "description": "Directory for output",
+            "type": "str",
+            "default": "./"
+        }
+    ],
+    "command": "intercal.p -w Tworkdir -r Sreffile -i Sinfile -b 1 2 3 4"
+}

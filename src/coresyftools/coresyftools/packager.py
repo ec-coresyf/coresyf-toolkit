@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python
 from os import listdir
 from os.path import join, exists
 from zipfile import ZipFile
