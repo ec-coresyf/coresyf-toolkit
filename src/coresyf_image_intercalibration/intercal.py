@@ -28,7 +28,7 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 def do_irmad_radcal(opts):
-    # driver for the IR-MAD radcal agorithm
+    # driver for the IR-MAD radcal algorithm
     logger.info("Performing IR-MAD radiometric normalization")
     irmad(opts)
     radcal(opts)
