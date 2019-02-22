@@ -6,7 +6,7 @@
 """
 import numpy as np
 from numpy.ctypeslib import ndpointer
-# from betaincder import betainc
+from scipy.special import betainc
 import math
 import argparse
 import platform
@@ -182,9 +182,7 @@ def fv_test(x0,x1):
         f = v1/v0
         df0 = nx1-1
         df1 = nx0-1
-    # prob = 2.0*betainc(0.5*df1,0.5*df0,df1/(df1+df0*f))
-    # TODO: source betainc
-    prob = 1
+    prob = 2.0*betainc(0.5*df1,0.5*df0,df1/(df1+df0*f))
     if prob >1:
         return (f,2.0-prob)
     else:

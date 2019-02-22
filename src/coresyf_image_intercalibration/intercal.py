@@ -12,28 +12,27 @@ of the image to be corrected with the reference image.
     - Note that both raster images must have the same dimensions.
 """
 
-from tools.irmad import radcal
+from tools.irmad import irmad
+from tools.radcal import radcal
 import tools.image
 import tools.auxil
 from tools.auxil import create_parser
 import os, sys, logging
 
 # create logger singleton
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('intercal')
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(levelname)s:%(asctime)s - %(message)s', '%d-%m-%Y %H:%M:%S')
 fh = logging.FileHandler('intercal.log', 'w')
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 
-
 def do_irmad_radcal(opts):
     # driver for the IR-MAD radcal agorithm
-    logger.info("Performing IR-MAD Normalization")
-    print("Performing IR-MAD Normalization")
+    logger.info("Performing IR-MAD radiometric normalization")
+    irmad(opts)
     radcal(opts)
-    logger.info("Completed IR-MAD PIF calibration")
-    print("Completed IR-MAD PIF calibration")
+    logger.info("Completed IR-MAD radiometric normalisation")
     return
 
 def do_interp_pifs(opts):
