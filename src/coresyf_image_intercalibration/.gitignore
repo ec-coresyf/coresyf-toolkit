@@ -1,2 +1,7 @@
 *.log
-data
+demo/pif_reference.tif
+demo/cal_target.tif*.ipynb
+.DS_Store
+.ipynb_checkpoints/
+.pytest_cache/
+.vscode/
