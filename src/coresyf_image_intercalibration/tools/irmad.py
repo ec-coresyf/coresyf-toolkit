@@ -14,6 +14,17 @@
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
+'''
+@summary:
+This module performs IR-MAD change detection for all bands in two input raster files
+and outputs a PIF (pseudo invariant feature) file for input into the RADCAL modile
+
+@info:
+Adapted from https://github.com/mortcanty/CRCPython/blob/master/src/CHAPTER9/iMad.py
+
+Morton J. Canty (2014) Image Analysis, Classification and Change Detection in Remote
+Sensing. Third Edition.
+'''
 
 import tools.auxil as auxil
 import tools.image as img
@@ -22,7 +33,6 @@ from scipy import linalg, stats
 from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
 import os, sys, time
-import matplotlib.pyplot as plt
 import logging
 
 gdal.AllRegister()
@@ -66,7 +76,7 @@ def irmad(opts):
     # TODO Allow selection of pif identifcation area
     x10 = y10 = x20 = y20 = 0
 
-    logger.info('delta             [canonical correlations]')
+    logger.info('delta                    [canonical correlations]')
  
     # iteration of MAD
     cpm = auxil.Cpm(2*bands)    
@@ -142,7 +152,7 @@ def irmad(opts):
         rho=mu*(1-penalty)/np.sqrt( (1-penalty*a2)*(1-penalty*b2) )
         # stopping criterion
         delta = max(abs(rho-oldrho))
-        logger.info('%-17s %10s', delta, rho)
+        logger.info('%-25s %10s', delta, rho)
         oldrho = rho  
         # tile the sigmas and means             
         sigMADs = np.tile(sigma,(cols,1)) 

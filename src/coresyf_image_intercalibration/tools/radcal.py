@@ -13,6 +13,17 @@
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
+'''
+@summary:
+This module performs Relative Radiative Normalization of a target image against a
+reference image based on a pseudo invariant feature (PIF) file created by irmad.py
+
+@info:
+Adapted from https://github.com/mortcanty/CRCPython/blob/master/src/CHAPTER9/radcal.py
+
+Morton J. Canty (2014) Image Analysis, Classification and Change Detection in Remote
+Sensing. Third Edition.
+'''
 
 import tools.auxil as auxil
 import os, sys, time
@@ -21,7 +32,7 @@ import numpy as np
 from scipy import stats
 from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly, GDT_Float32
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt 
 import logging
 
 gdal.AllRegister()
@@ -121,7 +132,7 @@ def radcal(opts):
         outBand = outDataset.GetRasterBand(i)
         outBand.WriteArray(np.resize(a+b*y,(rows,cols)),0,0) 
         outBand.FlushCache()
-        if opts.debug:
+        """ if opts.debug:
             if i <= 10:
                 plt.figure(i)    
                 ymax = max(y[idx]) 
@@ -130,8 +141,8 @@ def radcal(opts):
                 plt.axis([0,ymax,0,xmax])
                 plt.title('Band '+str(k))
                 plt.xlabel('Target')
-                plt.ylabel('Reference')        
-            i += 1
+                plt.ylabel('Reference') """        
+        i += 1
     outDataset = None
     logger.info('Wrote calibrated image: %s', outfile)
             
@@ -164,8 +175,8 @@ def radcal(opts):
         outDataset = None
         logger.info('Wrote calibrated image: %s', fsoutfile)
     
-    if opts.debug:
-        plt.show()
+    """if opts.debug:
+        plt.show()"""
     
     inDataset1 = None
     inDataset2 = None
