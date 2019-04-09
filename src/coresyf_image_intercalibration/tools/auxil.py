@@ -60,8 +60,8 @@ def create_parser():
                         help="Bands to be corrected e.g. -b 2 3 4, default band 1",
                         nargs='*', type=int, default=[])
     parser.add_argument('-t', '--type', 
-                        help="Type of calibration - '[irmad]','match','pif'",
-                        choices=['irmad', 'match', 'pif'],
+                        help="Type of calibration - '[irmad]','match'",
+                        choices=['irmad', 'match'],
                         default='irmad', type=str)
     parser.add_argument('-n', '--ncp',
                         help="No change threshold. Default 0.95",
@@ -187,3 +187,14 @@ def fv_test(x0,x1):
         return (f,2.0-prob)
     else:
         return (f,prob) 
+
+#======================================================#
+# Convenience function for computing the empirical CDF #
+#======================================================#
+
+def ecdf(x):
+    """convenience function for computing the empirical CDF"""
+    vals, counts = np.unique(x, return_counts=True)
+    ecdf = np.cumsum(counts).astype(np.float64)
+    ecdf /= ecdf[-1]
+    return vals, ecdf

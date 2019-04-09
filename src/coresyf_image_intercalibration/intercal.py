@@ -14,6 +14,7 @@ of the image to be corrected with the reference image.
 
 from tools.irmad import irmad
 from tools.radcal import radcal
+from tools.hmatch import hmatch
 import tools.image
 import tools.auxil
 from tools.auxil import create_parser
@@ -35,20 +36,10 @@ def do_irmad_radcal(opts):
     logger.info("Completed IR-MAD radiometric normalisation")
     return
 
-def do_interp_pifs(opts):
-    # driver for the point PIF interpolation algorithm
-    logger.info("Performing PIF interpolation using shapefile")
-    print("Performing PIF interpolation using shapefile")
-    # TODO: Add code
-    pass
-    return
-
 def do_histogram_match(opts):
     # driver for the histogram matching algorithm
     logger.info("Performing histogram matching")
-    print("Performing histogram matching")
-    # TODO: Add code
-    pass
+    hmatch(opts)
     return
 
 def main():
@@ -61,8 +52,6 @@ def main():
         do_irmad_radcal(opts)    
     elif opts.type == 'match':
         do_histogram_match(opts)
-    elif opts.type == 'pif':
-        do_interp_pifs(opts)
     else:
         parser.error('The type method is not implemented')
     return

@@ -18,6 +18,7 @@ illumination or atmospheric conditions
 Description https://en.wikipedia.org/wiki/Histogram_matching
 '''
 
+import tools.auxil as auxil
 import tools.image as img
 import os, sys
 import numpy as np
@@ -55,49 +56,64 @@ def hmatch(opts):
     cols = col1
     rows = row1
 
-    x10 = y10 = x20 = y20 = 0
-
     # output image file
     outfile = os.path.join(opts.workdir, \
         "cal_"+os.path.basename(os.path.splitext(opts.infile)[0]+".tif"))
 
     driver = gdal.GetDriverByName(opts.format)    
     outDataset = driver.Create(outfile,cols,rows,bands,GDT_Float32) 
-    projection = inDataset1.GetProjection()
-    geotransform = inDataset1.GetGeoTransform()
-    if geotransform is not None:
-        gt = list(geotransform)
-        gt[0] = gt[0] + x10*gt[1]
-        gt[3] = gt[3] + y10*gt[5]
-        outDataset.SetGeoTransform(tuple(gt))
-    if projection is not None:
-        outDataset.SetProjection(projection) 
+    outDataset.SetProjection(inDataset1.GetProjection())
+    outDataset.SetGeoTransform(inDataset1.GetGeoTransform())
     i = 1
+
     # process image
     for band in pos:
-        refband = inDataset1.GetRasterBand(band).ReadAsArray(x10,y10,cols,rows).astype(float).ravel()
-        inpband = inDataset2.GetRasterBand(band).ReadAsArray(x20,y20,cols,rows).astype(float).ravel() 
-        gray_levels = 256*256
-        refhist, refbin_edges = np.histogram(refband, bins=gray_levels)
-        inphist, inpbin_edges = np.histogram(inpband, bins=gray_levels)
-        refcdf = np.cumsum(refhist)
-        inpcdf = np.cumsum(inphist)
+        refband = inDataset1.GetRasterBand(band).ReadAsArray().astype(float)
+        refband = refband.ravel()
+        inpband = inDataset2.GetRasterBand(band).ReadAsArray().astype(float)
+        inpband = inpband.ravel()
 
-        outband = np.zeros(len(inpband))
-        for i in range(len(inpband)):
-            index = np.searchsorted(refcdf,[inpcdf[inpband[i]]])
-            outband[i] = index[0]
+        # get set of unique pixel values and corresponding index and counts
+        _, bin_idx, i_counts = np.unique(inpband, return_inverse=True, return_counts=True)
+        r_values, r_counts = np.unique(refband, return_counts=True)
 
-        outDataset.GetRasterband(i).WriteArray(outband.reshape((cols,rows)))
+        # take the cumsum and normalize by the numver of pixels to get the
+        # empirical cumulative distribution funciton for the reference and
+        # input (maps pixel values --> quantile)
+        r_quantiles = np.cumsum(r_counts).astype(np.float64)
+        r_quantiles /= r_quantiles[-1]
+        i_quantiles = np.cumsum(i_counts).astype(np.float64)
+        i_quantiles /= i_quantiles[-1]
+
+        # interpolate linearly to find the pixel values in the input image
+        # that correspond most closely to the quantities in the reference
+        interp_r_values = np.interp(i_quantiles, r_quantiles, r_values)
+        corrected = interp_r_values[bin_idx]
+
+        outband = outDataset.GetRasterBand(i)
+        outband.WriteArray(np.resize(corrected,(rows,cols)),0,0)
+
+        """ if opts.debug:
+            plt.figure(i)
+            x1, y1 = auxil.ecdf(refband)
+            x2, y2 = auxil.ecdf(inpband)
+            x3, y3 = auxil.ecdf(corrected)
+            plt.plot(x1, y1 * 100, '-r', lw=3, label='Reference')
+            plt.plot(x2, y2 * 100, '-k', lw=3, label='Input')
+            plt.plot(x3, y3 * 100, '--r', lw=3, label='Corrected')
+            plt.xlabel('Pixel value')
+            plt.ylabel('Cumulative %')
+            plt.legend(loc=5) """
+
         outband.FlushCache()
-
-        refbin_edges = inpbin_edges
-        inpbin_edges = refbin_edges
-
-    # TODO  Output bands here
+        corrected = None
+        i += 1
 
     outDataset = None
     logger.info('Wrote calibrated image: %s', outfile)
+
+    """ if opts.debug:
+            plt.show() """
 
     inDataset1 = None
     inDataset2 = None

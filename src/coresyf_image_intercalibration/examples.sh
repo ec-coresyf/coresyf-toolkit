@@ -11,3 +11,9 @@ pytest -v
 # statistics written into intercal.log
 # all output files overwritten if commanbd re-run
 ./intercal.py -w demo -r tests/data/reference.img -i tests/data/target.img -b 1 2 3 4
+
+# Performs histogram matching of a target image to a
+#  reference image i.e. apply a transformation of the target
+#  image so that the histogram matches the histogram of the
+#  reference image.
+/intercal.py -w demo -r tests/data/reference.img -i tests/data/target.img -b 1 2 3 4 -t match
